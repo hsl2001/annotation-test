@@ -1,23 +1,9 @@
-"""단순화된 유전자 구조 예측 PoC.
-
-파이프라인
-  1) Y  GFF3 + FASTA → strand별 6종 경계점 라벨 (p_U5, m_U5, ...)
-  2) X  FASTA → 6종 복소수 염기 매핑
-  3) X  각 매핑을 period-2 Morlet 커널 하나로 컨볼루션 → (6, L)
-  4) 학습  X, Y를 model에 투입 (model은 TODO 자리)
-  5) 예측  사이트 호출 → DP 조립 → GFF3
-          (spliced CDS가 긴 순 top 5, 가장 긴 CDS 전사물과 50% 이상 겹치는 것만)
-
-사용
-  uv run poc.py --fasta genome.fasta --annotation annotation.gff3 --gff out.gff3
-"""
 from __future__ import annotations
 
 import argparse
 import gzip
 import itertools
 import math
-import time
 from bisect import bisect_left, bisect_right
 from collections import defaultdict
 from dataclasses import dataclass
@@ -26,22 +12,32 @@ from itertools import pairwise
 import numpy as np
 from numpy.typing import NDArray
 
-# ============================================================== 1. 상수 정의
+from model import Model
+
 SITES = ("U5", "GS", "IS", "IE", "GE", "U3")
 STRANDS = ("+", "-")
 
-# strand별 Y 행 순서: p_U5, p_GS, p_IS, p_IE, p_GE, p_U3 / m_U5, ...
 STRAND_LABELS = {
     "+": tuple(f"p_{site}" for site in SITES),
     "-": tuple(f"m_{site}" for site in SITES),
 }
 
-PERIOD = 2.0  # 사용하는 커널은 period-2 Morlet 하나뿐
+PERIOD = 2.0
 W0 = 6.0
 MORLET_LIMIT = 8.0
 
 TOP = 5
 MIN_OVERLAP = 0.5
+BUDGET_FACTOR = 50
+MAX_BUDGET = 2_000
+MAX_PATHS = 5
+INTRON_PENALTY = 4.0
+START_CODON = np.array([0, 3, 2], dtype=np.uint8)
+STOP_CODONS = (
+    np.array([3, 0, 0], dtype=np.uint8),
+    np.array([3, 0, 2], dtype=np.uint8),
+    np.array([3, 2, 0], dtype=np.uint8),
+)
 
 NODES = np.array(
     [
@@ -73,20 +69,15 @@ for _code, _value in zip(b"ACGTacgt", (0, 1, 2, 3, 0, 1, 2, 3)):
     LUT[_code] = _value
 COMPLEMENT = np.array([3, 2, 1, 0, 4], dtype=np.uint8)
 
-# 6종 복소수 매핑: A=1로 고정하고 (C, G, T)를 (i, -1, -i)의 순열로 할당한다.
-# 4개 염기를 4차 단위근에 대응시키는 24개 전단사 중 전역 회전을 제거한 6가지다.
-# (기존 BASE 매핑은 이 중 하나를 전역 회전한 것과 같다.)
 ROOTS = np.array([1.0, 1.0j, -1.0, -1.0j], dtype=np.complex128)
 MAPPINGS = np.zeros((5, 6), dtype=np.complex128)
 for _column, _permutation in enumerate(itertools.permutations((1, 2, 3))):
-    MAPPINGS[0, _column] = ROOTS[0]  # A
-    MAPPINGS[1, _column] = ROOTS[_permutation[0]]  # C
-    MAPPINGS[2, _column] = ROOTS[_permutation[1]]  # G
-    MAPPINGS[3, _column] = ROOTS[_permutation[2]]  # T
-# MAPPINGS[4] = 0 for N
+    MAPPINGS[0, _column] = ROOTS[0]
+    MAPPINGS[1, _column] = ROOTS[_permutation[0]]
+    MAPPINGS[2, _column] = ROOTS[_permutation[1]]
+    MAPPINGS[3, _column] = ROOTS[_permutation[2]]
 
 
-# ========================================================== 2. 데이터 준비
 def open_text(path: str):
     return gzip.open(path, "rt") if path.endswith(".gz") else open(path, "rt")
 
@@ -175,7 +166,6 @@ def oriented(sequence: NDArray[np.uint8], strand: str) -> NDArray[np.uint8]:
 def site_labels(
     transcripts: list[Transcript], lengths: dict[str, int]
 ) -> dict[tuple[str, str, str], NDArray[np.int64]]:
-    """(seqid, strand, site) → 정방향(oriented) 좌표의 경계점들."""
     points: dict[tuple[str, str, str], set[int]] = defaultdict(set)
     for transcript in transcripts:
         length = lengths.get(transcript.seqid, 0)
@@ -214,7 +204,6 @@ def label_matrix(
     strand: str,
     length: int,
 ) -> NDArray[np.bool_]:
-    """(6, L) 이진 라벨. 행 순서는 STRAND_LABELS[strand]와 같다."""
     out = np.zeros((len(SITES), length), dtype=np.bool_)
     for row, label in enumerate(STRAND_LABELS[strand]):
         positions = labels.get((name, strand, label[2:]))
@@ -260,19 +249,17 @@ def derive_limits(transcripts: list[Transcript], lengths: dict[str, int]) -> Lim
     if not introns or not spans or not exons:
         raise SystemExit("annotation lacks the intervals needed to derive limits")
     return Limits(
-        min_exon=min(exons),
-        min_intron=min(introns),
-        min_coding=min(spans),
-        min_transcript=min(utrs) if utrs else min(spans),
-        max_intron=max(introns),
-        max_span=max(spans),
-        max_utr=max(utrs) if utrs else max(spans),
+        min_exon=min(min(exons), 3),
+        min_intron=min(min(introns), 10),
+        min_coding=min(min(spans), 30),
+        min_transcript=min(min(utrs) if utrs else min(spans), 30),
+        max_intron=max(max(introns) * 3, 10_000),
+        max_span=max(max(spans) * 3, 20_000),
+        max_utr=max(max(utrs) * 3, 20_000) if utrs else max(max(spans) * 3, 20_000),
     )
 
 
-# ====================================================== 3. X: 복소수 매핑 + 커널
 def build_kernel(dilation: float, w0: float = W0) -> NDArray[np.complex128]:
-    """Morlet 웨이블릿을 염기 단위로 적분한 커널."""
     radius = math.ceil(MORLET_LIMIT * dilation + 0.5)
     width = 2 * radius + 1
     kernel = np.zeros(width, dtype=np.complex128)
@@ -310,62 +297,77 @@ def morlet_integral(lower: float, upper: float, w0: float = W0) -> complex:
     return norm * integral
 
 
-KERNEL = build_kernel(PERIOD)
+MORLET = build_kernel(PERIOD)
 
 
 def features(codes: NDArray[np.uint8]) -> NDArray[np.float32]:
-    """(6, L) 실수 특징. 각 복소수 매핑을 period-2 커널로 컨볼루션한 에너지."""
-    n = len(codes)
-    width = len(KERNEL)
-    fft_size = 1 << (n + width - 1).bit_length()
-    kernel_spectrum = np.fft.fft(KERNEL[::-1], fft_size)
-    out = np.empty((MAPPINGS.shape[1], n), dtype=np.float32)
-    for index in range(MAPPINGS.shape[1]):
-        signal = MAPPINGS[codes, index]
-        spectrum = np.fft.fft(signal, fft_size) * kernel_spectrum
-        coefficients = np.fft.ifft(spectrum)[width // 2 : width // 2 + n]
-        values = np.log1p(np.abs(coefficients) ** 2)
-        scale = values.std()
-        out[index] = (values - values.mean()) / (scale if scale > 1e-6 else 1.0)
+    signal = MAPPINGS[codes]
+    length = signal.shape[0]
+    radius = len(MORLET) // 2
+    fft_size = 1 << (length + len(MORLET) - 1).bit_length()
+    kernel_spectrum = np.fft.fft(MORLET, fft_size)
+    out = np.empty((signal.shape[1], length), dtype=np.float32)
+    for channel in range(signal.shape[1]):
+        coefficients = np.fft.ifft(
+            np.fft.fft(signal[:, channel], fft_size) * kernel_spectrum
+        )[radius : radius + length]
+        out[channel] = np.abs(coefficients) ** 2
     return out
 
 
-# ================================================================ 4. 모델
-class Model:
-    """TODO: 실제 모델로 교체할 자리.
-
-    X: (6, L) 특징, Y: (6, L) 이진 라벨 (strand별 모델).
-    fit(X, Y) -> self, predict(X) -> (6, L) 점수.
-    """
-
-    def fit(self, X: NDArray[np.float32], Y: NDArray[np.bool_]) -> Model:
-        # TODO: 실제 모델 구현. 지금은 bias 포함 선형회귀 placeholder.
-        gram = np.zeros((X.shape[0] + 1, X.shape[0] + 1), dtype=np.float64)
-        cross = np.zeros((X.shape[0] + 1, Y.shape[0]), dtype=np.float64)
-        chunk = 1_000_000
-        for start in range(0, X.shape[1], chunk):
-            x = X[:, start : start + chunk].astype(np.float64)
-            y = Y[:, start : start + chunk].astype(np.float64)
-            design = np.vstack([x, np.ones((1, x.shape[1]))])
-            gram += design @ design.T
-            cross += design @ y.T
-        self.weights = np.linalg.solve(
-            gram + 1e-6 * np.eye(len(gram)), cross
-        ).T  # (6, 7)
-        return self
-
-    def predict(self, X: NDArray[np.float32]) -> NDArray[np.float32]:
-        # TODO: 실제 모델 구현.
-        out = np.empty((self.weights.shape[0], X.shape[1]), dtype=np.float32)
-        chunk = 1_000_000
-        for start in range(0, X.shape[1], chunk):
-            x = X[:, start : start + chunk].astype(np.float64)
-            design = np.vstack([x, np.ones((1, x.shape[1]))])
-            out[:, start : start + chunk] = self.weights @ design
-        return out
+def learn_motifs(
+    codes: dict[str, NDArray[np.uint8]],
+    labels: dict[tuple[str, str, str], NDArray[np.int64]],
+) -> dict[str, set[bytes]]:
+    motifs: dict[str, set[bytes]] = {
+        "GS": {bytes((0, 3, 2))},
+        "IS": {bytes((2, 3)), bytes((2, 1))},
+        "IE": {bytes((0, 2))},
+        "GE": {
+            bytes((3, 0, 0)),
+            bytes((3, 0, 2)),
+            bytes((3, 2, 0)),
+        },
+    }
+    for (name, strand, site), positions in labels.items():
+        if site not in motifs:
+            continue
+        sequence = oriented(codes[name], strand)
+        for position in positions:
+            if site == "GS":
+                kmer = sequence[position : position + 3]
+            elif site == "IS":
+                kmer = sequence[position : position + 2]
+            elif site == "IE":
+                kmer = sequence[position - 2 : position]
+            else:
+                kmer = sequence[position - 3 : position]
+            if len(kmer) and np.all(kmer < 4):
+                motifs[site].add(bytes(kmer))
+    return motifs
 
 
-# ============================================================== 5. DP 조립
+def motif_mask(
+    sequence: NDArray[np.uint8], site: str, motifs: dict[str, set[bytes]]
+) -> NDArray[np.bool_]:
+    n = len(sequence)
+    if site not in motifs:
+        return np.ones(n, dtype=bool)
+    mask = np.zeros(n, dtype=bool)
+    for motif in motifs[site]:
+        k = len(motif)
+        if k > n:
+            continue
+        match = np.ones(n - k + 1, dtype=bool)
+        for offset, value in enumerate(motif):
+            match &= sequence[offset : offset + n - k + 1] == value
+        if site in ("GS", "IS"):
+            mask[: n - k + 1] |= match
+        else:
+            mask[k:] |= match[: n - k]
+    return mask
+
+
 @dataclass
 class Sites:
     positions: NDArray[np.int64]
@@ -376,7 +378,6 @@ class Sites:
 
 
 def local_max(score: NDArray[np.float32]) -> NDArray[np.bool_]:
-    """엄격한 국소최댓값(좌 >, 우 ≥)."""
     if not len(score):
         return np.zeros(0, dtype=bool)
     keep = np.ones(len(score), dtype=bool)
@@ -385,9 +386,16 @@ def local_max(score: NDArray[np.float32]) -> NDArray[np.bool_]:
     return keep
 
 
-def call_sites(score: NDArray[np.float32], budget: int) -> Sites:
-    """국소최댓값 중 상위 budget 개만 채택."""
+def call_sites(
+    score: NDArray[np.float32],
+    budget: int,
+    valid: NDArray[np.bool_] | None = None,
+) -> Sites:
+    if valid is not None:
+        score = np.where(valid, score, -np.inf)
     positions = np.flatnonzero(local_max(score)).astype(np.int64)
+    if valid is not None:
+        positions = positions[valid[positions]]
     if not len(positions):
         return Sites(positions, np.array([], dtype=np.float32))
     values = score[positions]
@@ -408,18 +416,36 @@ class Candidate:
     exons: list[tuple[int, int]]
     spliced_cds: int
     score: float
+    locus: int = 0
+
+
+def valid_orf(sequence: NDArray[np.uint8], cds: list[tuple[int, int]]) -> bool:
+    coding = np.concatenate([sequence[left:right] for left, right in cds])
+    if len(coding) < 6 or len(coding) % 3:
+        return False
+    if not np.array_equal(coding[:3], START_CODON):
+        return False
+    if not any(np.array_equal(coding[-3:], stop) for stop in STOP_CODONS):
+        return False
+    codons = coding[:-3].reshape(-1, 3)
+    return not any(np.all(codons == stop, axis=1).any() for stop in STOP_CODONS)
 
 
 def assemble_candidates(
     seqid: str,
     strand: str,
+    sequence: NDArray[np.uint8],
     scores: dict[str, NDArray[np.float32]],
     limits: Limits,
     budgets: dict[str, int],
-    length: int,
+    motifs: dict[str, set[bytes]],
 ) -> list[Candidate]:
-    """GS → (IS → IE)* → GE 경로를 DP로 찾고, 앞뒤 U5/U3로 전사체 span을 잡는다."""
-    sites = {kind: call_sites(scores[kind], budgets[kind]) for kind in SITES}
+    length = len(sequence)
+    valid = {site: motif_mask(sequence, site, motifs) for site in SITES}
+    sites = {
+        kind: call_sites(scores[kind], budgets[kind], valid[kind])
+        for kind in SITES
+    }
 
     events: list[tuple[int, str, float]] = []
     for kind in ("GS", "IS", "IE", "GE"):
@@ -428,156 +454,209 @@ def assemble_candidates(
     events.sort()
 
     n = len(events)
-    dp = np.full(n, -np.inf, dtype=np.float64)
-    prev = np.full(n, -1, dtype=np.int64)
-    start = np.full(n, -1, dtype=np.int64)
+    best_paths: list[list[int]] = [[] for _ in range(n)]
+    path_score: list[float] = []
+    path_start: list[int] = []
+    path_event: list[int] = []
+    path_prev: list[int] = []
     kind_indices: dict[str, list[int]] = {kind: [] for kind in ("GS", "IS", "IE", "GE")}
     kind_positions: dict[str, list[int]] = {kind: [] for kind in ("GS", "IS", "IE", "GE")}
 
+    def add_path(score: float, start: int, event: int, previous: int) -> int:
+        path_score.append(score)
+        path_start.append(start)
+        path_event.append(event)
+        path_prev.append(previous)
+        return len(path_score) - 1
+
+    def gather(kind: str, low: int, high: int) -> list[int]:
+        result: list[int] = []
+        for event in kind_indices[kind][low:high]:
+            result.extend(best_paths[event])
+        return result
+
     for event_index, (position, kind, score) in enumerate(events):
+        created: list[int] = []
         if kind == "GS":
-            dp[event_index] = score
-            start[event_index] = position
-        else:
-            best = -np.inf
-            best_event = -1
-            if kind == "IS":
-                # 첫 엑손(GS→IS) 또는 내부 엑손(IE→IS) 뒤 min_exon 이상.
-                for predecessor in ("GS", "IE"):
-                    positions = kind_positions[predecessor]
-                    limit = bisect_right(positions, position - limits.min_exon)
-                    if limit:
-                        options = kind_indices[predecessor][:limit]
-                        values = dp[options]
-                        arg = int(np.argmax(values))
-                        if values[arg] > best:
-                            best = values[arg]
-                            best_event = options[arg]
-            elif kind == "IE":
-                # 인트론 길이가 [min_intron, max_intron]인 IS만.
-                positions = kind_positions["IS"]
-                low = bisect_left(positions, position - limits.max_intron)
-                high = bisect_right(positions, position - limits.min_intron)
-                if low < high:
-                    options = kind_indices["IS"][low:high]
-                    values = dp[options]
-                    arg = int(np.argmax(values))
-                    if values[arg] > best:
-                        best = values[arg]
-                        best_event = options[arg]
-            elif kind == "GE":
-                # 인트론 없음(GS→GE) 또는 마지막 엑손(IE→GE).
-                for predecessor, minimum in (
-                    ("GS", limits.min_coding),
-                    ("IE", limits.min_exon),
-                ):
-                    positions = kind_positions[predecessor]
-                    limit = bisect_right(positions, position - minimum)
-                    for candidate_event in kind_indices[predecessor][:limit]:
-                        candidate_start = start[candidate_event]
-                        if candidate_start < 0:
-                            continue
-                        span = position - candidate_start
-                        if span < limits.min_coding or span > limits.max_span:
-                            continue
-                        value = dp[candidate_event]
-                        if value > best:
-                            best = value
-                            best_event = candidate_event
-            if best_event >= 0 and np.isfinite(best):
-                dp[event_index] = score + best
-                prev[event_index] = best_event
-                start[event_index] = start[best_event]
+            created.append(add_path(score, position, event_index, -1))
+        elif kind == "IS":
+            for predecessor in ("GS", "IE"):
+                high = bisect_right(
+                    kind_positions[predecessor], position - limits.min_exon
+                )
+                for path in gather(predecessor, 0, high):
+                    created.append(
+                        add_path(
+                            path_score[path] + score,
+                            path_start[path],
+                            event_index,
+                            path,
+                        )
+                    )
+        elif kind == "IE":
+            positions = kind_positions["IS"]
+            low = bisect_left(positions, position - limits.max_intron)
+            high = bisect_right(positions, position - limits.min_intron)
+            for path in gather("IS", low, high):
+                created.append(
+                    add_path(
+                        path_score[path] + score - INTRON_PENALTY,
+                        path_start[path],
+                        event_index,
+                        path,
+                    )
+                )
+        elif kind == "GE":
+            for predecessor, minimum in (
+                ("GS", limits.min_coding),
+                ("IE", limits.min_exon),
+            ):
+                high = bisect_right(
+                    kind_positions[predecessor], position - minimum
+                )
+                for path in gather(predecessor, 0, high):
+                    span = position - path_start[path]
+                    if span < limits.min_coding or span > limits.max_span:
+                        continue
+                    created.append(
+                        add_path(
+                            path_score[path] + score,
+                            path_start[path],
+                            event_index,
+                            path,
+                        )
+                    )
+        created.sort(key=lambda path: path_score[path], reverse=True)
+        best_paths[event_index] = created[:MAX_PATHS]
         kind_indices[kind].append(event_index)
         kind_positions[kind].append(position)
 
     candidates: list[Candidate] = []
     for event_index, (position, kind, _) in enumerate(events):
-        if kind != "GE" or not np.isfinite(dp[event_index]):
+        if kind != "GE":
             continue
-        path: list[int] = []
-        current = event_index
-        while current >= 0:
-            path.append(current)
-            current = int(prev[current])
-        path.reverse()
-        if len(path) < 2 or events[path[0]][1] != "GS":
-            continue
+        for path in best_paths[event_index]:
+            chain: list[int] = []
+            current = path
+            while current >= 0:
+                chain.append(path_event[current])
+                current = path_prev[current]
+            chain.reverse()
+            if len(chain) < 2 or events[chain[0]][1] != "GS":
+                continue
 
-        gs_pos = events[path[0]][0]
-        ge_pos = position
-        introns: list[tuple[int, int]] = []
-        for index in range(1, len(path) - 1, 2):
-            introns.append((events[path[index]][0], events[path[index + 1]][0]))
+            gs_pos = events[chain[0]][0]
+            ge_pos = position
+            introns: list[tuple[int, int]] = []
+            for index in range(1, len(chain) - 1, 2):
+                introns.append(
+                    (events[chain[index]][0], events[chain[index + 1]][0])
+                )
+            cds: list[tuple[int, int]] = []
+            cursor = gs_pos
+            for is_pos, ie_pos in introns:
+                cds.append((cursor, is_pos))
+                cursor = ie_pos
+            cds.append((cursor, ge_pos))
+            if not valid_orf(sequence, cds):
+                continue
+            spliced = sum(right - left for left, right in cds)
 
-        cds: list[tuple[int, int]] = []
-        cursor = gs_pos
-        for is_pos, ie_pos in introns:
-            cds.append((cursor, is_pos))
-            cursor = ie_pos
-        cds.append((cursor, ge_pos))
-        spliced = sum(right - left for left, right in cds)
+            transcript = (gs_pos, ge_pos)
+            u5_index = bisect_right(sites["U5"].positions, gs_pos) - 1
+            u3_index = bisect_left(sites["U3"].positions, ge_pos)
+            if u5_index >= 0 and u3_index < len(sites["U3"]):
+                u5_pos = int(sites["U5"].positions[u5_index])
+                u3_pos = int(sites["U3"].positions[u3_index])
+                if limits.min_transcript <= u3_pos - u5_pos <= limits.max_utr:
+                    transcript = (u5_pos, u3_pos)
 
-        # CDS 앞의 가장 가까운 U5, 뒤의 가장 가까운 U3로 transcript span을 잡는다.
-        transcript = (gs_pos, ge_pos)
-        u5_index = bisect_right(sites["U5"].positions, gs_pos) - 1
-        u3_index = bisect_left(sites["U3"].positions, ge_pos)
-        if u5_index >= 0 and u3_index < len(sites["U3"]):
-            u5_pos = int(sites["U5"].positions[u5_index])
-            u3_pos = int(sites["U3"].positions[u3_index])
-            if limits.min_transcript <= u3_pos - u5_pos <= limits.max_utr:
-                transcript = (u5_pos, u3_pos)
+            exons: list[tuple[int, int]] = []
+            if transcript[0] < gs_pos:
+                exons.append((transcript[0], gs_pos))
+            exons.extend(cds)
+            if ge_pos < transcript[1]:
+                exons.append((ge_pos, transcript[1]))
 
-        exons: list[tuple[int, int]] = []
-        if transcript[0] < gs_pos:
-            exons.append((transcript[0], gs_pos))
-        exons.extend(cds)
-        if ge_pos < transcript[1]:
-            exons.append((ge_pos, transcript[1]))
-
-        candidates.append(
-            Candidate(
-                seqid=seqid,
-                strand=strand,
-                length=length,
-                transcript=transcript,
-                cds=cds,
-                exons=exons,
-                spliced_cds=spliced,
-                score=float(dp[event_index]),
+            candidates.append(
+                Candidate(
+                    seqid=seqid,
+                    strand=strand,
+                    length=length,
+                    transcript=transcript,
+                    cds=cds,
+                    exons=exons,
+                    spliced_cds=spliced,
+                    score=float(path_score[path]),
+                )
             )
-        )
     return candidates
 
 
+def cds_envelope(candidate: Candidate) -> tuple[int, int]:
+    return candidate.cds[0][0], candidate.cds[-1][1]
+
+
+def envelope_overlap(
+    left: tuple[int, int], right: tuple[int, int], reference: tuple[int, int]
+) -> float:
+    overlap = max(0, min(left[1], right[1]) - max(left[0], right[0]))
+    return overlap / max(reference[1] - reference[0], 1)
+
+
 def select_top(candidates: list[Candidate]) -> list[Candidate]:
-    """가장 긴 spliced CDS 전사물과 50% 이상 겹치는 것 중 top 5."""
     if not candidates:
         return []
-    longest = max(candidates, key=lambda candidate: candidate.spliced_cds)
-    span = longest.transcript
-    span_length = max(span[1] - span[0], 1)
 
-    def overlap(candidate: Candidate) -> int:
-        return max(
-            0,
-            min(candidate.transcript[1], span[1])
-            - max(candidate.transcript[0], span[0]),
-        )
+    unique: dict[tuple, Candidate] = {}
+    for candidate in candidates:
+        key = (candidate.seqid, candidate.strand, tuple(candidate.cds))
+        if key not in unique or candidate.score > unique[key].score:
+            unique[key] = candidate
+    pool = list(unique.values())
+    pool.sort(key=lambda candidate: -candidate.score)
 
-    selected = [
-        candidate
-        for candidate in candidates
-        if candidate.seqid == longest.seqid
-        and candidate.strand == longest.strand
-        and overlap(candidate) / span_length >= MIN_OVERLAP
-    ]
-    selected.sort(key=lambda candidate: -candidate.spliced_cds)
-    return selected[:TOP]
+    selected: list[Candidate] = []
+    assigned: set[int] = set()
+    locus = 0
+    for primary in pool:
+        if id(primary) in assigned:
+            continue
+        reference = cds_envelope(primary)
+        group = [
+            candidate
+            for candidate in pool
+            if id(candidate) not in assigned
+            and candidate.seqid == primary.seqid
+            and candidate.strand == primary.strand
+            and envelope_overlap(cds_envelope(candidate), reference, reference)
+            >= MIN_OVERLAP
+        ]
+        for candidate in group:
+            assigned.add(id(candidate))
+        if not group:
+            continue
+        longest = max(group, key=lambda candidate: candidate.spliced_cds)
+        longest_span = cds_envelope(longest)
+        isoforms = [
+            candidate
+            for candidate in group
+            if envelope_overlap(cds_envelope(candidate), longest_span, longest_span)
+            >= MIN_OVERLAP
+        ]
+        isoforms.sort(key=lambda candidate: (-candidate.spliced_cds, -candidate.score))
+        locus += 1
+        for candidate in isoforms[:TOP]:
+            candidate.locus = locus
+            selected.append(candidate)
+
+    selected.sort(key=lambda candidate: (candidate.seqid, candidate.strand, candidate.transcript))
+    return selected
 
 
-# ================================================================ 6. 출력
-def gff_records(candidate: Candidate, number: int) -> list[str]:
+def gff_records(
+    candidate: Candidate, gene_number: int, transcript_number: int
+) -> list[str]:
     seqid, strand, length = candidate.seqid, candidate.strand, candidate.length
 
     def convert(position: int) -> int:
@@ -587,8 +666,8 @@ def gff_records(candidate: Candidate, number: int) -> list[str]:
         first, last = convert(start), convert(end - 1)
         return min(first, last) + 1, max(first, last) + 1
 
-    gene_id = f"{seqid}.g{number}"
-    transcript_id = f"{gene_id}.t1"
+    gene_id = f"{seqid}.g{gene_number}"
+    transcript_id = f"{gene_id}.t{transcript_number}"
     a, b = interval(*candidate.transcript)
     out = [f"{seqid}\tpoc\tgene\t{a}\t{b}\t.\t{strand}\t.\tID={gene_id}"]
     out.append(
@@ -625,28 +704,37 @@ def gff_records(candidate: Candidate, number: int) -> list[str]:
 
 
 def write_gff3(path: str, candidates: list[Candidate]) -> None:
+    groups: dict[tuple[str, str, int], list[Candidate]] = defaultdict(list)
+    for candidate in candidates:
+        groups[(candidate.seqid, candidate.strand, candidate.locus)].append(candidate)
+    ordered = sorted(
+        groups.values(),
+        key=lambda group: (group[0].seqid, group[0].strand, group[0].transcript),
+    )
     with open(path, "w") as handle:
         handle.write("##gff-version 3\n")
-        for number, candidate in enumerate(candidates, 1):
-            handle.writelines(line + "\n" for line in gff_records(candidate, number))
+        for gene_number, group in enumerate(ordered, 1):
+            for transcript_number, candidate in enumerate(group, 1):
+                handle.writelines(
+                    line + "\n"
+                    for line in gff_records(
+                        candidate, gene_number, transcript_number
+                    )
+                )
 
 
-# ================================================================== 7. main
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="단순화된 CWT 특징 기반 유전자 구조 예측 PoC"
-    )
-    parser.add_argument("--fasta", required=True, help="게놈 FASTA (.gz 가능)")
-    parser.add_argument("--annotation", required=True, help="학습용 GFF3 (.gz 가능)")
-    parser.add_argument("--gff", default="poc.gff3", help="출력 GFF3 경로")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--fasta", required=True)
+    parser.add_argument("--annotation", required=True)
+    parser.add_argument("--predict-fasta")
+    parser.add_argument("--gff", default="poc.gff3")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    started = time.time()
 
-    # --- 1) Y: GFF3 + FASTA → strand별 6종 라벨 ---------------------
     codes = read_fasta(args.fasta)
     lengths = {name: len(sequence) for name, sequence in codes.items()}
     transcripts = read_annotation(args.annotation)
@@ -656,62 +744,61 @@ def main(argv: list[str] | None = None) -> int:
     counts: dict[tuple[str, str], int] = defaultdict(int)
     for (_, strand, site), positions in labels.items():
         counts[(strand, site)] += len(positions)
-    print(f"data: {len(codes)} contig(s), {training_length:,} bp")
-    print(f"limits: {limits}")
 
-    # --- 2-3) X: 6종 복소수 매핑 → period-2 커널 컨볼루션 ----------
-    X_blocks: dict[str, list[NDArray[np.float32]]] = {strand: [] for strand in STRANDS}
-    Y_blocks: dict[str, list[NDArray[np.bool_]]] = {strand: [] for strand in STRANDS}
+    X_blocks: list[NDArray[np.float32]] = []
+    Y_blocks: list[NDArray[np.bool_]] = []
     for name, sequence in codes.items():
         for strand in STRANDS:
-            X_blocks[strand].append(features(oriented(sequence, strand)))
-            Y_blocks[strand].append(
-                label_matrix(labels, name, strand, len(sequence))
-            )
+            X_blocks.append(features(oriented(sequence, strand)))
+            Y_blocks.append(label_matrix(labels, name, strand, len(sequence)))
+    X_train = np.concatenate(X_blocks, axis=1)
+    Y_train = np.concatenate(Y_blocks, axis=1)
 
-    # --- 4) 학습: X, Y → model (TODO) ------------------------------
-    models: dict[str, Model] = {}
-    for strand in STRANDS:
-        X = np.concatenate(X_blocks[strand], axis=1)
-        Y = np.concatenate(Y_blocks[strand], axis=1)
-        print(f"X[{strand}]: {X.shape}, Y[{strand}]: {Y.shape}")
-        models[strand] = Model().fit(X, Y)
-    print(f"models fitted (TODO: replace placeholder) ({time.time() - started:.1f}s)")
+    model = Model().fit(X_train, Y_train)
+    assert model.thresholds is not None
+    thresholds = model.thresholds
+    motifs = learn_motifs(codes, labels)
 
-    # --- 5) 예측 → DP 조립 → GFF3 ---------------------------------
+    predict_codes = (
+        read_fasta(args.predict_fasta) if args.predict_fasta else codes
+    )
     candidates: list[Candidate] = []
-    for name, sequence in codes.items():
+    for name, sequence in predict_codes.items():
         for strand in STRANDS:
-            scores = models[strand].predict(features(oriented(sequence, strand)))
+            oriented_sequence = oriented(sequence, strand)
+            scores = model.predict(features(oriented_sequence))
             score_dict = {
-                site: scores[index] for index, site in enumerate(SITES)
+                site: scores[index] - thresholds[index]
+                for index, site in enumerate(SITES)
             }
             budgets = {
-                site: max(
-                    1,
-                    round(
-                        counts[(strand, site)]
-                        * len(sequence)
-                        / training_length
+                site: min(
+                    MAX_BUDGET,
+                    max(
+                        1,
+                        round(
+                            counts[(strand, site)]
+                            * len(sequence)
+                            / training_length
+                            * BUDGET_FACTOR
+                        ),
                     ),
                 )
                 for site in SITES
             }
             found = assemble_candidates(
-                name, strand, score_dict, limits, budgets, len(sequence)
+                name,
+                strand,
+                oriented_sequence,
+                score_dict,
+                limits,
+                budgets,
+                motifs,
             )
             candidates.extend(found)
-            print(
-                f"  {name}/{strand}: {len(found)} candidate(s) "
-                f"({time.time() - started:.1f}s)"
-            )
 
     selected = select_top(candidates)
     write_gff3(args.gff, selected)
-    print(
-        f"wrote {args.gff}: {len(selected)} transcript(s) "
-        f"({time.time() - started:.1f}s)"
-    )
     return 0
 
 
