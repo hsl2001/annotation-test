@@ -22,13 +22,16 @@ STRAND_LABELS = {
     "-": tuple(f"m_{site}" for site in SITES),
 }
 
+TOP = 5
+MIN_OVERLAP = 0.5
+MAX_PATHS = 50
+THRESHOLD_SCALE = 0.95
+ORF_CHECKS = True
+
 PERIOD = 2.0
 W0 = 6.0
 MORLET_LIMIT = 8.0
 
-TOP = 5
-MIN_OVERLAP = 0.5
-MAX_PATHS = 5
 START_CODON = np.array([0, 3, 2], dtype=np.uint8)
 STOP_CODONS = (
     np.array([3, 0, 0], dtype=np.uint8),
@@ -215,6 +218,7 @@ class Limits:
     min_intron: int
     min_coding: int
     min_transcript: int
+    max_exon: int
     max_intron: int
     max_span: int
     max_utr: int
@@ -246,13 +250,18 @@ def derive_limits(transcripts: list[Transcript], lengths: dict[str, int]) -> Lim
     if not introns or not spans or not exons:
         raise SystemExit("annotation lacks the intervals needed to derive limits")
     return Limits(
-        min_exon=min(min(exons), 3),
-        min_intron=min(min(introns), 10),
+        min_exon=max(3, min(min(exons), 3)),
+        min_intron=max(10, min(min(introns), 10)),
         min_coding=min(min(spans), 30),
         min_transcript=min(min(utrs) if utrs else min(spans), 30),
-        max_intron=max(max(introns) * 3, 10_000),
-        max_span=max(max(spans) * 3, 20_000),
-        max_utr=max(max(utrs) * 3, 20_000) if utrs else max(max(spans) * 3, 20_000),
+        max_exon=int(max(float(np.percentile(exons, 99.9)) * 3, 10_000)),
+        max_intron=int(max(float(np.percentile(introns, 99.9)) * 4, 15_000)),
+        max_span=int(max(float(np.percentile(spans, 99.9)) * 3, 20_000)),
+        max_utr=int(
+            max(float(np.percentile(utrs, 99.9)) * 3, 20_000)
+            if utrs
+            else max(float(np.percentile(spans, 99.9)) * 3, 20_000)
+        ),
     )
 
 
@@ -298,17 +307,25 @@ MORLET = build_kernel(PERIOD)
 
 
 def features(codes: NDArray[np.uint8]) -> NDArray[np.float32]:
-    signal = MAPPINGS[codes]
-    length = signal.shape[0]
+    length = len(codes)
     radius = len(MORLET) // 2
-    fft_size = 1 << (length + len(MORLET) - 1).bit_length()
-    kernel_spectrum = np.fft.fft(MORLET, fft_size)
-    out = np.empty((signal.shape[1], length), dtype=np.float32)
-    for channel in range(signal.shape[1]):
-        coefficients = np.fft.ifft(
-            np.fft.fft(signal[:, channel], fft_size) * kernel_spectrum
-        )[radius : radius + length]
-        out[channel] = np.abs(coefficients) ** 2
+    out = np.empty((MAPPINGS.shape[1], length), dtype=np.float32)
+    chunk = 1_000_000
+    for start in range(0, length, chunk):
+        end = min(start + chunk, length)
+        low = max(0, start - radius)
+        high = min(length, end + radius)
+        signal = MAPPINGS[codes[low:high]]
+        span = high - low
+        fft_size = 1 << (span + len(MORLET) - 1).bit_length()
+        kernel_spectrum = np.fft.fft(MORLET, fft_size)
+        for channel in range(signal.shape[1]):
+            coefficients = np.fft.ifft(
+                np.fft.fft(signal[:, channel], fft_size) * kernel_spectrum
+            )[radius : radius + span]
+            out[channel, start:end] = (
+                np.abs(coefficients[start - low : end - low]) ** 2
+            )
     return out
 
 
@@ -427,6 +444,17 @@ def assemble_candidates(
     motifs: dict[str, set[bytes]],
 ) -> list[Candidate]:
     length = len(sequence)
+    stop_at = np.zeros(length, dtype=bool)
+    if length >= 3:
+        for stop in STOP_CODONS:
+            match = np.ones(length - 2, dtype=bool)
+            for offset in range(3):
+                match &= sequence[offset : offset + length - 2] == stop[offset]
+            stop_at[: length - 2] |= match
+    stop_starts = np.flatnonzero(stop_at)
+    stops_by_frame = [
+        stop_starts[stop_starts % 3 == frame] for frame in range(3)
+    ]
     valid = {site: motif_mask(sequence, site, motifs) for site in SITES}
     sites = {
         kind: call_sites(scores[kind], valid[kind])
@@ -445,14 +473,18 @@ def assemble_candidates(
     path_start: list[int] = []
     path_event: list[int] = []
     path_prev: list[int] = []
+    path_frame: list[int] = []
     kind_indices: dict[str, list[int]] = {kind: [] for kind in ("GS", "IS", "IE", "GE")}
     kind_positions: dict[str, list[int]] = {kind: [] for kind in ("GS", "IS", "IE", "GE")}
 
-    def add_path(score: float, start: int, event: int, previous: int) -> int:
+    def add_path(
+        score: float, start: int, event: int, previous: int, frame: int
+    ) -> int:
         path_score.append(score)
         path_start.append(start)
         path_event.append(event)
         path_prev.append(previous)
+        path_frame.append(frame)
         return len(path_score) - 1
 
     def gather(kind: str, low: int, high: int) -> list[int]:
@@ -461,22 +493,49 @@ def assemble_candidates(
             result.extend(best_paths[event])
         return result
 
+    def has_stop(start: int, end: int, frame: int, skip_last: bool) -> bool:
+        if not ORF_CHECKS:
+            return False
+        first = start + (3 - frame) % 3
+        last = end - 2
+        if skip_last:
+            last -= 3
+        if first > last:
+            return False
+        candidates = stops_by_frame[first % 3]
+        index = bisect_left(candidates, first)
+        return bool(index < len(candidates) and candidates[index] <= last)
+
     for event_index, (position, kind, score) in enumerate(events):
         created: list[int] = []
         if kind == "GS":
-            created.append(add_path(score, position, event_index, -1))
+            created.append(add_path(score, position, event_index, -1, 0))
         elif kind == "IS":
             for predecessor in ("GS", "IE"):
-                high = bisect_right(
-                    kind_positions[predecessor], position - limits.min_exon
+                positions_of_kind = kind_positions[predecessor]
+                low = bisect_left(
+                    positions_of_kind, position - limits.max_exon
                 )
-                for path in gather(predecessor, 0, high):
+                high = bisect_right(
+                    positions_of_kind, position - limits.min_exon
+                )
+                for path in gather(predecessor, low, high):
+                    if predecessor == "GS":
+                        start = path_start[path]
+                        base_frame = 0
+                    else:
+                        start = events[path_event[path]][0]
+                        base_frame = path_frame[path]
+                    if has_stop(start, position, base_frame, False):
+                        continue
+                    frame = (base_frame + position - start) % 3
                     created.append(
                         add_path(
                             path_score[path] + score,
                             path_start[path],
                             event_index,
                             path,
+                            frame,
                         )
                     )
         elif kind == "IE":
@@ -490,19 +549,32 @@ def assemble_candidates(
                         path_start[path],
                         event_index,
                         path,
+                        path_frame[path],
                     )
                 )
         elif kind == "GE":
-            for predecessor, minimum in (
-                ("GS", limits.min_coding),
-                ("IE", limits.min_exon),
+            for predecessor, minimum, maximum in (
+                ("GS", limits.min_coding, limits.max_span),
+                ("IE", limits.min_exon, min(limits.max_exon, limits.max_span)),
             ):
+                positions_of_kind = kind_positions[predecessor]
+                low = bisect_left(positions_of_kind, position - maximum)
                 high = bisect_right(
-                    kind_positions[predecessor], position - minimum
+                    positions_of_kind, position - minimum
                 )
-                for path in gather(predecessor, 0, high):
+                for path in gather(predecessor, low, high):
                     span = position - path_start[path]
                     if span < limits.min_coding or span > limits.max_span:
+                        continue
+                    if predecessor == "GS":
+                        start = path_start[path]
+                        base_frame = 0
+                    else:
+                        start = events[path_event[path]][0]
+                        base_frame = path_frame[path]
+                    if (base_frame + position - start) % 3:
+                        continue
+                    if has_stop(start, position, base_frame, True):
                         continue
                     created.append(
                         add_path(
@@ -510,6 +582,7 @@ def assemble_candidates(
                             path_start[path],
                             event_index,
                             path,
+                            0,
                         )
                     )
         created.sort(key=lambda path: path_score[path], reverse=True)
@@ -544,7 +617,7 @@ def assemble_candidates(
                 cds.append((cursor, is_pos))
                 cursor = ie_pos
             cds.append((cursor, ge_pos))
-            if not valid_orf(sequence, cds):
+            if ORF_CHECKS and not valid_orf(sequence, cds):
                 continue
             spliced = sum(right - left for left, right in cds)
 
@@ -602,6 +675,18 @@ def select_top(candidates: list[Candidate]) -> list[Candidate]:
     pool = list(unique.values())
     pool.sort(key=lambda candidate: -candidate.score)
 
+    by_loc: dict[tuple[str, str], list[Candidate]] = defaultdict(list)
+    for candidate in pool:
+        by_loc[(candidate.seqid, candidate.strand)].append(candidate)
+    starts: dict[tuple[str, str], list[int]] = {}
+    max_len: dict[tuple[str, str], int] = {}
+    for loc, group in by_loc.items():
+        group.sort(key=lambda candidate: candidate.cds[0][0])
+        starts[loc] = [candidate.cds[0][0] for candidate in group]
+        max_len[loc] = max(
+            candidate.cds[-1][1] - candidate.cds[0][0] for candidate in group
+        )
+
     selected: list[Candidate] = []
     assigned: set[int] = set()
     locus = 0
@@ -609,12 +694,15 @@ def select_top(candidates: list[Candidate]) -> list[Candidate]:
         if id(primary) in assigned:
             continue
         reference = cds_envelope(primary)
+        loc = (primary.seqid, primary.strand)
+        group_all = by_loc[loc]
+        starts_all = starts[loc]
+        low = bisect_left(starts_all, reference[0] - max_len[loc])
+        high = bisect_right(starts_all, reference[1])
         group = [
             candidate
-            for candidate in pool
+            for candidate in group_all[low:high]
             if id(candidate) not in assigned
-            and candidate.seqid == primary.seqid
-            and candidate.strand == primary.strand
             and envelope_overlap(cds_envelope(candidate), reference, reference)
             >= MIN_OVERLAP
         ]
@@ -715,7 +803,76 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--annotation", required=True)
     parser.add_argument("--predict-fasta")
     parser.add_argument("--gff", default="poc.gff3")
+    parser.add_argument("--chunk-size", type=int, default=1_000_000)
+    parser.add_argument("--model-radius", type=int, default=26)
+    parser.add_argument("--threshold-scale", type=float, default=THRESHOLD_SCALE)
     return parser
+
+
+def train_models(
+    codes: dict[str, NDArray[np.uint8]],
+    labels: dict[tuple[str, str, str], NDArray[np.int64]],
+    chunk_size: int,
+    radius: int,
+) -> dict[tuple[str, str, int], Model]:
+    models: dict[tuple[str, str, int], Model] = {}
+    for name, sequence in codes.items():
+        for strand in STRANDS:
+            oriented_sequence = oriented(sequence, strand)
+            label_mat = label_matrix(labels, name, strand, len(sequence))
+            starts = range(0, len(sequence), chunk_size) if chunk_size > 0 else (0,)
+            for start in starts:
+                end = min(start + chunk_size, len(sequence)) if chunk_size > 0 else len(sequence)
+                X = features(oriented_sequence[start:end])
+                Y = label_mat[:, start:end]
+                models[(name, strand, start)] = Model(radius=radius).fit(X, Y)
+    return models
+
+
+def shift_candidate(candidate: Candidate, offset: int, length: int) -> None:
+    candidate.transcript = (candidate.transcript[0] + offset, candidate.transcript[1] + offset)
+    candidate.cds = [(a + offset, b + offset) for a, b in candidate.cds]
+    candidate.exons = [(a + offset, b + offset) for a, b in candidate.exons]
+    candidate.length = length
+
+
+def predict_models(
+    models: dict[tuple[str, str, int], Model],
+    predict_codes: dict[str, NDArray[np.uint8]],
+    chunk_size: int,
+    limits: Limits,
+    motifs: dict[str, set[bytes]],
+    threshold_scale: float,
+) -> list[Candidate]:
+    fallback: dict[str, Model] = {}
+    for (_, strand, _), model in models.items():
+        fallback.setdefault(strand, model)
+    candidates: list[Candidate] = []
+    for name, sequence in predict_codes.items():
+        for strand in STRANDS:
+            oriented_sequence = oriented(sequence, strand)
+            starts = range(0, len(sequence), chunk_size) if chunk_size > 0 else (0,)
+            for start in starts:
+                end = min(start + chunk_size, len(sequence)) if chunk_size > 0 else len(sequence)
+                model = models.get((name, strand, start), fallback[strand])
+                assert model.thresholds is not None
+                scores = model.predict(features(oriented_sequence[start:end]))
+                score_dict = {
+                    site: scores[index] - model.thresholds[index] * threshold_scale
+                    for index, site in enumerate(SITES)
+                }
+                found = assemble_candidates(
+                    name,
+                    strand,
+                    oriented_sequence[start:end],
+                    score_dict,
+                    limits,
+                    motifs,
+                )
+                for candidate in found:
+                    shift_candidate(candidate, start, len(sequence))
+                candidates.extend(found)
+    return candidates
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -726,43 +883,15 @@ def main(argv: list[str] | None = None) -> int:
     transcripts = read_annotation(args.annotation)
     labels = site_labels(transcripts, lengths)
     limits = derive_limits(transcripts, lengths)
-
-    X_blocks: list[NDArray[np.float32]] = []
-    Y_blocks: list[NDArray[np.bool_]] = []
-    for name, sequence in codes.items():
-        for strand in STRANDS:
-            X_blocks.append(features(oriented(sequence, strand)))
-            Y_blocks.append(label_matrix(labels, name, strand, len(sequence)))
-    X_train = np.concatenate(X_blocks, axis=1)
-    Y_train = np.concatenate(Y_blocks, axis=1)
-
-    model = Model().fit(X_train, Y_train)
-    assert model.thresholds is not None
-    thresholds = model.thresholds
     motifs = learn_motifs(codes, labels)
 
+    models = train_models(codes, labels, args.chunk_size, args.model_radius)
     predict_codes = (
         read_fasta(args.predict_fasta) if args.predict_fasta else codes
     )
-    candidates: list[Candidate] = []
-    for name, sequence in predict_codes.items():
-        for strand in STRANDS:
-            oriented_sequence = oriented(sequence, strand)
-            scores = model.predict(features(oriented_sequence))
-            score_dict = {
-                site: scores[index] - thresholds[index]
-                for index, site in enumerate(SITES)
-            }
-            found = assemble_candidates(
-                name,
-                strand,
-                oriented_sequence,
-                score_dict,
-                limits,
-                motifs,
-            )
-            candidates.extend(found)
-
+    candidates = predict_models(
+        models, predict_codes, args.chunk_size, limits, motifs, args.threshold_scale
+    )
     selected = select_top(candidates)
     write_gff3(args.gff, selected)
     return 0
