@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+from numpy.lib.stride_tricks import sliding_window_view
 from numpy.typing import NDArray
 
 
@@ -18,91 +19,6 @@ def extract_windows(
     return np.ascontiguousarray(windows, dtype=np.float32)
 
 
-def background_mean(channels: NDArray[np.float32], radius: int) -> NDArray[np.float64]:
-    width = 2 * radius + 1
-    n = channels.shape[1]
-    prefix = np.concatenate(
-        [np.zeros((channels.shape[0], 1)), np.cumsum(channels, axis=1)], axis=1
-    )
-    mean = np.zeros((channels.shape[0], width), dtype=np.float64)
-    for k in range(width):
-        d = k - radius
-        low, high = max(0, d), min(n, n + d)
-        mean[:, k] = (prefix[:, high] - prefix[:, low]) / max(n, 1)
-    return mean.ravel()
-
-
-def accumulate_gram(
-    gram: NDArray[np.float64],
-    spectra: list[NDArray[np.complex128]],
-    fft_size: int,
-    width: int,
-) -> None:
-    channels = len(spectra)
-    max_lag = width - 1
-    for c1 in range(channels):
-        for c2 in range(c1, channels):
-            correlation = np.fft.irfft(
-                np.conj(spectra[c1]) * spectra[c2], fft_size
-            )
-            values = np.concatenate(
-                [correlation[fft_size - max_lag :], correlation[: max_lag + 1]]
-            )
-            for d in range(-max_lag, max_lag + 1):
-                value = values[d + max_lag]
-                low, high = max(0, -d), min(width, width - d)
-                rows = c1 * width + np.arange(low, high)
-                columns = c2 * width + np.arange(low, high) + d
-                gram[rows, columns] += value
-                if c1 != c2:
-                    gram[columns, rows] += value
-
-
-def design_snr_filter(
-    gram: NDArray[np.float64],
-    positive_windows: NDArray[np.float32],
-    background: NDArray[np.float64],
-    length: int,
-    channels: int,
-    width: int,
-    regularization: float = 0.01,
-) -> NDArray[np.float32]:
-    mean_positive = positive_windows.astype(np.float64).mean(axis=0)
-    covariance = gram / max(length, 1) - np.outer(background, background)
-    dimension = covariance.shape[0]
-    shrinkage = np.trace(covariance) / dimension
-    weights = np.linalg.solve(
-        covariance + regularization * shrinkage * np.eye(dimension),
-        mean_positive - background,
-    )
-    norm = np.linalg.norm(weights)
-    return (weights / (norm if norm > 0 else 1.0)).reshape(
-        channels, width
-    ).astype(np.float32)
-
-
-def channel_spectra(
-    channels: NDArray[np.float32], width: int
-) -> tuple[list[NDArray[np.complex128]], int]:
-    fft_size = 1 << (channels.shape[1] + width).bit_length()
-    return [np.fft.rfft(row, fft_size) for row in channels], fft_size
-
-
-def convolve(
-    spectra: list[NDArray[np.complex128]],
-    fft_size: int,
-    weights: NDArray[np.float32],
-    length: int,
-    center: int,
-) -> NDArray[np.float32]:
-    spectrum = np.zeros(fft_size // 2 + 1, dtype=np.complex128)
-    for index, kernel in enumerate(weights):
-        spectrum += spectra[index] * np.fft.rfft(kernel[::-1], fft_size)
-    return np.fft.irfft(spectrum, fft_size)[center : center + length].astype(
-        np.float32
-    )
-
-
 def local_max(score: NDArray[np.float32]) -> NDArray[np.bool_]:
     if not len(score):
         return np.zeros(0, dtype=bool)
@@ -112,69 +28,196 @@ def local_max(score: NDArray[np.float32]) -> NDArray[np.bool_]:
     return keep
 
 
+def _sigmoid(x: NDArray[np.float64]) -> NDArray[np.float64]:
+    return 1.0 / (1.0 + np.exp(-x))
+
+
 class Model:
-    def __init__(self, radius: int = 26, regularization: float = 0.01):
+    def __init__(
+        self,
+        radius: int = 26,
+        hidden: int = 128,
+        epochs: int = 60,
+        batch: int = 256,
+        learning_rate: float = 1e-3,
+        weight_decay: float = 1e-3,
+        negatives: int = 8,
+        hard_negatives: int = 5,
+        seed: int = 0,
+    ):
         self.radius = radius
         self.width = 2 * radius + 1
-        self.regularization = regularization
-        self.kernels: NDArray[np.float32] | None = None
+        self.hidden = hidden
+        self.epochs = epochs
+        self.batch = batch
+        self.learning_rate = learning_rate
+        self.weight_decay = weight_decay
+        self.negatives = negatives
+        self.hard_negatives = hard_negatives
+        self.seed = seed
+        self.mean: NDArray[np.float64] | None = None
+        self.std: NDArray[np.float64] | None = None
+        self.W1: NDArray[np.float64] | None = None
+        self.b1: NDArray[np.float64] | None = None
+        self.W2: NDArray[np.float64] | None = None
+        self.b2: NDArray[np.float64] | None = None
         self.thresholds: NDArray[np.float32] | None = None
 
+    def _forward(self, features: NDArray[np.float64]) -> NDArray[np.float64]:
+        assert self.W1 is not None and self.b1 is not None
+        assert self.W2 is not None and self.b2 is not None
+        hidden = np.maximum(features @ self.W1 + self.b1, 0.0)
+        return _sigmoid(hidden @ self.W2 + self.b2)
+
     def fit(self, X: NDArray[np.float32], Y: NDArray[np.bool_]) -> Model:
-        channels, length = X.shape
+        rng = np.random.default_rng(self.seed)
+        _, length = X.shape
         sites = Y.shape[0]
-        dimension = channels * self.width
 
-        fft_size = 1 << (length + 2 * (self.width - 1)).bit_length()
-        spectra = [np.fft.rfft(row, fft_size) for row in X]
-        gram = np.zeros((dimension, dimension), dtype=np.float64)
-        accumulate_gram(gram, spectra, fft_size, self.width)
-        background = background_mean(X, self.radius)
+        positives = [np.flatnonzero(Y[site]).astype(np.int64) for site in range(sites)]
+        exclude = np.zeros(length, dtype=bool)
+        for positions in positives:
+            for offset in range(-2, 3):
+                index = positions + offset
+                index = index[(index >= 0) & (index < length)]
+                exclude[index] = True
+        background = np.flatnonzero(~exclude)
 
-        kernels = np.zeros((sites, channels, self.width), dtype=np.float32)
-        thresholds = np.zeros(sites, dtype=np.float32)
-        spectra2, fft_size2 = channel_spectra(X, self.width)
+        positive_positions = np.concatenate(
+            [positions for positions in positives if len(positions)]
+        )
+        count = min(len(background), self.negatives * max(len(positive_positions), 1))
+        negative_positions = rng.choice(background, size=count, replace=False)
+        positions = np.concatenate([positive_positions, negative_positions])
+
+        labels = Y[:, positions].T.astype(np.float64)
+        windows = extract_windows(X, positions, self.radius).reshape(
+            len(positions), -1
+        ).astype(np.float64)
+        self.mean = windows.mean(axis=0)
+        self.std = windows.std(axis=0) + 1e-6
+        windows = (windows - self.mean) / self.std
+
+        pos_weight = np.ones(sites)
         for site in range(sites):
-            positives = np.flatnonzero(Y[site]).astype(np.int64)
-            if not len(positives):
-                continue
-            windows = extract_windows(X, positives, self.radius).reshape(
-                len(positives), dimension
+            n_positive = labels[:, site].sum()
+            n_negative = len(labels) - n_positive
+            pos_weight[site] = min(n_negative / max(n_positive, 1.0), 100.0)
+
+        self._train(windows, labels, pos_weight, rng)
+
+        scores = self.predict(X)
+        hard = []
+        for site in range(sites):
+            site_scores = scores[site].copy()
+            site_scores[exclude] = -np.inf
+            count = min(
+                len(background), self.hard_negatives * max(len(positives[site]), 1)
             )
-            kernels[site] = design_snr_filter(
-                gram,
-                windows,
-                background,
-                length,
-                channels,
-                self.width,
-                self.regularization,
-            )
-            response = convolve(
-                spectra2, fft_size2, kernels[site], length, self.radius
-            )
-            positions = np.flatnonzero(local_max(response)).astype(np.int64)
-            if len(positions):
-                low = np.searchsorted(positives, positions - 2)
-                high = np.searchsorted(positives, positions + 2, side="right")
-                background_positions = positions[high == low]
-                if len(background_positions):
-                    thresholds[site] = np.quantile(
-                        response[background_positions], 0.90
-                    )
-        self.kernels = kernels
-        self.thresholds = thresholds
+            hard.append(np.argsort(-site_scores)[:count])
+        hard_positions = np.concatenate(hard)
+        positions = np.concatenate([positions, hard_positions])
+        labels = Y[:, positions].T.astype(np.float64)
+        windows = extract_windows(X, positions, self.radius).reshape(
+            len(positions), -1
+        ).astype(np.float64)
+        windows = (windows - self.mean) / self.std
+        self._train(windows, labels, pos_weight, rng)
+
+        scores = self.predict(X)
+        self.thresholds = np.array(
+            [
+                self._best_threshold(scores[site], Y[site])
+                for site in range(sites)
+            ],
+            dtype=np.float32,
+        )
         return self
 
+    def _best_threshold(
+        self, score: NDArray[np.float32], label: NDArray[np.bool_]
+    ) -> float:
+        truth = np.flatnonzero(label)
+        if not len(truth):
+            return 1.0
+        positions = np.flatnonzero(local_max(score))
+        values = score[positions]
+        is_true = np.isin(positions, truth)
+        best_f1, best_threshold = 0.0, 0.5
+        for threshold in np.linspace(0.5, 1.0, 101):
+            selected = values > threshold
+            true_positive = int(is_true[selected].sum())
+            false_positive = int(selected.sum()) - true_positive
+            false_negative = len(truth) - true_positive
+            denominator = 2 * true_positive + false_positive + false_negative
+            f1 = 2 * true_positive / denominator if denominator else 0.0
+            if f1 > best_f1:
+                best_f1, best_threshold = f1, float(threshold)
+        return best_threshold
+
+    def _train(
+        self,
+        features: NDArray[np.float64],
+        labels: NDArray[np.float64],
+        pos_weight: NDArray[np.float64],
+        rng: np.random.Generator,
+    ) -> None:
+        dimension = features.shape[1]
+        sites = labels.shape[1]
+        self.W1 = rng.normal(0.0, np.sqrt(2.0 / dimension), (dimension, self.hidden))
+        self.b1 = np.zeros(self.hidden)
+        self.W2 = rng.normal(0.0, np.sqrt(1.0 / self.hidden), (self.hidden, sites))
+        self.b2 = np.zeros(sites)
+
+        params = [self.W1, self.b1, self.W2, self.b2]
+        first = [np.zeros_like(param) for param in params]
+        second = [np.zeros_like(param) for param in params]
+        beta1, beta2, eps = 0.9, 0.999, 1e-8
+        step = 0
+        n = len(features)
+
+        for _ in range(self.epochs):
+            order = rng.permutation(n)
+            for start in range(0, n, self.batch):
+                index = order[start : start + self.batch]
+                x = features[index]
+                y = labels[index]
+
+                pre = x @ self.W1 + self.b1
+                hidden = np.maximum(pre, 0.0)
+                probs = _sigmoid(hidden @ self.W2 + self.b2)
+
+                weight = pos_weight * y + (1.0 - y)
+                dlogits = (probs - y) * weight / len(index)
+                dW2 = hidden.T @ dlogits + self.weight_decay * self.W2
+                db2 = dlogits.sum(axis=0)
+                dhidden = dlogits @ self.W2.T
+                dhidden[pre <= 0] = 0.0
+                dW1 = x.T @ dhidden + self.weight_decay * self.W1
+                db1 = dhidden.sum(axis=0)
+
+                step += 1
+                for i, (param, grad) in enumerate(zip(params, [dW1, db1, dW2, db2])):
+                    first[i] = beta1 * first[i] + (1.0 - beta1) * grad
+                    second[i] = beta2 * second[i] + (1.0 - beta2) * grad * grad
+                    m_hat = first[i] / (1.0 - beta1**step)
+                    v_hat = second[i] / (1.0 - beta2**step)
+                    param -= self.learning_rate * m_hat / (np.sqrt(v_hat) + eps)
+
     def predict(self, X: NDArray[np.float32]) -> NDArray[np.float32]:
-        if self.kernels is None:
+        if self.W1 is None or self.W2 is None:
             raise RuntimeError("model is not fitted")
-        length = X.shape[1]
-        spectra, fft_size = channel_spectra(X, self.width)
-        out = np.zeros((self.kernels.shape[0], length), dtype=np.float32)
-        for site, kernel in enumerate(self.kernels):
-            if kernel.any():
-                out[site] = convolve(
-                    spectra, fft_size, kernel, length, self.radius
-                )
+        assert self.mean is not None and self.std is not None
+        _, length = X.shape
+        padded = np.pad(X, ((0, 0), (self.radius, self.radius)))
+        out = np.zeros((self.W2.shape[1], length), dtype=np.float32)
+        chunk = 100_000
+        for start in range(0, length, chunk):
+            end = min(start + chunk, length)
+            windows = sliding_window_view(
+                padded[:, start : end + 2 * self.radius], self.width, axis=1
+            )
+            features = windows.transpose(1, 0, 2).reshape(end - start, -1)
+            features = (features.astype(np.float64) - self.mean) / self.std
+            out[:, start:end] = self._forward(features).T
         return out

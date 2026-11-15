@@ -28,10 +28,7 @@ MORLET_LIMIT = 8.0
 
 TOP = 5
 MIN_OVERLAP = 0.5
-BUDGET_FACTOR = 50
-MAX_BUDGET = 2_000
 MAX_PATHS = 5
-INTRON_PENALTY = 4.0
 START_CODON = np.array([0, 3, 2], dtype=np.uint8)
 STOP_CODONS = (
     np.array([3, 0, 0], dtype=np.uint8),
@@ -388,22 +385,12 @@ def local_max(score: NDArray[np.float32]) -> NDArray[np.bool_]:
 
 def call_sites(
     score: NDArray[np.float32],
-    budget: int,
     valid: NDArray[np.bool_] | None = None,
 ) -> Sites:
     if valid is not None:
         score = np.where(valid, score, -np.inf)
-    positions = np.flatnonzero(local_max(score)).astype(np.int64)
-    if valid is not None:
-        positions = positions[valid[positions]]
-    if not len(positions):
-        return Sites(positions, np.array([], dtype=np.float32))
-    values = score[positions]
-    if 0 < budget < len(positions):
-        order = np.argsort(-values)[:budget]
-        order.sort()
-        positions, values = positions[order], values[order]
-    return Sites(positions, values)
+    positions = np.flatnonzero(local_max(score) & (score > 0)).astype(np.int64)
+    return Sites(positions, score[positions])
 
 
 @dataclass
@@ -437,13 +424,12 @@ def assemble_candidates(
     sequence: NDArray[np.uint8],
     scores: dict[str, NDArray[np.float32]],
     limits: Limits,
-    budgets: dict[str, int],
     motifs: dict[str, set[bytes]],
 ) -> list[Candidate]:
     length = len(sequence)
     valid = {site: motif_mask(sequence, site, motifs) for site in SITES}
     sites = {
-        kind: call_sites(scores[kind], budgets[kind], valid[kind])
+        kind: call_sites(scores[kind], valid[kind])
         for kind in SITES
     }
 
@@ -500,7 +486,7 @@ def assemble_candidates(
             for path in gather("IS", low, high):
                 created.append(
                     add_path(
-                        path_score[path] + score - INTRON_PENALTY,
+                        path_score[path] + score,
                         path_start[path],
                         event_index,
                         path,
@@ -740,10 +726,6 @@ def main(argv: list[str] | None = None) -> int:
     transcripts = read_annotation(args.annotation)
     labels = site_labels(transcripts, lengths)
     limits = derive_limits(transcripts, lengths)
-    training_length = sum(lengths.values())
-    counts: dict[tuple[str, str], int] = defaultdict(int)
-    for (_, strand, site), positions in labels.items():
-        counts[(strand, site)] += len(positions)
 
     X_blocks: list[NDArray[np.float32]] = []
     Y_blocks: list[NDArray[np.bool_]] = []
@@ -771,28 +753,12 @@ def main(argv: list[str] | None = None) -> int:
                 site: scores[index] - thresholds[index]
                 for index, site in enumerate(SITES)
             }
-            budgets = {
-                site: min(
-                    MAX_BUDGET,
-                    max(
-                        1,
-                        round(
-                            counts[(strand, site)]
-                            * len(sequence)
-                            / training_length
-                            * BUDGET_FACTOR
-                        ),
-                    ),
-                )
-                for site in SITES
-            }
             found = assemble_candidates(
                 name,
                 strand,
                 oriented_sequence,
                 score_dict,
                 limits,
-                budgets,
                 motifs,
             )
             candidates.extend(found)
