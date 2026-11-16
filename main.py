@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from itertools import pairwise
 
 import numpy as np
+from numba import njit, prange
 from numpy.typing import NDArray
 
 from model import Model
@@ -32,7 +33,6 @@ PERIOD = 2.0
 W0 = 6.0
 MORLET_LIMIT = 8.0
 
-START_CODON = np.array([0, 3, 2], dtype=np.uint8)
 STOP_CODONS = (
     np.array([3, 0, 0], dtype=np.uint8),
     np.array([3, 0, 2], dtype=np.uint8),
@@ -304,29 +304,39 @@ def morlet_integral(lower: float, upper: float, w0: float = W0) -> complex:
 
 
 MORLET = build_kernel(PERIOD)
+MORLET_RADIUS = len(MORLET) // 2
+MORLET_TABLE = MAPPINGS[:, :, None] * MORLET[::-1][None, None, :]
+MORLET_REAL = np.ascontiguousarray(MORLET_TABLE.real)
+MORLET_IMAG = np.ascontiguousarray(MORLET_TABLE.imag)
+
+
+@njit(cache=True, parallel=True)
+def _features(
+    codes: NDArray[np.uint8],
+    real: NDArray[np.float64],
+    imag: NDArray[np.float64],
+    radius: int,
+) -> NDArray[np.float32]:
+    length = codes.shape[0]
+    width = 2 * radius + 1
+    channels = real.shape[1]
+    out = np.empty((channels, length), dtype=np.float32)
+    for position in prange(length):
+        for channel in range(channels):
+            re = 0.0
+            im = 0.0
+            for tap in range(width):
+                source = position + tap - radius
+                if 0 <= source < length:
+                    base = codes[source]
+                    re += real[base, channel, tap]
+                    im += imag[base, channel, tap]
+            out[channel, position] = re * re + im * im
+    return out
 
 
 def features(codes: NDArray[np.uint8]) -> NDArray[np.float32]:
-    length = len(codes)
-    radius = len(MORLET) // 2
-    out = np.empty((MAPPINGS.shape[1], length), dtype=np.float32)
-    chunk = 1_000_000
-    for start in range(0, length, chunk):
-        end = min(start + chunk, length)
-        low = max(0, start - radius)
-        high = min(length, end + radius)
-        signal = MAPPINGS[codes[low:high]]
-        span = high - low
-        fft_size = 1 << (span + len(MORLET) - 1).bit_length()
-        kernel_spectrum = np.fft.fft(MORLET, fft_size)
-        for channel in range(signal.shape[1]):
-            coefficients = np.fft.ifft(
-                np.fft.fft(signal[:, channel], fft_size) * kernel_spectrum
-            )[radius : radius + span]
-            out[channel, start:end] = (
-                np.abs(coefficients[start - low : end - low]) ** 2
-            )
-    return out
+    return _features(codes, MORLET_REAL, MORLET_IMAG, MORLET_RADIUS)
 
 
 def learn_motifs(
@@ -361,25 +371,44 @@ def learn_motifs(
     return motifs
 
 
+@njit(cache=True)
+def _motif_mask(
+    sequence: NDArray[np.uint8],
+    motifs: NDArray[np.uint8],
+    lengths: NDArray[np.int64],
+    forward: bool,
+) -> NDArray[np.bool_]:
+    n = sequence.shape[0]
+    mask = np.zeros(n, dtype=np.bool_)
+    for row in range(motifs.shape[0]):
+        k = lengths[row]
+        if k > n:
+            continue
+        limit = n - k + 1 if forward else n - k
+        for start in range(limit):
+            hit = True
+            for offset in range(k):
+                if sequence[start + offset] != motifs[row, offset]:
+                    hit = False
+                    break
+            if hit:
+                mask[start if forward else start + k] = True
+    return mask
+
+
 def motif_mask(
     sequence: NDArray[np.uint8], site: str, motifs: dict[str, set[bytes]]
 ) -> NDArray[np.bool_]:
     n = len(sequence)
     if site not in motifs:
         return np.ones(n, dtype=bool)
-    mask = np.zeros(n, dtype=bool)
-    for motif in motifs[site]:
-        k = len(motif)
-        if k > n:
-            continue
-        match = np.ones(n - k + 1, dtype=bool)
-        for offset, value in enumerate(motif):
-            match &= sequence[offset : offset + n - k + 1] == value
-        if site in ("GS", "IS"):
-            mask[: n - k + 1] |= match
-        else:
-            mask[k:] |= match[: n - k]
-    return mask
+    found = list(motifs[site])
+    table = np.zeros((len(found), max(len(motif) for motif in found)), dtype=np.uint8)
+    lengths = np.zeros(len(found), dtype=np.int64)
+    for row, motif in enumerate(found):
+        table[row, : len(motif)] = np.frombuffer(motif, dtype=np.uint8)
+        lengths[row] = len(motif)
+    return _motif_mask(sequence, table, lengths, site in ("GS", "IS"))
 
 
 @dataclass
@@ -391,12 +420,16 @@ class Sites:
         return len(self.positions)
 
 
+@njit(cache=True)
 def local_max(score: NDArray[np.float32]) -> NDArray[np.bool_]:
-    if not len(score):
-        return np.zeros(0, dtype=bool)
-    keep = np.ones(len(score), dtype=bool)
-    keep[1:] &= score[1:] > score[:-1]
-    keep[:-1] &= score[:-1] >= score[1:]
+    n = score.shape[0]
+    keep = np.ones(n, dtype=np.bool_)
+    for i in range(1, n):
+        if not score[i] > score[i - 1]:
+            keep[i] = False
+    for i in range(n - 1):
+        if not score[i] >= score[i + 1]:
+            keep[i] = False
     return keep
 
 
@@ -423,16 +456,42 @@ class Candidate:
     locus: int = 0
 
 
+@njit(cache=True)
+def _is_stop(a: int, b: int, c: int) -> bool:
+    return (a == 3 and b == 0 and (c == 0 or c == 2)) or (a == 3 and b == 2 and c == 0)
+
+
+@njit(cache=True)
+def _valid_orf(
+    sequence: NDArray[np.uint8],
+    starts: NDArray[np.int64],
+    ends: NDArray[np.int64],
+) -> bool:
+    total = 0
+    for index in range(starts.shape[0]):
+        total += ends[index] - starts[index]
+    if total < 6 or total % 3:
+        return False
+    coding = np.empty(total, dtype=np.uint8)
+    cursor = 0
+    for index in range(starts.shape[0]):
+        for position in range(starts[index], ends[index]):
+            coding[cursor] = sequence[position]
+            cursor += 1
+    if coding[0] != 0 or coding[1] != 3 or coding[2] != 2:  # ATG
+        return False
+    if not _is_stop(coding[total - 3], coding[total - 2], coding[total - 1]):
+        return False
+    for codon in range(0, total - 3, 3):
+        if _is_stop(coding[codon], coding[codon + 1], coding[codon + 2]):
+            return False
+    return True
+
+
 def valid_orf(sequence: NDArray[np.uint8], cds: list[tuple[int, int]]) -> bool:
-    coding = np.concatenate([sequence[left:right] for left, right in cds])
-    if len(coding) < 6 or len(coding) % 3:
-        return False
-    if not np.array_equal(coding[:3], START_CODON):
-        return False
-    if not any(np.array_equal(coding[-3:], stop) for stop in STOP_CODONS):
-        return False
-    codons = coding[:-3].reshape(-1, 3)
-    return not any(np.all(codons == stop, axis=1).any() for stop in STOP_CODONS)
+    starts = np.array([left for left, _ in cds], dtype=np.int64)
+    ends = np.array([right for _, right in cds], dtype=np.int64)
+    return bool(_valid_orf(sequence, starts, ends))
 
 
 def assemble_candidates(
@@ -453,7 +512,7 @@ def assemble_candidates(
             stop_at[: length - 2] |= match
     stop_starts = np.flatnonzero(stop_at)
     stops_by_frame = [
-        stop_starts[stop_starts % 3 == frame] for frame in range(3)
+        stop_starts[stop_starts % 3 == frame].tolist() for frame in range(3)
     ]
     valid = {site: motif_mask(sequence, site, motifs) for site in SITES}
     sites = {
