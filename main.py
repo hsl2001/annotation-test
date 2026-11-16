@@ -803,7 +803,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--annotation", required=True)
     parser.add_argument("--predict-fasta")
     parser.add_argument("--gff", default="poc.gff3")
-    parser.add_argument("--chunk-size", type=int, default=1_000_000)
+    parser.add_argument("--chunk-size", type=int, default=500_000)
     parser.add_argument("--model-radius", type=int, default=26)
     parser.add_argument("--threshold-scale", type=float, default=THRESHOLD_SCALE)
     return parser
@@ -825,6 +825,8 @@ def train_models(
                 end = min(start + chunk_size, len(sequence)) if chunk_size > 0 else len(sequence)
                 X = features(oriented_sequence[start:end])
                 Y = label_mat[:, start:end]
+                if not Y.any():
+                    continue
                 models[(name, strand, start)] = Model(radius=radius).fit(X, Y)
     return models
 
@@ -854,7 +856,9 @@ def predict_models(
             starts = range(0, len(sequence), chunk_size) if chunk_size > 0 else (0,)
             for start in starts:
                 end = min(start + chunk_size, len(sequence)) if chunk_size > 0 else len(sequence)
-                model = models.get((name, strand, start), fallback[strand])
+                model = models.get((name, strand, start), fallback.get(strand))
+                if model is None:
+                    continue
                 assert model.thresholds is not None
                 scores = model.predict(features(oriented_sequence[start:end]))
                 score_dict = {
