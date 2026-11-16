@@ -9,4 +9,4 @@ wheels/
 # Virtual environments
 .venv
 
-*.gff3
+poc.gff3
