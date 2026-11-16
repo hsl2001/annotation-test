@@ -863,7 +863,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--predict-fasta")
     parser.add_argument("--gff", default="poc.gff3")
     parser.add_argument("--chunk-size", type=int, default=500_000)
-    parser.add_argument("--model-radius", type=int, default=26)
+    parser.add_argument("--model-radius", type=int, default=100)
     parser.add_argument("--threshold-scale", type=float, default=THRESHOLD_SCALE)
     return parser
 

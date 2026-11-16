@@ -1,0 +1,1387 @@
+###
+Chr5	TRASH	repeat_region	1	7	.	+	.	ID=AT5R3300001;locus_tag=AT5R3300001;locus_biotype=telomeric_repeat;Name=AT5R3300001;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300001
+###
+Chr5	TRASH	repeat_region	8	14	.	+	.	ID=AT5R3300002;locus_tag=AT5R3300002;locus_biotype=telomeric_repeat;Name=AT5R3300002;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300002
+###
+Chr5	TRASH	repeat_region	15	21	.	+	.	ID=AT5R3300003;locus_tag=AT5R3300003;locus_biotype=telomeric_repeat;Name=AT5R3300003;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300003
+###
+Chr5	TRASH	repeat_region	22	28	.	+	.	ID=AT5R3300004;locus_tag=AT5R3300004;locus_biotype=telomeric_repeat;Name=AT5R3300004;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300004
+###
+Chr5	TRASH	repeat_region	29	35	.	+	.	ID=AT5R3300005;locus_tag=AT5R3300005;locus_biotype=telomeric_repeat;Name=AT5R3300005;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300005
+###
+Chr5	TRASH	repeat_region	36	42	.	+	.	ID=AT5R3300006;locus_tag=AT5R3300006;locus_biotype=telomeric_repeat;Name=AT5R3300006;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300006
+###
+Chr5	TRASH	repeat_region	43	49	.	+	.	ID=AT5R3300007;locus_tag=AT5R3300007;locus_biotype=telomeric_repeat;Name=AT5R3300007;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300007
+###
+Chr5	TRASH	repeat_region	50	56	.	+	.	ID=AT5R3300008;locus_tag=AT5R3300008;locus_biotype=telomeric_repeat;Name=AT5R3300008;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300008
+###
+Chr5	TRASH	repeat_region	57	63	.	+	.	ID=AT5R3300009;locus_tag=AT5R3300009;locus_biotype=telomeric_repeat;Name=AT5R3300009;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300009
+###
+Chr5	TRASH	repeat_region	64	70	.	+	.	ID=AT5R3300010;locus_tag=AT5R3300010;locus_biotype=telomeric_repeat;Name=AT5R3300010;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300010
+###
+Chr5	TRASH	repeat_region	71	77	.	+	.	ID=AT5R3300011;locus_tag=AT5R3300011;locus_biotype=telomeric_repeat;Name=AT5R3300011;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300011
+###
+Chr5	TRASH	repeat_region	78	84	.	+	.	ID=AT5R3300012;locus_tag=AT5R3300012;locus_biotype=telomeric_repeat;Name=AT5R3300012;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300012
+###
+Chr5	TRASH	repeat_region	85	91	.	+	.	ID=AT5R3300013;locus_tag=AT5R3300013;locus_biotype=telomeric_repeat;Name=AT5R3300013;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300013
+###
+Chr5	TRASH	repeat_region	92	98	.	+	.	ID=AT5R3300014;locus_tag=AT5R3300014;locus_biotype=telomeric_repeat;Name=AT5R3300014;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300014
+###
+Chr5	TRASH	repeat_region	99	105	.	+	.	ID=AT5R3300015;locus_tag=AT5R3300015;locus_biotype=telomeric_repeat;Name=AT5R3300015;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300015
+###
+Chr5	TRASH	repeat_region	106	112	.	+	.	ID=AT5R3300016;locus_tag=AT5R3300016;locus_biotype=telomeric_repeat;Name=AT5R3300016;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300016
+###
+Chr5	TRASH	repeat_region	113	119	.	+	.	ID=AT5R3300017;locus_tag=AT5R3300017;locus_biotype=telomeric_repeat;Name=AT5R3300017;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300017
+###
+Chr5	TRASH	repeat_region	120	126	.	+	.	ID=AT5R3300018;locus_tag=AT5R3300018;locus_biotype=telomeric_repeat;Name=AT5R3300018;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300018
+###
+Chr5	TRASH	repeat_region	127	133	.	+	.	ID=AT5R3300019;locus_tag=AT5R3300019;locus_biotype=telomeric_repeat;Name=AT5R3300019;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300019
+###
+Chr5	TRASH	repeat_region	134	140	.	+	.	ID=AT5R3300020;locus_tag=AT5R3300020;locus_biotype=telomeric_repeat;Name=AT5R3300020;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300020
+###
+Chr5	TRASH	repeat_region	141	147	.	+	.	ID=AT5R3300021;locus_tag=AT5R3300021;locus_biotype=telomeric_repeat;Name=AT5R3300021;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300021
+###
+Chr5	TRASH	repeat_region	148	154	.	+	.	ID=AT5R3300022;locus_tag=AT5R3300022;locus_biotype=telomeric_repeat;Name=AT5R3300022;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300022
+###
+Chr5	TRASH	repeat_region	155	161	.	+	.	ID=AT5R3300023;locus_tag=AT5R3300023;locus_biotype=telomeric_repeat;Name=AT5R3300023;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300023
+###
+Chr5	TRASH	repeat_region	162	168	.	+	.	ID=AT5R3300024;locus_tag=AT5R3300024;locus_biotype=telomeric_repeat;Name=AT5R3300024;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300024
+###
+Chr5	TRASH	repeat_region	169	175	.	+	.	ID=AT5R3300025;locus_tag=AT5R3300025;locus_biotype=telomeric_repeat;Name=AT5R3300025;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300025
+###
+Chr5	TRASH	repeat_region	176	182	.	+	.	ID=AT5R3300026;locus_tag=AT5R3300026;locus_biotype=telomeric_repeat;Name=AT5R3300026;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300026
+###
+Chr5	TRASH	repeat_region	183	189	.	+	.	ID=AT5R3300027;locus_tag=AT5R3300027;locus_biotype=telomeric_repeat;Name=AT5R3300027;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300027
+###
+Chr5	TRASH	repeat_region	190	196	.	+	.	ID=AT5R3300028;locus_tag=AT5R3300028;locus_biotype=telomeric_repeat;Name=AT5R3300028;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300028
+###
+Chr5	TRASH	repeat_region	197	203	.	+	.	ID=AT5R3300029;locus_tag=AT5R3300029;locus_biotype=telomeric_repeat;Name=AT5R3300029;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300029
+###
+Chr5	TRASH	repeat_region	204	210	.	+	.	ID=AT5R3300030;locus_tag=AT5R3300030;locus_biotype=telomeric_repeat;Name=AT5R3300030;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300030
+###
+Chr5	TRASH	repeat_region	211	217	.	+	.	ID=AT5R3300031;locus_tag=AT5R3300031;locus_biotype=telomeric_repeat;Name=AT5R3300031;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300031
+###
+Chr5	TRASH	repeat_region	218	224	.	+	.	ID=AT5R3300032;locus_tag=AT5R3300032;locus_biotype=telomeric_repeat;Name=AT5R3300032;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300032
+###
+Chr5	TRASH	repeat_region	225	231	.	+	.	ID=AT5R3300033;locus_tag=AT5R3300033;locus_biotype=telomeric_repeat;Name=AT5R3300033;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300033
+###
+Chr5	TRASH	repeat_region	232	238	.	+	.	ID=AT5R3300034;locus_tag=AT5R3300034;locus_biotype=telomeric_repeat;Name=AT5R3300034;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300034
+###
+Chr5	TRASH	repeat_region	239	245	.	+	.	ID=AT5R3300035;locus_tag=AT5R3300035;locus_biotype=telomeric_repeat;Name=AT5R3300035;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300035
+###
+Chr5	TRASH	repeat_region	246	252	.	+	.	ID=AT5R3300036;locus_tag=AT5R3300036;locus_biotype=telomeric_repeat;Name=AT5R3300036;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300036
+###
+Chr5	TRASH	repeat_region	253	259	.	+	.	ID=AT5R3300037;locus_tag=AT5R3300037;locus_biotype=telomeric_repeat;Name=AT5R3300037;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300037
+###
+Chr5	TRASH	repeat_region	260	266	.	+	.	ID=AT5R3300038;locus_tag=AT5R3300038;locus_biotype=telomeric_repeat;Name=AT5R3300038;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300038
+###
+Chr5	TRASH	repeat_region	267	273	.	+	.	ID=AT5R3300039;locus_tag=AT5R3300039;locus_biotype=telomeric_repeat;Name=AT5R3300039;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300039
+###
+Chr5	TRASH	repeat_region	274	280	.	+	.	ID=AT5R3300040;locus_tag=AT5R3300040;locus_biotype=telomeric_repeat;Name=AT5R3300040;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300040
+###
+Chr5	TRASH	repeat_region	281	287	.	+	.	ID=AT5R3300041;locus_tag=AT5R3300041;locus_biotype=telomeric_repeat;Name=AT5R3300041;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300041
+###
+Chr5	TRASH	repeat_region	288	294	.	+	.	ID=AT5R3300042;locus_tag=AT5R3300042;locus_biotype=telomeric_repeat;Name=AT5R3300042;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300042
+###
+Chr5	TRASH	repeat_region	295	301	.	+	.	ID=AT5R3300043;locus_tag=AT5R3300043;locus_biotype=telomeric_repeat;Name=AT5R3300043;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300043
+###
+Chr5	TRASH	repeat_region	302	308	.	+	.	ID=AT5R3300044;locus_tag=AT5R3300044;locus_biotype=telomeric_repeat;Name=AT5R3300044;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300044
+###
+Chr5	TRASH	repeat_region	309	315	.	+	.	ID=AT5R3300045;locus_tag=AT5R3300045;locus_biotype=telomeric_repeat;Name=AT5R3300045;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300045
+###
+Chr5	TRASH	repeat_region	316	322	.	+	.	ID=AT5R3300046;locus_tag=AT5R3300046;locus_biotype=telomeric_repeat;Name=AT5R3300046;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300046
+###
+Chr5	TRASH	repeat_region	323	329	.	+	.	ID=AT5R3300047;locus_tag=AT5R3300047;locus_biotype=telomeric_repeat;Name=AT5R3300047;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300047
+###
+Chr5	TRASH	repeat_region	330	336	.	+	.	ID=AT5R3300048;locus_tag=AT5R3300048;locus_biotype=telomeric_repeat;Name=AT5R3300048;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300048
+###
+Chr5	TRASH	repeat_region	337	343	.	+	.	ID=AT5R3300049;locus_tag=AT5R3300049;locus_biotype=telomeric_repeat;Name=AT5R3300049;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300049
+###
+Chr5	TRASH	repeat_region	344	350	.	+	.	ID=AT5R3300050;locus_tag=AT5R3300050;locus_biotype=telomeric_repeat;Name=AT5R3300050;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300050
+###
+Chr5	TRASH	repeat_region	351	357	.	+	.	ID=AT5R3300051;locus_tag=AT5R3300051;locus_biotype=telomeric_repeat;Name=AT5R3300051;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300051
+###
+Chr5	TRASH	repeat_region	358	364	.	+	.	ID=AT5R3300052;locus_tag=AT5R3300052;locus_biotype=telomeric_repeat;Name=AT5R3300052;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300052
+###
+Chr5	TRASH	repeat_region	365	371	.	+	.	ID=AT5R3300053;locus_tag=AT5R3300053;locus_biotype=telomeric_repeat;Name=AT5R3300053;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300053
+###
+Chr5	TRASH	repeat_region	372	378	.	+	.	ID=AT5R3300054;locus_tag=AT5R3300054;locus_biotype=telomeric_repeat;Name=AT5R3300054;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300054
+###
+Chr5	TRASH	repeat_region	379	385	.	+	.	ID=AT5R3300055;locus_tag=AT5R3300055;locus_biotype=telomeric_repeat;Name=AT5R3300055;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300055
+###
+Chr5	TRASH	repeat_region	386	392	.	+	.	ID=AT5R3300056;locus_tag=AT5R3300056;locus_biotype=telomeric_repeat;Name=AT5R3300056;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300056
+###
+Chr5	TRASH	repeat_region	393	399	.	+	.	ID=AT5R3300057;locus_tag=AT5R3300057;locus_biotype=telomeric_repeat;Name=AT5R3300057;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300057
+###
+Chr5	TRASH	repeat_region	400	406	.	+	.	ID=AT5R3300058;locus_tag=AT5R3300058;locus_biotype=telomeric_repeat;Name=AT5R3300058;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300058
+###
+Chr5	TRASH	repeat_region	407	413	.	+	.	ID=AT5R3300059;locus_tag=AT5R3300059;locus_biotype=telomeric_repeat;Name=AT5R3300059;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300059
+###
+Chr5	TRASH	repeat_region	414	420	.	+	.	ID=AT5R3300060;locus_tag=AT5R3300060;locus_biotype=telomeric_repeat;Name=AT5R3300060;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300060
+###
+Chr5	TRASH	repeat_region	421	427	.	+	.	ID=AT5R3300061;locus_tag=AT5R3300061;locus_biotype=telomeric_repeat;Name=AT5R3300061;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300061
+###
+Chr5	TRASH	repeat_region	428	434	.	+	.	ID=AT5R3300062;locus_tag=AT5R3300062;locus_biotype=telomeric_repeat;Name=AT5R3300062;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300062
+###
+Chr5	TRASH	repeat_region	435	441	.	+	.	ID=AT5R3300063;locus_tag=AT5R3300063;locus_biotype=telomeric_repeat;Name=AT5R3300063;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300063
+###
+Chr5	TRASH	repeat_region	442	448	.	+	.	ID=AT5R3300064;locus_tag=AT5R3300064;locus_biotype=telomeric_repeat;Name=AT5R3300064;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300064
+###
+Chr5	TRASH	repeat_region	449	455	.	+	.	ID=AT5R3300065;locus_tag=AT5R3300065;locus_biotype=telomeric_repeat;Name=AT5R3300065;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300065
+###
+Chr5	TRASH	repeat_region	456	462	.	+	.	ID=AT5R3300066;locus_tag=AT5R3300066;locus_biotype=telomeric_repeat;Name=AT5R3300066;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300066
+###
+Chr5	TRASH	repeat_region	463	469	.	+	.	ID=AT5R3300067;locus_tag=AT5R3300067;locus_biotype=telomeric_repeat;Name=AT5R3300067;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300067
+###
+Chr5	TRASH	repeat_region	470	476	.	+	.	ID=AT5R3300068;locus_tag=AT5R3300068;locus_biotype=telomeric_repeat;Name=AT5R3300068;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300068
+###
+Chr5	TRASH	repeat_region	477	483	.	+	.	ID=AT5R3300069;locus_tag=AT5R3300069;locus_biotype=telomeric_repeat;Name=AT5R3300069;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300069
+###
+Chr5	TRASH	repeat_region	484	490	.	+	.	ID=AT5R3300070;locus_tag=AT5R3300070;locus_biotype=telomeric_repeat;Name=AT5R3300070;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300070
+###
+Chr5	TRASH	repeat_region	491	497	.	+	.	ID=AT5R3300071;locus_tag=AT5R3300071;locus_biotype=telomeric_repeat;Name=AT5R3300071;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300071
+###
+Chr5	TRASH	repeat_region	498	504	.	+	.	ID=AT5R3300072;locus_tag=AT5R3300072;locus_biotype=telomeric_repeat;Name=AT5R3300072;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300072
+###
+Chr5	TRASH	repeat_region	505	511	.	+	.	ID=AT5R3300073;locus_tag=AT5R3300073;locus_biotype=telomeric_repeat;Name=AT5R3300073;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300073
+###
+Chr5	TRASH	repeat_region	512	518	.	+	.	ID=AT5R3300074;locus_tag=AT5R3300074;locus_biotype=telomeric_repeat;Name=AT5R3300074;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300074
+###
+Chr5	TRASH	repeat_region	519	525	.	+	.	ID=AT5R3300075;locus_tag=AT5R3300075;locus_biotype=telomeric_repeat;Name=AT5R3300075;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300075
+###
+Chr5	TRASH	repeat_region	526	532	.	+	.	ID=AT5R3300076;locus_tag=AT5R3300076;locus_biotype=telomeric_repeat;Name=AT5R3300076;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300076
+###
+Chr5	TRASH	repeat_region	533	539	.	+	.	ID=AT5R3300077;locus_tag=AT5R3300077;locus_biotype=telomeric_repeat;Name=AT5R3300077;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300077
+###
+Chr5	TRASH	repeat_region	540	546	.	+	.	ID=AT5R3300078;locus_tag=AT5R3300078;locus_biotype=telomeric_repeat;Name=AT5R3300078;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300078
+###
+Chr5	TRASH	repeat_region	547	553	.	+	.	ID=AT5R3300079;locus_tag=AT5R3300079;locus_biotype=telomeric_repeat;Name=AT5R3300079;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300079
+###
+Chr5	TRASH	repeat_region	554	560	.	+	.	ID=AT5R3300080;locus_tag=AT5R3300080;locus_biotype=telomeric_repeat;Name=AT5R3300080;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300080
+###
+Chr5	TRASH	repeat_region	561	567	.	+	.	ID=AT5R3300081;locus_tag=AT5R3300081;locus_biotype=telomeric_repeat;Name=AT5R3300081;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300081
+###
+Chr5	TRASH	repeat_region	568	574	.	+	.	ID=AT5R3300082;locus_tag=AT5R3300082;locus_biotype=telomeric_repeat;Name=AT5R3300082;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300082
+###
+Chr5	TRASH	repeat_region	575	581	.	+	.	ID=AT5R3300083;locus_tag=AT5R3300083;locus_biotype=telomeric_repeat;Name=AT5R3300083;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300083
+###
+Chr5	TRASH	repeat_region	582	588	.	+	.	ID=AT5R3300084;locus_tag=AT5R3300084;locus_biotype=telomeric_repeat;Name=AT5R3300084;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300084
+###
+Chr5	TRASH	repeat_region	589	595	.	+	.	ID=AT5R3300085;locus_tag=AT5R3300085;locus_biotype=telomeric_repeat;Name=AT5R3300085;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300085
+###
+Chr5	TRASH	repeat_region	596	602	.	+	.	ID=AT5R3300086;locus_tag=AT5R3300086;locus_biotype=telomeric_repeat;Name=AT5R3300086;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300086
+###
+Chr5	TRASH	repeat_region	603	609	.	+	.	ID=AT5R3300087;locus_tag=AT5R3300087;locus_biotype=telomeric_repeat;Name=AT5R3300087;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300087
+###
+Chr5	TRASH	repeat_region	610	616	.	+	.	ID=AT5R3300088;locus_tag=AT5R3300088;locus_biotype=telomeric_repeat;Name=AT5R3300088;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300088
+###
+Chr5	TRASH	repeat_region	617	623	.	+	.	ID=AT5R3300089;locus_tag=AT5R3300089;locus_biotype=telomeric_repeat;Name=AT5R3300089;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300089
+###
+Chr5	TRASH	repeat_region	624	630	.	+	.	ID=AT5R3300090;locus_tag=AT5R3300090;locus_biotype=telomeric_repeat;Name=AT5R3300090;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300090
+###
+Chr5	TRASH	repeat_region	631	637	.	+	.	ID=AT5R3300091;locus_tag=AT5R3300091;locus_biotype=telomeric_repeat;Name=AT5R3300091;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300091
+###
+Chr5	TRASH	repeat_region	638	644	.	+	.	ID=AT5R3300092;locus_tag=AT5R3300092;locus_biotype=telomeric_repeat;Name=AT5R3300092;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300092
+###
+Chr5	TRASH	repeat_region	645	651	.	+	.	ID=AT5R3300093;locus_tag=AT5R3300093;locus_biotype=telomeric_repeat;Name=AT5R3300093;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300093
+###
+Chr5	TRASH	repeat_region	652	658	.	+	.	ID=AT5R3300094;locus_tag=AT5R3300094;locus_biotype=telomeric_repeat;Name=AT5R3300094;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300094
+###
+Chr5	TRASH	repeat_region	659	665	.	+	.	ID=AT5R3300095;locus_tag=AT5R3300095;locus_biotype=telomeric_repeat;Name=AT5R3300095;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300095
+###
+Chr5	TRASH	repeat_region	666	672	.	+	.	ID=AT5R3300096;locus_tag=AT5R3300096;locus_biotype=telomeric_repeat;Name=AT5R3300096;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300096
+###
+Chr5	TRASH	repeat_region	673	679	.	+	.	ID=AT5R3300097;locus_tag=AT5R3300097;locus_biotype=telomeric_repeat;Name=AT5R3300097;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300097
+###
+Chr5	TRASH	repeat_region	680	686	.	+	.	ID=AT5R3300098;locus_tag=AT5R3300098;locus_biotype=telomeric_repeat;Name=AT5R3300098;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300098
+###
+Chr5	TRASH	repeat_region	687	693	.	+	.	ID=AT5R3300099;locus_tag=AT5R3300099;locus_biotype=telomeric_repeat;Name=AT5R3300099;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300099
+###
+Chr5	TRASH	repeat_region	694	700	.	+	.	ID=AT5R3300100;locus_tag=AT5R3300100;locus_biotype=telomeric_repeat;Name=AT5R3300100;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300100
+###
+Chr5	TRASH	repeat_region	701	707	.	+	.	ID=AT5R3300101;locus_tag=AT5R3300101;locus_biotype=telomeric_repeat;Name=AT5R3300101;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300101
+###
+Chr5	TRASH	repeat_region	708	714	.	+	.	ID=AT5R3300102;locus_tag=AT5R3300102;locus_biotype=telomeric_repeat;Name=AT5R3300102;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300102
+###
+Chr5	TRASH	repeat_region	715	721	.	+	.	ID=AT5R3300103;locus_tag=AT5R3300103;locus_biotype=telomeric_repeat;Name=AT5R3300103;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300103
+###
+Chr5	TRASH	repeat_region	722	728	.	+	.	ID=AT5R3300104;locus_tag=AT5R3300104;locus_biotype=telomeric_repeat;Name=AT5R3300104;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300104
+###
+Chr5	TRASH	repeat_region	729	735	.	+	.	ID=AT5R3300105;locus_tag=AT5R3300105;locus_biotype=telomeric_repeat;Name=AT5R3300105;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300105
+###
+Chr5	TRASH	repeat_region	736	742	.	+	.	ID=AT5R3300106;locus_tag=AT5R3300106;locus_biotype=telomeric_repeat;Name=AT5R3300106;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300106
+###
+Chr5	TRASH	repeat_region	743	749	.	+	.	ID=AT5R3300107;locus_tag=AT5R3300107;locus_biotype=telomeric_repeat;Name=AT5R3300107;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300107
+###
+Chr5	TRASH	repeat_region	750	756	.	+	.	ID=AT5R3300108;locus_tag=AT5R3300108;locus_biotype=telomeric_repeat;Name=AT5R3300108;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300108
+###
+Chr5	TRASH	repeat_region	757	763	.	+	.	ID=AT5R3300109;locus_tag=AT5R3300109;locus_biotype=telomeric_repeat;Name=AT5R3300109;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300109
+###
+Chr5	TRASH	repeat_region	764	770	.	+	.	ID=AT5R3300110;locus_tag=AT5R3300110;locus_biotype=telomeric_repeat;Name=AT5R3300110;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300110
+###
+Chr5	TRASH	repeat_region	771	777	.	+	.	ID=AT5R3300111;locus_tag=AT5R3300111;locus_biotype=telomeric_repeat;Name=AT5R3300111;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300111
+###
+Chr5	TRASH	repeat_region	778	784	.	+	.	ID=AT5R3300112;locus_tag=AT5R3300112;locus_biotype=telomeric_repeat;Name=AT5R3300112;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300112
+###
+Chr5	TRASH	repeat_region	785	791	.	+	.	ID=AT5R3300113;locus_tag=AT5R3300113;locus_biotype=telomeric_repeat;Name=AT5R3300113;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300113
+###
+Chr5	TRASH	repeat_region	792	798	.	+	.	ID=AT5R3300114;locus_tag=AT5R3300114;locus_biotype=telomeric_repeat;Name=AT5R3300114;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300114
+###
+Chr5	TRASH	repeat_region	799	805	.	+	.	ID=AT5R3300115;locus_tag=AT5R3300115;locus_biotype=telomeric_repeat;Name=AT5R3300115;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300115
+###
+Chr5	TRASH	repeat_region	806	812	.	+	.	ID=AT5R3300116;locus_tag=AT5R3300116;locus_biotype=telomeric_repeat;Name=AT5R3300116;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300116
+###
+Chr5	TRASH	repeat_region	813	819	.	+	.	ID=AT5R3300117;locus_tag=AT5R3300117;locus_biotype=telomeric_repeat;Name=AT5R3300117;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300117
+###
+Chr5	TRASH	repeat_region	820	826	.	+	.	ID=AT5R3300118;locus_tag=AT5R3300118;locus_biotype=telomeric_repeat;Name=AT5R3300118;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300118
+###
+Chr5	TRASH	repeat_region	827	833	.	+	.	ID=AT5R3300119;locus_tag=AT5R3300119;locus_biotype=telomeric_repeat;Name=AT5R3300119;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300119
+###
+Chr5	TRASH	repeat_region	834	840	.	+	.	ID=AT5R3300120;locus_tag=AT5R3300120;locus_biotype=telomeric_repeat;Name=AT5R3300120;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300120
+###
+Chr5	TRASH	repeat_region	841	847	.	+	.	ID=AT5R3300121;locus_tag=AT5R3300121;locus_biotype=telomeric_repeat;Name=AT5R3300121;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300121
+###
+Chr5	TRASH	repeat_region	848	854	.	+	.	ID=AT5R3300122;locus_tag=AT5R3300122;locus_biotype=telomeric_repeat;Name=AT5R3300122;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300122
+###
+Chr5	TRASH	repeat_region	855	861	.	+	.	ID=AT5R3300123;locus_tag=AT5R3300123;locus_biotype=telomeric_repeat;Name=AT5R3300123;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300123
+###
+Chr5	TRASH	repeat_region	862	868	.	+	.	ID=AT5R3300124;locus_tag=AT5R3300124;locus_biotype=telomeric_repeat;Name=AT5R3300124;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300124
+###
+Chr5	TRASH	repeat_region	869	875	.	+	.	ID=AT5R3300125;locus_tag=AT5R3300125;locus_biotype=telomeric_repeat;Name=AT5R3300125;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300125
+###
+Chr5	TRASH	repeat_region	876	882	.	+	.	ID=AT5R3300126;locus_tag=AT5R3300126;locus_biotype=telomeric_repeat;Name=AT5R3300126;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300126
+###
+Chr5	TRASH	repeat_region	883	889	.	+	.	ID=AT5R3300127;locus_tag=AT5R3300127;locus_biotype=telomeric_repeat;Name=AT5R3300127;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300127
+###
+Chr5	TRASH	repeat_region	890	896	.	+	.	ID=AT5R3300128;locus_tag=AT5R3300128;locus_biotype=telomeric_repeat;Name=AT5R3300128;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300128
+###
+Chr5	TRASH	repeat_region	897	903	.	+	.	ID=AT5R3300129;locus_tag=AT5R3300129;locus_biotype=telomeric_repeat;Name=AT5R3300129;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300129
+###
+Chr5	TRASH	repeat_region	904	910	.	+	.	ID=AT5R3300130;locus_tag=AT5R3300130;locus_biotype=telomeric_repeat;Name=AT5R3300130;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300130
+###
+Chr5	TRASH	repeat_region	911	917	.	+	.	ID=AT5R3300131;locus_tag=AT5R3300131;locus_biotype=telomeric_repeat;Name=AT5R3300131;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300131
+###
+Chr5	TRASH	repeat_region	918	924	.	+	.	ID=AT5R3300132;locus_tag=AT5R3300132;locus_biotype=telomeric_repeat;Name=AT5R3300132;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300132
+###
+Chr5	TRASH	repeat_region	925	931	.	+	.	ID=AT5R3300133;locus_tag=AT5R3300133;locus_biotype=telomeric_repeat;Name=AT5R3300133;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300133
+###
+Chr5	TRASH	repeat_region	932	938	.	+	.	ID=AT5R3300134;locus_tag=AT5R3300134;locus_biotype=telomeric_repeat;Name=AT5R3300134;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300134
+###
+Chr5	TRASH	repeat_region	939	945	.	+	.	ID=AT5R3300135;locus_tag=AT5R3300135;locus_biotype=telomeric_repeat;Name=AT5R3300135;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300135
+###
+Chr5	TRASH	repeat_region	946	952	.	+	.	ID=AT5R3300136;locus_tag=AT5R3300136;locus_biotype=telomeric_repeat;Name=AT5R3300136;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300136
+###
+Chr5	TRASH	repeat_region	953	959	.	+	.	ID=AT5R3300137;locus_tag=AT5R3300137;locus_biotype=telomeric_repeat;Name=AT5R3300137;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300137
+###
+Chr5	TRASH	repeat_region	960	966	.	+	.	ID=AT5R3300138;locus_tag=AT5R3300138;locus_biotype=telomeric_repeat;Name=AT5R3300138;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300138
+###
+Chr5	TRASH	repeat_region	967	973	.	+	.	ID=AT5R3300139;locus_tag=AT5R3300139;locus_biotype=telomeric_repeat;Name=AT5R3300139;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300139
+###
+Chr5	TRASH	repeat_region	974	980	.	+	.	ID=AT5R3300140;locus_tag=AT5R3300140;locus_biotype=telomeric_repeat;Name=AT5R3300140;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300140
+###
+Chr5	TRASH	repeat_region	981	987	.	+	.	ID=AT5R3300141;locus_tag=AT5R3300141;locus_biotype=telomeric_repeat;Name=AT5R3300141;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300141
+###
+Chr5	TRASH	repeat_region	988	994	.	+	.	ID=AT5R3300142;locus_tag=AT5R3300142;locus_biotype=telomeric_repeat;Name=AT5R3300142;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300142
+###
+Chr5	TRASH	repeat_region	995	1001	.	+	.	ID=AT5R3300143;locus_tag=AT5R3300143;locus_biotype=telomeric_repeat;Name=AT5R3300143;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300143
+###
+Chr5	TRASH	repeat_region	1002	1008	.	+	.	ID=AT5R3300144;locus_tag=AT5R3300144;locus_biotype=telomeric_repeat;Name=AT5R3300144;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300144
+###
+Chr5	TRASH	repeat_region	1009	1015	.	+	.	ID=AT5R3300145;locus_tag=AT5R3300145;locus_biotype=telomeric_repeat;Name=AT5R3300145;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300145
+###
+Chr5	TRASH	repeat_region	1016	1022	.	+	.	ID=AT5R3300146;locus_tag=AT5R3300146;locus_biotype=telomeric_repeat;Name=AT5R3300146;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300146
+###
+Chr5	TRASH	repeat_region	1023	1029	.	+	.	ID=AT5R3300147;locus_tag=AT5R3300147;locus_biotype=telomeric_repeat;Name=AT5R3300147;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300147
+###
+Chr5	TRASH	repeat_region	1030	1036	.	+	.	ID=AT5R3300148;locus_tag=AT5R3300148;locus_biotype=telomeric_repeat;Name=AT5R3300148;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300148
+###
+Chr5	TRASH	repeat_region	1037	1043	.	+	.	ID=AT5R3300149;locus_tag=AT5R3300149;locus_biotype=telomeric_repeat;Name=AT5R3300149;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300149
+###
+Chr5	TRASH	repeat_region	1044	1050	.	+	.	ID=AT5R3300150;locus_tag=AT5R3300150;locus_biotype=telomeric_repeat;Name=AT5R3300150;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300150
+###
+Chr5	TRASH	repeat_region	1051	1057	.	+	.	ID=AT5R3300151;locus_tag=AT5R3300151;locus_biotype=telomeric_repeat;Name=AT5R3300151;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300151
+###
+Chr5	TRASH	repeat_region	1058	1064	.	+	.	ID=AT5R3300152;locus_tag=AT5R3300152;locus_biotype=telomeric_repeat;Name=AT5R3300152;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300152
+###
+Chr5	TRASH	repeat_region	1065	1071	.	+	.	ID=AT5R3300153;locus_tag=AT5R3300153;locus_biotype=telomeric_repeat;Name=AT5R3300153;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300153
+###
+Chr5	TRASH	repeat_region	1072	1078	.	+	.	ID=AT5R3300154;locus_tag=AT5R3300154;locus_biotype=telomeric_repeat;Name=AT5R3300154;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300154
+###
+Chr5	TRASH	repeat_region	1079	1085	.	+	.	ID=AT5R3300155;locus_tag=AT5R3300155;locus_biotype=telomeric_repeat;Name=AT5R3300155;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300155
+###
+Chr5	TRASH	repeat_region	1086	1092	.	+	.	ID=AT5R3300156;locus_tag=AT5R3300156;locus_biotype=telomeric_repeat;Name=AT5R3300156;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300156
+###
+Chr5	TRASH	repeat_region	1093	1099	.	+	.	ID=AT5R3300157;locus_tag=AT5R3300157;locus_biotype=telomeric_repeat;Name=AT5R3300157;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300157
+###
+Chr5	TRASH	repeat_region	1100	1106	.	+	.	ID=AT5R3300158;locus_tag=AT5R3300158;locus_biotype=telomeric_repeat;Name=AT5R3300158;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300158
+###
+Chr5	TRASH	repeat_region	1107	1113	.	+	.	ID=AT5R3300159;locus_tag=AT5R3300159;locus_biotype=telomeric_repeat;Name=AT5R3300159;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300159
+###
+Chr5	TRASH	repeat_region	1114	1120	.	+	.	ID=AT5R3300160;locus_tag=AT5R3300160;locus_biotype=telomeric_repeat;Name=AT5R3300160;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300160
+###
+Chr5	TRASH	repeat_region	1121	1127	.	+	.	ID=AT5R3300161;locus_tag=AT5R3300161;locus_biotype=telomeric_repeat;Name=AT5R3300161;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300161
+###
+Chr5	TRASH	repeat_region	1128	1134	.	+	.	ID=AT5R3300162;locus_tag=AT5R3300162;locus_biotype=telomeric_repeat;Name=AT5R3300162;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300162
+###
+Chr5	TRASH	repeat_region	1135	1141	.	+	.	ID=AT5R3300163;locus_tag=AT5R3300163;locus_biotype=telomeric_repeat;Name=AT5R3300163;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300163
+###
+Chr5	TRASH	repeat_region	1142	1148	.	+	.	ID=AT5R3300164;locus_tag=AT5R3300164;locus_biotype=telomeric_repeat;Name=AT5R3300164;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300164
+###
+Chr5	TRASH	repeat_region	1149	1155	.	+	.	ID=AT5R3300165;locus_tag=AT5R3300165;locus_biotype=telomeric_repeat;Name=AT5R3300165;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300165
+###
+Chr5	TRASH	repeat_region	1156	1162	.	+	.	ID=AT5R3300166;locus_tag=AT5R3300166;locus_biotype=telomeric_repeat;Name=AT5R3300166;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300166
+###
+Chr5	TRASH	repeat_region	1163	1169	.	+	.	ID=AT5R3300167;locus_tag=AT5R3300167;locus_biotype=telomeric_repeat;Name=AT5R3300167;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300167
+###
+Chr5	TRASH	repeat_region	1170	1176	.	+	.	ID=AT5R3300168;locus_tag=AT5R3300168;locus_biotype=telomeric_repeat;Name=AT5R3300168;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300168
+###
+Chr5	TRASH	repeat_region	1177	1183	.	+	.	ID=AT5R3300169;locus_tag=AT5R3300169;locus_biotype=telomeric_repeat;Name=AT5R3300169;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300169
+###
+Chr5	TRASH	repeat_region	1184	1190	.	+	.	ID=AT5R3300170;locus_tag=AT5R3300170;locus_biotype=telomeric_repeat;Name=AT5R3300170;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300170
+###
+Chr5	TRASH	repeat_region	1191	1197	.	+	.	ID=AT5R3300171;locus_tag=AT5R3300171;locus_biotype=telomeric_repeat;Name=AT5R3300171;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300171
+###
+Chr5	TRASH	repeat_region	1198	1204	.	+	.	ID=AT5R3300172;locus_tag=AT5R3300172;locus_biotype=telomeric_repeat;Name=AT5R3300172;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300172
+###
+Chr5	TRASH	repeat_region	1205	1211	.	+	.	ID=AT5R3300173;locus_tag=AT5R3300173;locus_biotype=telomeric_repeat;Name=AT5R3300173;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300173
+###
+Chr5	TRASH	repeat_region	1212	1218	.	+	.	ID=AT5R3300174;locus_tag=AT5R3300174;locus_biotype=telomeric_repeat;Name=AT5R3300174;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300174
+###
+Chr5	TRASH	repeat_region	1219	1225	.	+	.	ID=AT5R3300175;locus_tag=AT5R3300175;locus_biotype=telomeric_repeat;Name=AT5R3300175;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300175
+###
+Chr5	TRASH	repeat_region	1226	1232	.	+	.	ID=AT5R3300176;locus_tag=AT5R3300176;locus_biotype=telomeric_repeat;Name=AT5R3300176;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300176
+###
+Chr5	TRASH	repeat_region	1233	1239	.	+	.	ID=AT5R3300177;locus_tag=AT5R3300177;locus_biotype=telomeric_repeat;Name=AT5R3300177;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300177
+###
+Chr5	TRASH	repeat_region	1240	1246	.	+	.	ID=AT5R3300178;locus_tag=AT5R3300178;locus_biotype=telomeric_repeat;Name=AT5R3300178;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300178
+###
+Chr5	TRASH	repeat_region	1247	1253	.	+	.	ID=AT5R3300179;locus_tag=AT5R3300179;locus_biotype=telomeric_repeat;Name=AT5R3300179;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300179
+###
+Chr5	TRASH	repeat_region	1254	1260	.	+	.	ID=AT5R3300180;locus_tag=AT5R3300180;locus_biotype=telomeric_repeat;Name=AT5R3300180;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300180
+###
+Chr5	TRASH	repeat_region	1261	1267	.	+	.	ID=AT5R3300181;locus_tag=AT5R3300181;locus_biotype=telomeric_repeat;Name=AT5R3300181;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300181
+###
+Chr5	TRASH	repeat_region	1268	1274	.	+	.	ID=AT5R3300182;locus_tag=AT5R3300182;locus_biotype=telomeric_repeat;Name=AT5R3300182;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300182
+###
+Chr5	TRASH	repeat_region	1275	1281	.	+	.	ID=AT5R3300183;locus_tag=AT5R3300183;locus_biotype=telomeric_repeat;Name=AT5R3300183;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300183
+###
+Chr5	TRASH	repeat_region	1282	1288	.	+	.	ID=AT5R3300184;locus_tag=AT5R3300184;locus_biotype=telomeric_repeat;Name=AT5R3300184;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300184
+###
+Chr5	TRASH	repeat_region	1289	1295	.	+	.	ID=AT5R3300185;locus_tag=AT5R3300185;locus_biotype=telomeric_repeat;Name=AT5R3300185;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300185
+###
+Chr5	TRASH	repeat_region	1296	1302	.	+	.	ID=AT5R3300186;locus_tag=AT5R3300186;locus_biotype=telomeric_repeat;Name=AT5R3300186;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300186
+###
+Chr5	TRASH	repeat_region	1303	1309	.	+	.	ID=AT5R3300187;locus_tag=AT5R3300187;locus_biotype=telomeric_repeat;Name=AT5R3300187;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300187
+###
+Chr5	TRASH	repeat_region	1310	1316	.	+	.	ID=AT5R3300188;locus_tag=AT5R3300188;locus_biotype=telomeric_repeat;Name=AT5R3300188;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300188
+###
+Chr5	TRASH	repeat_region	1317	1323	.	+	.	ID=AT5R3300189;locus_tag=AT5R3300189;locus_biotype=telomeric_repeat;Name=AT5R3300189;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300189
+###
+Chr5	TRASH	repeat_region	1324	1330	.	+	.	ID=AT5R3300190;locus_tag=AT5R3300190;locus_biotype=telomeric_repeat;Name=AT5R3300190;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300190
+###
+Chr5	TRASH	repeat_region	1331	1337	.	+	.	ID=AT5R3300191;locus_tag=AT5R3300191;locus_biotype=telomeric_repeat;Name=AT5R3300191;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300191
+###
+Chr5	TRASH	repeat_region	1338	1344	.	+	.	ID=AT5R3300192;locus_tag=AT5R3300192;locus_biotype=telomeric_repeat;Name=AT5R3300192;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300192
+###
+Chr5	TRASH	repeat_region	1345	1351	.	+	.	ID=AT5R3300193;locus_tag=AT5R3300193;locus_biotype=telomeric_repeat;Name=AT5R3300193;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300193
+###
+Chr5	TRASH	repeat_region	1352	1358	.	+	.	ID=AT5R3300194;locus_tag=AT5R3300194;locus_biotype=telomeric_repeat;Name=AT5R3300194;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300194
+###
+Chr5	TRASH	repeat_region	1359	1365	.	+	.	ID=AT5R3300195;locus_tag=AT5R3300195;locus_biotype=telomeric_repeat;Name=AT5R3300195;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300195
+###
+Chr5	TRASH	repeat_region	1366	1372	.	+	.	ID=AT5R3300196;locus_tag=AT5R3300196;locus_biotype=telomeric_repeat;Name=AT5R3300196;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300196
+###
+Chr5	TRASH	repeat_region	1373	1379	.	+	.	ID=AT5R3300197;locus_tag=AT5R3300197;locus_biotype=telomeric_repeat;Name=AT5R3300197;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300197
+###
+Chr5	TRASH	repeat_region	1380	1386	.	+	.	ID=AT5R3300198;locus_tag=AT5R3300198;locus_biotype=telomeric_repeat;Name=AT5R3300198;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300198
+###
+Chr5	TRASH	repeat_region	1387	1393	.	+	.	ID=AT5R3300199;locus_tag=AT5R3300199;locus_biotype=telomeric_repeat;Name=AT5R3300199;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300199
+###
+Chr5	TRASH	repeat_region	1394	1400	.	+	.	ID=AT5R3300200;locus_tag=AT5R3300200;locus_biotype=telomeric_repeat;Name=AT5R3300200;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300200
+###
+Chr5	TRASH	repeat_region	1401	1407	.	+	.	ID=AT5R3300201;locus_tag=AT5R3300201;locus_biotype=telomeric_repeat;Name=AT5R3300201;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300201
+###
+Chr5	TRASH	repeat_region	1408	1414	.	+	.	ID=AT5R3300202;locus_tag=AT5R3300202;locus_biotype=telomeric_repeat;Name=AT5R3300202;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300202
+###
+Chr5	TRASH	repeat_region	1415	1421	.	+	.	ID=AT5R3300203;locus_tag=AT5R3300203;locus_biotype=telomeric_repeat;Name=AT5R3300203;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300203
+###
+Chr5	TRASH	repeat_region	1422	1428	.	+	.	ID=AT5R3300204;locus_tag=AT5R3300204;locus_biotype=telomeric_repeat;Name=AT5R3300204;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300204
+###
+Chr5	TRASH	repeat_region	1429	1435	.	+	.	ID=AT5R3300205;locus_tag=AT5R3300205;locus_biotype=telomeric_repeat;Name=AT5R3300205;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300205
+###
+Chr5	TRASH	repeat_region	1436	1442	.	+	.	ID=AT5R3300206;locus_tag=AT5R3300206;locus_biotype=telomeric_repeat;Name=AT5R3300206;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300206
+###
+Chr5	TRASH	repeat_region	1443	1449	.	+	.	ID=AT5R3300207;locus_tag=AT5R3300207;locus_biotype=telomeric_repeat;Name=AT5R3300207;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300207
+###
+Chr5	TRASH	repeat_region	1450	1456	.	+	.	ID=AT5R3300208;locus_tag=AT5R3300208;locus_biotype=telomeric_repeat;Name=AT5R3300208;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300208
+###
+Chr5	TRASH	repeat_region	1457	1463	.	+	.	ID=AT5R3300209;locus_tag=AT5R3300209;locus_biotype=telomeric_repeat;Name=AT5R3300209;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300209
+###
+Chr5	TRASH	repeat_region	1464	1470	.	+	.	ID=AT5R3300210;locus_tag=AT5R3300210;locus_biotype=telomeric_repeat;Name=AT5R3300210;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300210
+###
+Chr5	TRASH	repeat_region	1471	1477	.	+	.	ID=AT5R3300211;locus_tag=AT5R3300211;locus_biotype=telomeric_repeat;Name=AT5R3300211;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300211
+###
+Chr5	TRASH	repeat_region	1478	1484	.	+	.	ID=AT5R3300212;locus_tag=AT5R3300212;locus_biotype=telomeric_repeat;Name=AT5R3300212;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300212
+###
+Chr5	TRASH	repeat_region	1485	1491	.	+	.	ID=AT5R3300213;locus_tag=AT5R3300213;locus_biotype=telomeric_repeat;Name=AT5R3300213;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300213
+###
+Chr5	TRASH	repeat_region	1492	1498	.	+	.	ID=AT5R3300214;locus_tag=AT5R3300214;locus_biotype=telomeric_repeat;Name=AT5R3300214;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300214
+###
+Chr5	TRASH	repeat_region	1499	1505	.	+	.	ID=AT5R3300215;locus_tag=AT5R3300215;locus_biotype=telomeric_repeat;Name=AT5R3300215;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300215
+###
+Chr5	TRASH	repeat_region	1506	1512	.	+	.	ID=AT5R3300216;locus_tag=AT5R3300216;locus_biotype=telomeric_repeat;Name=AT5R3300216;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300216
+###
+Chr5	TRASH	repeat_region	1513	1519	.	+	.	ID=AT5R3300217;locus_tag=AT5R3300217;locus_biotype=telomeric_repeat;Name=AT5R3300217;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300217
+###
+Chr5	TRASH	repeat_region	1520	1526	.	+	.	ID=AT5R3300218;locus_tag=AT5R3300218;locus_biotype=telomeric_repeat;Name=AT5R3300218;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300218
+###
+Chr5	TRASH	repeat_region	1527	1533	.	+	.	ID=AT5R3300219;locus_tag=AT5R3300219;locus_biotype=telomeric_repeat;Name=AT5R3300219;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300219
+###
+Chr5	TRASH	repeat_region	1534	1540	.	+	.	ID=AT5R3300220;locus_tag=AT5R3300220;locus_biotype=telomeric_repeat;Name=AT5R3300220;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300220
+###
+Chr5	TRASH	repeat_region	1541	1547	.	+	.	ID=AT5R3300221;locus_tag=AT5R3300221;locus_biotype=telomeric_repeat;Name=AT5R3300221;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300221
+###
+Chr5	TRASH	repeat_region	1548	1554	.	+	.	ID=AT5R3300222;locus_tag=AT5R3300222;locus_biotype=telomeric_repeat;Name=AT5R3300222;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300222
+###
+Chr5	TRASH	repeat_region	1555	1561	.	+	.	ID=AT5R3300223;locus_tag=AT5R3300223;locus_biotype=telomeric_repeat;Name=AT5R3300223;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300223
+###
+Chr5	TRASH	repeat_region	1562	1568	.	+	.	ID=AT5R3300224;locus_tag=AT5R3300224;locus_biotype=telomeric_repeat;Name=AT5R3300224;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300224
+###
+Chr5	TRASH	repeat_region	1569	1575	.	+	.	ID=AT5R3300225;locus_tag=AT5R3300225;locus_biotype=telomeric_repeat;Name=AT5R3300225;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300225
+###
+Chr5	TRASH	repeat_region	1576	1582	.	+	.	ID=AT5R3300226;locus_tag=AT5R3300226;locus_biotype=telomeric_repeat;Name=AT5R3300226;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300226
+###
+Chr5	TRASH	repeat_region	1583	1589	.	+	.	ID=AT5R3300227;locus_tag=AT5R3300227;locus_biotype=telomeric_repeat;Name=AT5R3300227;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300227
+###
+Chr5	TRASH	repeat_region	1590	1596	.	+	.	ID=AT5R3300228;locus_tag=AT5R3300228;locus_biotype=telomeric_repeat;Name=AT5R3300228;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300228
+###
+Chr5	TRASH	repeat_region	1597	1603	.	+	.	ID=AT5R3300229;locus_tag=AT5R3300229;locus_biotype=telomeric_repeat;Name=AT5R3300229;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300229
+###
+Chr5	TRASH	repeat_region	1604	1610	.	+	.	ID=AT5R3300230;locus_tag=AT5R3300230;locus_biotype=telomeric_repeat;Name=AT5R3300230;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300230
+###
+Chr5	TRASH	repeat_region	1611	1617	.	+	.	ID=AT5R3300231;locus_tag=AT5R3300231;locus_biotype=telomeric_repeat;Name=AT5R3300231;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300231
+###
+Chr5	TRASH	repeat_region	1618	1624	.	+	.	ID=AT5R3300232;locus_tag=AT5R3300232;locus_biotype=telomeric_repeat;Name=AT5R3300232;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300232
+###
+Chr5	TRASH	repeat_region	1625	1631	.	+	.	ID=AT5R3300233;locus_tag=AT5R3300233;locus_biotype=telomeric_repeat;Name=AT5R3300233;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300233
+###
+Chr5	TRASH	repeat_region	1632	1638	.	+	.	ID=AT5R3300234;locus_tag=AT5R3300234;locus_biotype=telomeric_repeat;Name=AT5R3300234;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300234
+###
+Chr5	TRASH	repeat_region	1639	1645	.	+	.	ID=AT5R3300235;locus_tag=AT5R3300235;locus_biotype=telomeric_repeat;Name=AT5R3300235;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300235
+###
+Chr5	TRASH	repeat_region	1646	1652	.	+	.	ID=AT5R3300236;locus_tag=AT5R3300236;locus_biotype=telomeric_repeat;Name=AT5R3300236;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300236
+###
+Chr5	TRASH	repeat_region	1653	1659	.	+	.	ID=AT5R3300237;locus_tag=AT5R3300237;locus_biotype=telomeric_repeat;Name=AT5R3300237;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300237
+###
+Chr5	TRASH	repeat_region	1660	1666	.	+	.	ID=AT5R3300238;locus_tag=AT5R3300238;locus_biotype=telomeric_repeat;Name=AT5R3300238;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300238
+###
+Chr5	TRASH	repeat_region	1667	1673	.	+	.	ID=AT5R3300239;locus_tag=AT5R3300239;locus_biotype=telomeric_repeat;Name=AT5R3300239;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300239
+###
+Chr5	TRASH	repeat_region	1674	1680	.	+	.	ID=AT5R3300240;locus_tag=AT5R3300240;locus_biotype=telomeric_repeat;Name=AT5R3300240;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300240
+###
+Chr5	TRASH	repeat_region	1681	1687	.	+	.	ID=AT5R3300241;locus_tag=AT5R3300241;locus_biotype=telomeric_repeat;Name=AT5R3300241;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300241
+###
+Chr5	TRASH	repeat_region	1688	1694	.	+	.	ID=AT5R3300242;locus_tag=AT5R3300242;locus_biotype=telomeric_repeat;Name=AT5R3300242;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300242
+###
+Chr5	TRASH	repeat_region	1695	1701	.	+	.	ID=AT5R3300243;locus_tag=AT5R3300243;locus_biotype=telomeric_repeat;Name=AT5R3300243;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300243
+###
+Chr5	TRASH	repeat_region	1702	1708	.	+	.	ID=AT5R3300244;locus_tag=AT5R3300244;locus_biotype=telomeric_repeat;Name=AT5R3300244;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300244
+###
+Chr5	TRASH	repeat_region	1709	1715	.	+	.	ID=AT5R3300245;locus_tag=AT5R3300245;locus_biotype=telomeric_repeat;Name=AT5R3300245;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300245
+###
+Chr5	TRASH	repeat_region	1716	1722	.	+	.	ID=AT5R3300246;locus_tag=AT5R3300246;locus_biotype=telomeric_repeat;Name=AT5R3300246;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300246
+###
+Chr5	TRASH	repeat_region	1723	1729	.	+	.	ID=AT5R3300247;locus_tag=AT5R3300247;locus_biotype=telomeric_repeat;Name=AT5R3300247;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300247
+###
+Chr5	TRASH	repeat_region	1730	1736	.	+	.	ID=AT5R3300248;locus_tag=AT5R3300248;locus_biotype=telomeric_repeat;Name=AT5R3300248;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300248
+###
+Chr5	TRASH	repeat_region	1737	1743	.	+	.	ID=AT5R3300249;locus_tag=AT5R3300249;locus_biotype=telomeric_repeat;Name=AT5R3300249;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300249
+###
+Chr5	TRASH	repeat_region	1744	1750	.	+	.	ID=AT5R3300250;locus_tag=AT5R3300250;locus_biotype=telomeric_repeat;Name=AT5R3300250;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300250
+###
+Chr5	TRASH	repeat_region	1751	1757	.	+	.	ID=AT5R3300251;locus_tag=AT5R3300251;locus_biotype=telomeric_repeat;Name=AT5R3300251;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300251
+###
+Chr5	TRASH	repeat_region	1758	1764	.	+	.	ID=AT5R3300252;locus_tag=AT5R3300252;locus_biotype=telomeric_repeat;Name=AT5R3300252;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300252
+###
+Chr5	TRASH	repeat_region	1765	1771	.	+	.	ID=AT5R3300253;locus_tag=AT5R3300253;locus_biotype=telomeric_repeat;Name=AT5R3300253;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300253
+###
+Chr5	TRASH	repeat_region	1772	1778	.	+	.	ID=AT5R3300254;locus_tag=AT5R3300254;locus_biotype=telomeric_repeat;Name=AT5R3300254;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300254
+###
+Chr5	TRASH	repeat_region	1779	1785	.	+	.	ID=AT5R3300255;locus_tag=AT5R3300255;locus_biotype=telomeric_repeat;Name=AT5R3300255;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300255
+###
+Chr5	TRASH	repeat_region	1786	1792	.	+	.	ID=AT5R3300256;locus_tag=AT5R3300256;locus_biotype=telomeric_repeat;Name=AT5R3300256;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300256
+###
+Chr5	TRASH	repeat_region	1793	1799	.	+	.	ID=AT5R3300257;locus_tag=AT5R3300257;locus_biotype=telomeric_repeat;Name=AT5R3300257;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300257
+###
+Chr5	TRASH	repeat_region	1800	1806	.	+	.	ID=AT5R3300258;locus_tag=AT5R3300258;locus_biotype=telomeric_repeat;Name=AT5R3300258;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300258
+###
+Chr5	TRASH	repeat_region	1807	1813	.	+	.	ID=AT5R3300259;locus_tag=AT5R3300259;locus_biotype=telomeric_repeat;Name=AT5R3300259;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300259
+###
+Chr5	TRASH	repeat_region	1814	1820	.	+	.	ID=AT5R3300260;locus_tag=AT5R3300260;locus_biotype=telomeric_repeat;Name=AT5R3300260;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300260
+###
+Chr5	TRASH	repeat_region	1821	1827	.	+	.	ID=AT5R3300261;locus_tag=AT5R3300261;locus_biotype=telomeric_repeat;Name=AT5R3300261;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300261
+###
+Chr5	TRASH	repeat_region	1828	1834	.	+	.	ID=AT5R3300262;locus_tag=AT5R3300262;locus_biotype=telomeric_repeat;Name=AT5R3300262;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300262
+###
+Chr5	TRASH	repeat_region	1835	1841	.	+	.	ID=AT5R3300263;locus_tag=AT5R3300263;locus_biotype=telomeric_repeat;Name=AT5R3300263;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300263
+###
+Chr5	TRASH	repeat_region	1842	1848	.	+	.	ID=AT5R3300264;locus_tag=AT5R3300264;locus_biotype=telomeric_repeat;Name=AT5R3300264;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300264
+###
+Chr5	TRASH	repeat_region	1849	1855	.	+	.	ID=AT5R3300265;locus_tag=AT5R3300265;locus_biotype=telomeric_repeat;Name=AT5R3300265;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300265
+###
+Chr5	TRASH	repeat_region	1856	1862	.	+	.	ID=AT5R3300266;locus_tag=AT5R3300266;locus_biotype=telomeric_repeat;Name=AT5R3300266;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300266
+###
+Chr5	TRASH	repeat_region	1863	1869	.	+	.	ID=AT5R3300267;locus_tag=AT5R3300267;locus_biotype=telomeric_repeat;Name=AT5R3300267;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300267
+###
+Chr5	TRASH	repeat_region	1870	1876	.	+	.	ID=AT5R3300268;locus_tag=AT5R3300268;locus_biotype=telomeric_repeat;Name=AT5R3300268;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300268
+###
+Chr5	TRASH	repeat_region	1877	1883	.	+	.	ID=AT5R3300269;locus_tag=AT5R3300269;locus_biotype=telomeric_repeat;Name=AT5R3300269;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300269
+###
+Chr5	TRASH	repeat_region	1884	1890	.	+	.	ID=AT5R3300270;locus_tag=AT5R3300270;locus_biotype=telomeric_repeat;Name=AT5R3300270;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300270
+###
+Chr5	TRASH	repeat_region	1891	1897	.	+	.	ID=AT5R3300271;locus_tag=AT5R3300271;locus_biotype=telomeric_repeat;Name=AT5R3300271;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300271
+###
+Chr5	TRASH	repeat_region	1898	1904	.	+	.	ID=AT5R3300272;locus_tag=AT5R3300272;locus_biotype=telomeric_repeat;Name=AT5R3300272;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300272
+###
+Chr5	TRASH	repeat_region	1905	1911	.	+	.	ID=AT5R3300273;locus_tag=AT5R3300273;locus_biotype=telomeric_repeat;Name=AT5R3300273;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300273
+###
+Chr5	TRASH	repeat_region	1912	1918	.	+	.	ID=AT5R3300274;locus_tag=AT5R3300274;locus_biotype=telomeric_repeat;Name=AT5R3300274;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300274
+###
+Chr5	TRASH	repeat_region	1919	1925	.	+	.	ID=AT5R3300275;locus_tag=AT5R3300275;locus_biotype=telomeric_repeat;Name=AT5R3300275;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300275
+###
+Chr5	TRASH	repeat_region	1926	1932	.	+	.	ID=AT5R3300276;locus_tag=AT5R3300276;locus_biotype=telomeric_repeat;Name=AT5R3300276;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300276
+###
+Chr5	TRASH	repeat_region	1933	1939	.	+	.	ID=AT5R3300277;locus_tag=AT5R3300277;locus_biotype=telomeric_repeat;Name=AT5R3300277;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300277
+###
+Chr5	TRASH	repeat_region	1940	1946	.	+	.	ID=AT5R3300278;locus_tag=AT5R3300278;locus_biotype=telomeric_repeat;Name=AT5R3300278;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300278
+###
+Chr5	TRASH	repeat_region	1947	1953	.	+	.	ID=AT5R3300279;locus_tag=AT5R3300279;locus_biotype=telomeric_repeat;Name=AT5R3300279;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300279
+###
+Chr5	TRASH	repeat_region	1954	1960	.	+	.	ID=AT5R3300280;locus_tag=AT5R3300280;locus_biotype=telomeric_repeat;Name=AT5R3300280;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300280
+###
+Chr5	TRASH	repeat_region	1961	1967	.	+	.	ID=AT5R3300281;locus_tag=AT5R3300281;locus_biotype=telomeric_repeat;Name=AT5R3300281;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300281
+###
+Chr5	TRASH	repeat_region	1968	1974	.	+	.	ID=AT5R3300282;locus_tag=AT5R3300282;locus_biotype=telomeric_repeat;Name=AT5R3300282;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300282
+###
+Chr5	TRASH	repeat_region	1975	1981	.	+	.	ID=AT5R3300283;locus_tag=AT5R3300283;locus_biotype=telomeric_repeat;Name=AT5R3300283;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300283
+###
+Chr5	TRASH	repeat_region	1982	1988	.	+	.	ID=AT5R3300284;locus_tag=AT5R3300284;locus_biotype=telomeric_repeat;Name=AT5R3300284;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300284
+###
+Chr5	TRASH	repeat_region	1989	1995	.	+	.	ID=AT5R3300285;locus_tag=AT5R3300285;locus_biotype=telomeric_repeat;Name=AT5R3300285;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300285
+###
+Chr5	TRASH	repeat_region	1996	2002	.	+	.	ID=AT5R3300286;locus_tag=AT5R3300286;locus_biotype=telomeric_repeat;Name=AT5R3300286;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300286
+###
+Chr5	TRASH	repeat_region	2003	2009	.	+	.	ID=AT5R3300287;locus_tag=AT5R3300287;locus_biotype=telomeric_repeat;Name=AT5R3300287;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300287
+###
+Chr5	TRASH	repeat_region	2010	2016	.	+	.	ID=AT5R3300288;locus_tag=AT5R3300288;locus_biotype=telomeric_repeat;Name=AT5R3300288;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300288
+###
+Chr5	TRASH	repeat_region	2017	2023	.	+	.	ID=AT5R3300289;locus_tag=AT5R3300289;locus_biotype=telomeric_repeat;Name=AT5R3300289;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300289
+###
+Chr5	TRASH	repeat_region	2024	2030	.	+	.	ID=AT5R3300290;locus_tag=AT5R3300290;locus_biotype=telomeric_repeat;Name=AT5R3300290;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300290
+###
+Chr5	TRASH	repeat_region	2031	2037	.	+	.	ID=AT5R3300291;locus_tag=AT5R3300291;locus_biotype=telomeric_repeat;Name=AT5R3300291;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300291
+###
+Chr5	TRASH	repeat_region	2038	2044	.	+	.	ID=AT5R3300292;locus_tag=AT5R3300292;locus_biotype=telomeric_repeat;Name=AT5R3300292;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300292
+###
+Chr5	TRASH	repeat_region	2045	2051	.	+	.	ID=AT5R3300293;locus_tag=AT5R3300293;locus_biotype=telomeric_repeat;Name=AT5R3300293;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300293
+###
+Chr5	TRASH	repeat_region	2052	2058	.	+	.	ID=AT5R3300294;locus_tag=AT5R3300294;locus_biotype=telomeric_repeat;Name=AT5R3300294;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300294
+###
+Chr5	TRASH	repeat_region	2059	2065	.	+	.	ID=AT5R3300295;locus_tag=AT5R3300295;locus_biotype=telomeric_repeat;Name=AT5R3300295;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300295
+###
+Chr5	TRASH	repeat_region	2066	2072	.	+	.	ID=AT5R3300296;locus_tag=AT5R3300296;locus_biotype=telomeric_repeat;Name=AT5R3300296;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300296
+###
+Chr5	TRASH	repeat_region	2073	2079	.	+	.	ID=AT5R3300297;locus_tag=AT5R3300297;locus_biotype=telomeric_repeat;Name=AT5R3300297;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300297
+###
+Chr5	TRASH	repeat_region	2080	2086	.	+	.	ID=AT5R3300298;locus_tag=AT5R3300298;locus_biotype=telomeric_repeat;Name=AT5R3300298;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300298
+###
+Chr5	TRASH	repeat_region	2087	2093	.	+	.	ID=AT5R3300299;locus_tag=AT5R3300299;locus_biotype=telomeric_repeat;Name=AT5R3300299;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300299
+###
+Chr5	TRASH	repeat_region	2094	2100	.	+	.	ID=AT5R3300300;locus_tag=AT5R3300300;locus_biotype=telomeric_repeat;Name=AT5R3300300;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300300
+###
+Chr5	TRASH	repeat_region	2101	2107	.	+	.	ID=AT5R3300301;locus_tag=AT5R3300301;locus_biotype=telomeric_repeat;Name=AT5R3300301;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300301
+###
+Chr5	TRASH	repeat_region	2108	2114	.	+	.	ID=AT5R3300302;locus_tag=AT5R3300302;locus_biotype=telomeric_repeat;Name=AT5R3300302;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300302
+###
+Chr5	TRASH	repeat_region	2115	2121	.	+	.	ID=AT5R3300303;locus_tag=AT5R3300303;locus_biotype=telomeric_repeat;Name=AT5R3300303;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300303
+###
+Chr5	TRASH	repeat_region	2122	2128	.	+	.	ID=AT5R3300304;locus_tag=AT5R3300304;locus_biotype=telomeric_repeat;Name=AT5R3300304;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300304
+###
+Chr5	TRASH	repeat_region	2129	2135	.	+	.	ID=AT5R3300305;locus_tag=AT5R3300305;locus_biotype=telomeric_repeat;Name=AT5R3300305;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300305
+###
+Chr5	TRASH	repeat_region	2136	2142	.	+	.	ID=AT5R3300306;locus_tag=AT5R3300306;locus_biotype=telomeric_repeat;Name=AT5R3300306;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300306
+###
+Chr5	TRASH	repeat_region	2143	2149	.	+	.	ID=AT5R3300307;locus_tag=AT5R3300307;locus_biotype=telomeric_repeat;Name=AT5R3300307;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300307
+###
+Chr5	TRASH	repeat_region	2150	2156	.	+	.	ID=AT5R3300308;locus_tag=AT5R3300308;locus_biotype=telomeric_repeat;Name=AT5R3300308;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300308
+###
+Chr5	TRASH	repeat_region	2157	2163	.	+	.	ID=AT5R3300309;locus_tag=AT5R3300309;locus_biotype=telomeric_repeat;Name=AT5R3300309;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300309
+###
+Chr5	TRASH	repeat_region	2164	2170	.	+	.	ID=AT5R3300310;locus_tag=AT5R3300310;locus_biotype=telomeric_repeat;Name=AT5R3300310;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300310
+###
+Chr5	TRASH	repeat_region	2171	2177	.	+	.	ID=AT5R3300311;locus_tag=AT5R3300311;locus_biotype=telomeric_repeat;Name=AT5R3300311;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300311
+###
+Chr5	TRASH	repeat_region	2178	2184	.	+	.	ID=AT5R3300312;locus_tag=AT5R3300312;locus_biotype=telomeric_repeat;Name=AT5R3300312;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300312
+###
+Chr5	TRASH	repeat_region	2185	2191	.	+	.	ID=AT5R3300313;locus_tag=AT5R3300313;locus_biotype=telomeric_repeat;Name=AT5R3300313;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300313
+###
+Chr5	TRASH	repeat_region	2192	2198	.	+	.	ID=AT5R3300314;locus_tag=AT5R3300314;locus_biotype=telomeric_repeat;Name=AT5R3300314;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300314
+###
+Chr5	TRASH	repeat_region	2199	2205	.	+	.	ID=AT5R3300315;locus_tag=AT5R3300315;locus_biotype=telomeric_repeat;Name=AT5R3300315;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300315
+###
+Chr5	TRASH	repeat_region	2206	2212	.	+	.	ID=AT5R3300316;locus_tag=AT5R3300316;locus_biotype=telomeric_repeat;Name=AT5R3300316;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300316
+###
+Chr5	TRASH	repeat_region	2213	2219	.	+	.	ID=AT5R3300317;locus_tag=AT5R3300317;locus_biotype=telomeric_repeat;Name=AT5R3300317;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300317
+###
+Chr5	TRASH	repeat_region	2220	2226	.	+	.	ID=AT5R3300318;locus_tag=AT5R3300318;locus_biotype=telomeric_repeat;Name=AT5R3300318;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300318
+###
+Chr5	TRASH	repeat_region	2227	2233	.	+	.	ID=AT5R3300319;locus_tag=AT5R3300319;locus_biotype=telomeric_repeat;Name=AT5R3300319;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300319
+###
+Chr5	TRASH	repeat_region	2234	2240	.	+	.	ID=AT5R3300320;locus_tag=AT5R3300320;locus_biotype=telomeric_repeat;Name=AT5R3300320;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300320
+###
+Chr5	TRASH	repeat_region	2241	2247	.	+	.	ID=AT5R3300321;locus_tag=AT5R3300321;locus_biotype=telomeric_repeat;Name=AT5R3300321;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300321
+###
+Chr5	TRASH	repeat_region	2248	2254	.	+	.	ID=AT5R3300322;locus_tag=AT5R3300322;locus_biotype=telomeric_repeat;Name=AT5R3300322;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300322
+###
+Chr5	TRASH	repeat_region	2255	2261	.	+	.	ID=AT5R3300323;locus_tag=AT5R3300323;locus_biotype=telomeric_repeat;Name=AT5R3300323;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300323
+###
+Chr5	TRASH	repeat_region	2262	2268	.	+	.	ID=AT5R3300324;locus_tag=AT5R3300324;locus_biotype=telomeric_repeat;Name=AT5R3300324;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300324
+###
+Chr5	TRASH	repeat_region	2269	2275	.	+	.	ID=AT5R3300325;locus_tag=AT5R3300325;locus_biotype=telomeric_repeat;Name=AT5R3300325;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300325
+###
+Chr5	TRASH	repeat_region	2276	2282	.	+	.	ID=AT5R3300326;locus_tag=AT5R3300326;locus_biotype=telomeric_repeat;Name=AT5R3300326;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300326
+###
+Chr5	TRASH	repeat_region	2283	2289	.	+	.	ID=AT5R3300327;locus_tag=AT5R3300327;locus_biotype=telomeric_repeat;Name=AT5R3300327;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300327
+###
+Chr5	TRASH	repeat_region	2290	2296	.	+	.	ID=AT5R3300328;locus_tag=AT5R3300328;locus_biotype=telomeric_repeat;Name=AT5R3300328;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300328
+###
+Chr5	TRASH	repeat_region	2297	2303	.	+	.	ID=AT5R3300329;locus_tag=AT5R3300329;locus_biotype=telomeric_repeat;Name=AT5R3300329;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300329
+###
+Chr5	TRASH	repeat_region	2304	2310	.	+	.	ID=AT5R3300330;locus_tag=AT5R3300330;locus_biotype=telomeric_repeat;Name=AT5R3300330;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300330
+###
+Chr5	TRASH	repeat_region	2311	2317	.	+	.	ID=AT5R3300331;locus_tag=AT5R3300331;locus_biotype=telomeric_repeat;Name=AT5R3300331;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300331
+###
+Chr5	TRASH	repeat_region	2318	2324	.	+	.	ID=AT5R3300332;locus_tag=AT5R3300332;locus_biotype=telomeric_repeat;Name=AT5R3300332;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300332
+###
+Chr5	TRASH	repeat_region	2325	2331	.	+	.	ID=AT5R3300333;locus_tag=AT5R3300333;locus_biotype=telomeric_repeat;Name=AT5R3300333;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300333
+###
+Chr5	TRASH	repeat_region	2332	2338	.	+	.	ID=AT5R3300334;locus_tag=AT5R3300334;locus_biotype=telomeric_repeat;Name=AT5R3300334;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300334
+###
+Chr5	TRASH	repeat_region	2339	2345	.	+	.	ID=AT5R3300335;locus_tag=AT5R3300335;locus_biotype=telomeric_repeat;Name=AT5R3300335;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300335
+###
+Chr5	TRASH	repeat_region	2346	2352	.	+	.	ID=AT5R3300336;locus_tag=AT5R3300336;locus_biotype=telomeric_repeat;Name=AT5R3300336;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300336
+###
+Chr5	TRASH	repeat_region	2353	2359	.	+	.	ID=AT5R3300337;locus_tag=AT5R3300337;locus_biotype=telomeric_repeat;Name=AT5R3300337;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300337
+###
+Chr5	TRASH	repeat_region	2360	2366	.	+	.	ID=AT5R3300338;locus_tag=AT5R3300338;locus_biotype=telomeric_repeat;Name=AT5R3300338;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300338
+###
+Chr5	TRASH	repeat_region	2367	2373	.	+	.	ID=AT5R3300339;locus_tag=AT5R3300339;locus_biotype=telomeric_repeat;Name=AT5R3300339;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300339
+###
+Chr5	TRASH	repeat_region	2374	2380	.	+	.	ID=AT5R3300340;locus_tag=AT5R3300340;locus_biotype=telomeric_repeat;Name=AT5R3300340;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300340
+###
+Chr5	TRASH	repeat_region	2381	2387	.	+	.	ID=AT5R3300341;locus_tag=AT5R3300341;locus_biotype=telomeric_repeat;Name=AT5R3300341;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300341
+###
+Chr5	TRASH	repeat_region	2388	2394	.	+	.	ID=AT5R3300342;locus_tag=AT5R3300342;locus_biotype=telomeric_repeat;Name=AT5R3300342;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300342
+###
+Chr5	TRASH	repeat_region	2395	2401	.	+	.	ID=AT5R3300343;locus_tag=AT5R3300343;locus_biotype=telomeric_repeat;Name=AT5R3300343;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300343
+###
+Chr5	TRASH	repeat_region	2402	2408	.	+	.	ID=AT5R3300344;locus_tag=AT5R3300344;locus_biotype=telomeric_repeat;Name=AT5R3300344;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300344
+###
+Chr5	TRASH	repeat_region	2409	2415	.	+	.	ID=AT5R3300345;locus_tag=AT5R3300345;locus_biotype=telomeric_repeat;Name=AT5R3300345;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300345
+###
+Chr5	TRASH	repeat_region	2416	2422	.	+	.	ID=AT5R3300346;locus_tag=AT5R3300346;locus_biotype=telomeric_repeat;Name=AT5R3300346;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300346
+###
+Chr5	TRASH	repeat_region	2423	2429	.	+	.	ID=AT5R3300347;locus_tag=AT5R3300347;locus_biotype=telomeric_repeat;Name=AT5R3300347;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300347
+###
+Chr5	TRASH	repeat_region	2430	2436	.	+	.	ID=AT5R3300348;locus_tag=AT5R3300348;locus_biotype=telomeric_repeat;Name=AT5R3300348;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300348
+###
+Chr5	TRASH	repeat_region	2437	2443	.	+	.	ID=AT5R3300349;locus_tag=AT5R3300349;locus_biotype=telomeric_repeat;Name=AT5R3300349;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300349
+###
+Chr5	TRASH	repeat_region	2444	2450	.	+	.	ID=AT5R3300350;locus_tag=AT5R3300350;locus_biotype=telomeric_repeat;Name=AT5R3300350;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300350
+###
+Chr5	TRASH	repeat_region	2451	2457	.	+	.	ID=AT5R3300351;locus_tag=AT5R3300351;locus_biotype=telomeric_repeat;Name=AT5R3300351;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300351
+###
+Chr5	TRASH	repeat_region	2458	2464	.	+	.	ID=AT5R3300352;locus_tag=AT5R3300352;locus_biotype=telomeric_repeat;Name=AT5R3300352;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300352
+###
+Chr5	TRASH	repeat_region	2465	2471	.	+	.	ID=AT5R3300353;locus_tag=AT5R3300353;locus_biotype=telomeric_repeat;Name=AT5R3300353;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300353
+###
+Chr5	TRASH	repeat_region	2472	2478	.	+	.	ID=AT5R3300354;locus_tag=AT5R3300354;locus_biotype=telomeric_repeat;Name=AT5R3300354;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300354
+###
+Chr5	TRASH	repeat_region	2479	2485	.	+	.	ID=AT5R3300355;locus_tag=AT5R3300355;locus_biotype=telomeric_repeat;Name=AT5R3300355;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300355
+###
+Chr5	TRASH	repeat_region	2486	2492	.	+	.	ID=AT5R3300356;locus_tag=AT5R3300356;locus_biotype=telomeric_repeat;Name=AT5R3300356;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300356
+###
+Chr5	TRASH	repeat_region	2493	2499	.	+	.	ID=AT5R3300357;locus_tag=AT5R3300357;locus_biotype=telomeric_repeat;Name=AT5R3300357;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300357
+###
+Chr5	TRASH	repeat_region	2500	2506	.	+	.	ID=AT5R3300358;locus_tag=AT5R3300358;locus_biotype=telomeric_repeat;Name=AT5R3300358;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300358
+###
+Chr5	TRASH	repeat_region	2507	2513	.	+	.	ID=AT5R3300359;locus_tag=AT5R3300359;locus_biotype=telomeric_repeat;Name=AT5R3300359;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300359
+###
+Chr5	TRASH	repeat_region	2514	2520	.	+	.	ID=AT5R3300360;locus_tag=AT5R3300360;locus_biotype=telomeric_repeat;Name=AT5R3300360;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300360
+###
+Chr5	TRASH	repeat_region	2521	2527	.	+	.	ID=AT5R3300361;locus_tag=AT5R3300361;locus_biotype=telomeric_repeat;Name=AT5R3300361;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300361
+###
+Chr5	TRASH	repeat_region	2528	2534	.	+	.	ID=AT5R3300362;locus_tag=AT5R3300362;locus_biotype=telomeric_repeat;Name=AT5R3300362;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300362
+###
+Chr5	TRASH	repeat_region	2535	2541	.	+	.	ID=AT5R3300363;locus_tag=AT5R3300363;locus_biotype=telomeric_repeat;Name=AT5R3300363;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300363
+###
+Chr5	TRASH	repeat_region	2542	2548	.	+	.	ID=AT5R3300364;locus_tag=AT5R3300364;locus_biotype=telomeric_repeat;Name=AT5R3300364;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300364
+###
+Chr5	TRASH	repeat_region	2549	2555	.	+	.	ID=AT5R3300365;locus_tag=AT5R3300365;locus_biotype=telomeric_repeat;Name=AT5R3300365;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300365
+###
+Chr5	TRASH	repeat_region	2556	2562	.	+	.	ID=AT5R3300366;locus_tag=AT5R3300366;locus_biotype=telomeric_repeat;Name=AT5R3300366;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300366
+###
+Chr5	TRASH	repeat_region	2563	2569	.	+	.	ID=AT5R3300367;locus_tag=AT5R3300367;locus_biotype=telomeric_repeat;Name=AT5R3300367;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300367
+###
+Chr5	TRASH	repeat_region	2570	2576	.	+	.	ID=AT5R3300368;locus_tag=AT5R3300368;locus_biotype=telomeric_repeat;Name=AT5R3300368;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300368
+###
+Chr5	TRASH	repeat_region	2577	2583	.	+	.	ID=AT5R3300369;locus_tag=AT5R3300369;locus_biotype=telomeric_repeat;Name=AT5R3300369;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300369
+###
+Chr5	TRASH	repeat_region	2584	2590	.	+	.	ID=AT5R3300370;locus_tag=AT5R3300370;locus_biotype=telomeric_repeat;Name=AT5R3300370;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300370
+###
+Chr5	TRASH	repeat_region	2591	2597	.	+	.	ID=AT5R3300371;locus_tag=AT5R3300371;locus_biotype=telomeric_repeat;Name=AT5R3300371;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300371
+###
+Chr5	TRASH	repeat_region	2598	2604	.	+	.	ID=AT5R3300372;locus_tag=AT5R3300372;locus_biotype=telomeric_repeat;Name=AT5R3300372;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300372
+###
+Chr5	TRASH	repeat_region	2605	2611	.	+	.	ID=AT5R3300373;locus_tag=AT5R3300373;locus_biotype=telomeric_repeat;Name=AT5R3300373;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300373
+###
+Chr5	TRASH	repeat_region	2612	2618	.	+	.	ID=AT5R3300374;locus_tag=AT5R3300374;locus_biotype=telomeric_repeat;Name=AT5R3300374;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300374
+###
+Chr5	TRASH	repeat_region	2619	2625	.	+	.	ID=AT5R3300375;locus_tag=AT5R3300375;locus_biotype=telomeric_repeat;Name=AT5R3300375;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300375
+###
+Chr5	TRASH	repeat_region	2626	2632	.	+	.	ID=AT5R3300376;locus_tag=AT5R3300376;locus_biotype=telomeric_repeat;Name=AT5R3300376;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300376
+###
+Chr5	TRASH	repeat_region	2633	2639	.	+	.	ID=AT5R3300377;locus_tag=AT5R3300377;locus_biotype=telomeric_repeat;Name=AT5R3300377;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300377
+###
+Chr5	TRASH	repeat_region	2640	2646	.	+	.	ID=AT5R3300378;locus_tag=AT5R3300378;locus_biotype=telomeric_repeat;Name=AT5R3300378;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300378
+###
+Chr5	TRASH	repeat_region	2647	2653	.	+	.	ID=AT5R3300379;locus_tag=AT5R3300379;locus_biotype=telomeric_repeat;Name=AT5R3300379;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300379
+###
+Chr5	TRASH	repeat_region	2654	2660	.	+	.	ID=AT5R3300380;locus_tag=AT5R3300380;locus_biotype=telomeric_repeat;Name=AT5R3300380;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300380
+###
+Chr5	TRASH	repeat_region	2661	2667	.	+	.	ID=AT5R3300381;locus_tag=AT5R3300381;locus_biotype=telomeric_repeat;Name=AT5R3300381;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300381
+###
+Chr5	TRASH	repeat_region	2668	2674	.	+	.	ID=AT5R3300382;locus_tag=AT5R3300382;locus_biotype=telomeric_repeat;Name=AT5R3300382;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300382
+###
+Chr5	TRASH	repeat_region	2675	2681	.	+	.	ID=AT5R3300383;locus_tag=AT5R3300383;locus_biotype=telomeric_repeat;Name=AT5R3300383;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300383
+###
+Chr5	TRASH	repeat_region	2682	2688	.	+	.	ID=AT5R3300384;locus_tag=AT5R3300384;locus_biotype=telomeric_repeat;Name=AT5R3300384;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300384
+###
+Chr5	TRASH	repeat_region	2689	2695	.	+	.	ID=AT5R3300385;locus_tag=AT5R3300385;locus_biotype=telomeric_repeat;Name=AT5R3300385;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300385
+###
+Chr5	TRASH	repeat_region	2696	2702	.	+	.	ID=AT5R3300386;locus_tag=AT5R3300386;locus_biotype=telomeric_repeat;Name=AT5R3300386;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300386
+###
+Chr5	TRASH	repeat_region	2703	2709	.	+	.	ID=AT5R3300387;locus_tag=AT5R3300387;locus_biotype=telomeric_repeat;Name=AT5R3300387;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300387
+###
+Chr5	TRASH	repeat_region	2710	2716	.	+	.	ID=AT5R3300388;locus_tag=AT5R3300388;locus_biotype=telomeric_repeat;Name=AT5R3300388;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300388
+###
+Chr5	TRASH	repeat_region	2717	2723	.	+	.	ID=AT5R3300389;locus_tag=AT5R3300389;locus_biotype=telomeric_repeat;Name=AT5R3300389;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300389
+###
+Chr5	TRASH	repeat_region	2724	2730	.	+	.	ID=AT5R3300390;locus_tag=AT5R3300390;locus_biotype=telomeric_repeat;Name=AT5R3300390;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300390
+###
+Chr5	TRASH	repeat_region	2731	2737	.	+	.	ID=AT5R3300391;locus_tag=AT5R3300391;locus_biotype=telomeric_repeat;Name=AT5R3300391;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300391
+###
+Chr5	TRASH	repeat_region	2738	2744	.	+	.	ID=AT5R3300392;locus_tag=AT5R3300392;locus_biotype=telomeric_repeat;Name=AT5R3300392;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300392
+###
+Chr5	TRASH	repeat_region	2745	2751	.	+	.	ID=AT5R3300393;locus_tag=AT5R3300393;locus_biotype=telomeric_repeat;Name=AT5R3300393;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300393
+###
+Chr5	TRASH	repeat_region	2752	2758	.	+	.	ID=AT5R3300394;locus_tag=AT5R3300394;locus_biotype=telomeric_repeat;Name=AT5R3300394;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300394
+###
+Chr5	TRASH	repeat_region	2759	2765	.	+	.	ID=AT5R3300395;locus_tag=AT5R3300395;locus_biotype=telomeric_repeat;Name=AT5R3300395;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300395
+###
+Chr5	TRASH	repeat_region	2766	2772	.	+	.	ID=AT5R3300396;locus_tag=AT5R3300396;locus_biotype=telomeric_repeat;Name=AT5R3300396;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300396
+###
+Chr5	TRASH	repeat_region	2773	2779	.	+	.	ID=AT5R3300397;locus_tag=AT5R3300397;locus_biotype=telomeric_repeat;Name=AT5R3300397;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300397
+###
+Chr5	TRASH	repeat_region	2780	2786	.	+	.	ID=AT5R3300398;locus_tag=AT5R3300398;locus_biotype=telomeric_repeat;Name=AT5R3300398;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300398
+###
+Chr5	TRASH	repeat_region	2787	2793	.	+	.	ID=AT5R3300399;locus_tag=AT5R3300399;locus_biotype=telomeric_repeat;Name=AT5R3300399;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300399
+###
+Chr5	TRASH	repeat_region	2794	2800	.	+	.	ID=AT5R3300400;locus_tag=AT5R3300400;locus_biotype=telomeric_repeat;Name=AT5R3300400;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300400
+###
+Chr5	TRASH	repeat_region	2801	2807	.	+	.	ID=AT5R3300401;locus_tag=AT5R3300401;locus_biotype=telomeric_repeat;Name=AT5R3300401;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300401
+###
+Chr5	TRASH	repeat_region	2808	2814	.	+	.	ID=AT5R3300402;locus_tag=AT5R3300402;locus_biotype=telomeric_repeat;Name=AT5R3300402;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300402
+###
+Chr5	TRASH	repeat_region	2815	2821	.	+	.	ID=AT5R3300403;locus_tag=AT5R3300403;locus_biotype=telomeric_repeat;Name=AT5R3300403;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300403
+###
+Chr5	TRASH	repeat_region	2822	2828	.	+	.	ID=AT5R3300404;locus_tag=AT5R3300404;locus_biotype=telomeric_repeat;Name=AT5R3300404;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300404
+###
+Chr5	TRASH	repeat_region	2829	2835	.	+	.	ID=AT5R3300405;locus_tag=AT5R3300405;locus_biotype=telomeric_repeat;Name=AT5R3300405;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300405
+###
+Chr5	TRASH	repeat_region	2836	2842	.	+	.	ID=AT5R3300406;locus_tag=AT5R3300406;locus_biotype=telomeric_repeat;Name=AT5R3300406;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300406
+###
+Chr5	TRASH	repeat_region	2843	2849	.	+	.	ID=AT5R3300407;locus_tag=AT5R3300407;locus_biotype=telomeric_repeat;Name=AT5R3300407;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300407
+###
+Chr5	TRASH	repeat_region	2850	2856	.	+	.	ID=AT5R3300408;locus_tag=AT5R3300408;locus_biotype=telomeric_repeat;Name=AT5R3300408;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300408
+###
+Chr5	TRASH	repeat_region	2857	2863	.	+	.	ID=AT5R3300409;locus_tag=AT5R3300409;locus_biotype=telomeric_repeat;Name=AT5R3300409;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300409
+###
+Chr5	TRASH	repeat_region	2864	2870	.	+	.	ID=AT5R3300410;locus_tag=AT5R3300410;locus_biotype=telomeric_repeat;Name=AT5R3300410;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300410
+###
+Chr5	TRASH	repeat_region	2871	2877	.	+	.	ID=AT5R3300411;locus_tag=AT5R3300411;locus_biotype=telomeric_repeat;Name=AT5R3300411;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300411
+###
+Chr5	TRASH	repeat_region	2878	2884	.	+	.	ID=AT5R3300412;locus_tag=AT5R3300412;locus_biotype=telomeric_repeat;Name=AT5R3300412;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300412
+###
+Chr5	TRASH	repeat_region	2885	2891	.	+	.	ID=AT5R3300413;locus_tag=AT5R3300413;locus_biotype=telomeric_repeat;Name=AT5R3300413;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300413
+###
+Chr5	TRASH	repeat_region	2892	2898	.	+	.	ID=AT5R3300414;locus_tag=AT5R3300414;locus_biotype=telomeric_repeat;Name=AT5R3300414;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300414
+###
+Chr5	TRASH	repeat_region	2899	2905	.	+	.	ID=AT5R3300415;locus_tag=AT5R3300415;locus_biotype=telomeric_repeat;Name=AT5R3300415;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300415
+###
+Chr5	TRASH	repeat_region	2906	2912	.	+	.	ID=AT5R3300416;locus_tag=AT5R3300416;locus_biotype=telomeric_repeat;Name=AT5R3300416;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300416
+###
+Chr5	TRASH	repeat_region	2913	2919	.	+	.	ID=AT5R3300417;locus_tag=AT5R3300417;locus_biotype=telomeric_repeat;Name=AT5R3300417;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300417
+###
+Chr5	TRASH	repeat_region	2920	2926	.	+	.	ID=AT5R3300418;locus_tag=AT5R3300418;locus_biotype=telomeric_repeat;Name=AT5R3300418;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300418
+###
+Chr5	TRASH	repeat_region	2927	2933	.	+	.	ID=AT5R3300419;locus_tag=AT5R3300419;locus_biotype=telomeric_repeat;Name=AT5R3300419;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300419
+###
+Chr5	TRASH	repeat_region	2934	2940	.	+	.	ID=AT5R3300420;locus_tag=AT5R3300420;locus_biotype=telomeric_repeat;Name=AT5R3300420;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300420
+###
+Chr5	TRASH	repeat_region	2941	2947	.	+	.	ID=AT5R3300421;locus_tag=AT5R3300421;locus_biotype=telomeric_repeat;Name=AT5R3300421;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300421
+###
+Chr5	TRASH	repeat_region	2948	2954	.	+	.	ID=AT5R3300422;locus_tag=AT5R3300422;locus_biotype=telomeric_repeat;Name=AT5R3300422;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300422
+###
+Chr5	TRASH	repeat_region	2955	2961	.	+	.	ID=AT5R3300423;locus_tag=AT5R3300423;locus_biotype=telomeric_repeat;Name=AT5R3300423;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300423
+###
+Chr5	TRASH	repeat_region	2962	2968	.	+	.	ID=AT5R3300424;locus_tag=AT5R3300424;locus_biotype=telomeric_repeat;Name=AT5R3300424;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300424
+###
+Chr5	TRASH	repeat_region	2969	2975	.	+	.	ID=AT5R3300425;locus_tag=AT5R3300425;locus_biotype=telomeric_repeat;Name=AT5R3300425;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300425
+###
+Chr5	TRASH	repeat_region	2976	2982	.	+	.	ID=AT5R3300426;locus_tag=AT5R3300426;locus_biotype=telomeric_repeat;Name=AT5R3300426;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300426
+###
+Chr5	TRASH	repeat_region	2983	2989	.	+	.	ID=AT5R3300427;locus_tag=AT5R3300427;locus_biotype=telomeric_repeat;Name=AT5R3300427;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300427
+###
+Chr5	TRASH	repeat_region	2990	2996	.	+	.	ID=AT5R3300428;locus_tag=AT5R3300428;locus_biotype=telomeric_repeat;Name=AT5R3300428;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300428
+###
+Chr5	TRASH	repeat_region	2997	3003	.	+	.	ID=AT5R3300429;locus_tag=AT5R3300429;locus_biotype=telomeric_repeat;Name=AT5R3300429;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300429
+###
+Chr5	TRASH	repeat_region	3004	3010	.	+	.	ID=AT5R3300430;locus_tag=AT5R3300430;locus_biotype=telomeric_repeat;Name=AT5R3300430;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300430
+###
+Chr5	TRASH	repeat_region	3011	3017	.	+	.	ID=AT5R3300431;locus_tag=AT5R3300431;locus_biotype=telomeric_repeat;Name=AT5R3300431;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300431
+###
+Chr5	TRASH	repeat_region	3018	3024	.	+	.	ID=AT5R3300432;locus_tag=AT5R3300432;locus_biotype=telomeric_repeat;Name=AT5R3300432;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300432
+###
+Chr5	TRASH	repeat_region	3025	3031	.	+	.	ID=AT5R3300433;locus_tag=AT5R3300433;locus_biotype=telomeric_repeat;Name=AT5R3300433;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300433
+###
+Chr5	TRASH	repeat_region	3032	3038	.	+	.	ID=AT5R3300434;locus_tag=AT5R3300434;locus_biotype=telomeric_repeat;Name=AT5R3300434;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300434
+###
+Chr5	TRASH	repeat_region	3039	3045	.	+	.	ID=AT5R3300435;locus_tag=AT5R3300435;locus_biotype=telomeric_repeat;Name=AT5R3300435;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300435
+###
+Chr5	TRASH	repeat_region	3046	3052	.	+	.	ID=AT5R3300436;locus_tag=AT5R3300436;locus_biotype=telomeric_repeat;Name=AT5R3300436;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300436
+###
+Chr5	TRASH	repeat_region	3053	3059	.	+	.	ID=AT5R3300437;locus_tag=AT5R3300437;locus_biotype=telomeric_repeat;Name=AT5R3300437;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300437
+###
+Chr5	TRASH	repeat_region	3060	3066	.	+	.	ID=AT5R3300438;locus_tag=AT5R3300438;locus_biotype=telomeric_repeat;Name=AT5R3300438;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300438
+###
+Chr5	TRASH	repeat_region	3067	3073	.	+	.	ID=AT5R3300439;locus_tag=AT5R3300439;locus_biotype=telomeric_repeat;Name=AT5R3300439;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300439
+###
+Chr5	TRASH	repeat_region	3074	3080	.	+	.	ID=AT5R3300440;locus_tag=AT5R3300440;locus_biotype=telomeric_repeat;Name=AT5R3300440;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300440
+###
+Chr5	TRASH	repeat_region	3081	3087	.	+	.	ID=AT5R3300441;locus_tag=AT5R3300441;locus_biotype=telomeric_repeat;Name=AT5R3300441;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300441
+###
+Chr5	TRASH	repeat_region	3088	3094	.	+	.	ID=AT5R3300442;locus_tag=AT5R3300442;locus_biotype=telomeric_repeat;Name=AT5R3300442;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300442
+###
+Chr5	TRASH	repeat_region	3095	3101	.	+	.	ID=AT5R3300443;locus_tag=AT5R3300443;locus_biotype=telomeric_repeat;Name=AT5R3300443;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300443
+###
+Chr5	TRASH	repeat_region	3102	3108	.	+	.	ID=AT5R3300444;locus_tag=AT5R3300444;locus_biotype=telomeric_repeat;Name=AT5R3300444;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300444
+###
+Chr5	TRASH	repeat_region	3109	3115	.	+	.	ID=AT5R3300445;locus_tag=AT5R3300445;locus_biotype=telomeric_repeat;Name=AT5R3300445;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300445
+###
+Chr5	TRASH	repeat_region	3116	3122	.	+	.	ID=AT5R3300446;locus_tag=AT5R3300446;locus_biotype=telomeric_repeat;Name=AT5R3300446;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300446
+###
+Chr5	TRASH	repeat_region	3123	3129	.	+	.	ID=AT5R3300447;locus_tag=AT5R3300447;locus_biotype=telomeric_repeat;Name=AT5R3300447;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300447
+###
+Chr5	TRASH	repeat_region	3130	3136	.	+	.	ID=AT5R3300448;locus_tag=AT5R3300448;locus_biotype=telomeric_repeat;Name=AT5R3300448;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300448
+###
+Chr5	TRASH	repeat_region	3137	3143	.	+	.	ID=AT5R3300449;locus_tag=AT5R3300449;locus_biotype=telomeric_repeat;Name=AT5R3300449;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300449
+###
+Chr5	TRASH	repeat_region	3144	3150	.	+	.	ID=AT5R3300450;locus_tag=AT5R3300450;locus_biotype=telomeric_repeat;Name=AT5R3300450;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300450
+###
+Chr5	TRASH	repeat_region	3151	3157	.	+	.	ID=AT5R3300451;locus_tag=AT5R3300451;locus_biotype=telomeric_repeat;Name=AT5R3300451;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300451
+###
+Chr5	TRASH	repeat_region	3158	3164	.	+	.	ID=AT5R3300452;locus_tag=AT5R3300452;locus_biotype=telomeric_repeat;Name=AT5R3300452;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300452
+###
+Chr5	TRASH	repeat_region	3165	3171	.	+	.	ID=AT5R3300453;locus_tag=AT5R3300453;locus_biotype=telomeric_repeat;Name=AT5R3300453;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300453
+###
+Chr5	TRASH	repeat_region	3172	3178	.	+	.	ID=AT5R3300454;locus_tag=AT5R3300454;locus_biotype=telomeric_repeat;Name=AT5R3300454;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300454
+###
+Chr5	TRASH	repeat_region	3179	3185	.	+	.	ID=AT5R3300455;locus_tag=AT5R3300455;locus_biotype=telomeric_repeat;Name=AT5R3300455;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300455
+###
+Chr5	TRASH	repeat_region	3186	3192	.	+	.	ID=AT5R3300456;locus_tag=AT5R3300456;locus_biotype=telomeric_repeat;Name=AT5R3300456;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300456
+###
+Chr5	TRASH	repeat_region	3193	3199	.	+	.	ID=AT5R3300457;locus_tag=AT5R3300457;locus_biotype=telomeric_repeat;Name=AT5R3300457;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300457
+###
+Chr5	TRASH	repeat_region	3200	3206	.	+	.	ID=AT5R3300458;locus_tag=AT5R3300458;locus_biotype=telomeric_repeat;Name=AT5R3300458;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300458
+###
+Chr5	TRASH	repeat_region	3207	3213	.	+	.	ID=AT5R3300459;locus_tag=AT5R3300459;locus_biotype=telomeric_repeat;Name=AT5R3300459;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300459
+###
+Chr5	TRASH	repeat_region	3214	3220	.	+	.	ID=AT5R3300460;locus_tag=AT5R3300460;locus_biotype=telomeric_repeat;Name=AT5R3300460;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300460
+###
+Chr5	TRASH	repeat_region	3221	3227	.	+	.	ID=AT5R3300461;locus_tag=AT5R3300461;locus_biotype=telomeric_repeat;Name=AT5R3300461;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300461
+###
+Chr5	TRASH	repeat_region	3228	3234	.	+	.	ID=AT5R3300462;locus_tag=AT5R3300462;locus_biotype=telomeric_repeat;Name=AT5R3300462;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300462
+###
+Chr5	TRASH	repeat_region	3235	3241	.	+	.	ID=AT5R3300463;locus_tag=AT5R3300463;locus_biotype=telomeric_repeat;Name=AT5R3300463;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300463
+###
+Chr5	TRASH	repeat_region	3242	3248	.	+	.	ID=AT5R3300464;locus_tag=AT5R3300464;locus_biotype=telomeric_repeat;Name=AT5R3300464;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300464
+###
+Chr5	TRASH	repeat_region	3249	3255	.	+	.	ID=AT5R3300465;locus_tag=AT5R3300465;locus_biotype=telomeric_repeat;Name=AT5R3300465;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300465
+###
+Chr5	TRASH	repeat_region	3256	3262	.	+	.	ID=AT5R3300466;locus_tag=AT5R3300466;locus_biotype=telomeric_repeat;Name=AT5R3300466;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300466
+###
+Chr5	TRASH	repeat_region	3263	3269	.	+	.	ID=AT5R3300467;locus_tag=AT5R3300467;locus_biotype=telomeric_repeat;Name=AT5R3300467;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300467
+###
+Chr5	TRASH	repeat_region	3270	3276	.	+	.	ID=AT5R3300468;locus_tag=AT5R3300468;locus_biotype=telomeric_repeat;Name=AT5R3300468;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300468
+###
+Chr5	TRASH	repeat_region	3277	3283	.	+	.	ID=AT5R3300469;locus_tag=AT5R3300469;locus_biotype=telomeric_repeat;Name=AT5R3300469;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300469
+###
+Chr5	TRASH	repeat_region	3284	3290	.	+	.	ID=AT5R3300470;locus_tag=AT5R3300470;locus_biotype=telomeric_repeat;Name=AT5R3300470;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300470
+###
+Chr5	TRASH	repeat_region	3291	3297	.	+	.	ID=AT5R3300471;locus_tag=AT5R3300471;locus_biotype=telomeric_repeat;Name=AT5R3300471;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300471
+###
+Chr5	TRASH	repeat_region	3298	3304	.	+	.	ID=AT5R3300472;locus_tag=AT5R3300472;locus_biotype=telomeric_repeat;Name=AT5R3300472;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300472
+###
+Chr5	TRASH	repeat_region	3305	3311	.	+	.	ID=AT5R3300473;locus_tag=AT5R3300473;locus_biotype=telomeric_repeat;Name=AT5R3300473;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300473
+###
+Chr5	TRASH	repeat_region	3312	3318	.	+	.	ID=AT5R3300474;locus_tag=AT5R3300474;locus_biotype=telomeric_repeat;Name=AT5R3300474;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300474
+###
+Chr5	TRASH	repeat_region	3319	3325	.	+	.	ID=AT5R3300475;locus_tag=AT5R3300475;locus_biotype=telomeric_repeat;Name=AT5R3300475;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300475
+###
+Chr5	TRASH	repeat_region	3326	3332	.	+	.	ID=AT5R3300476;locus_tag=AT5R3300476;locus_biotype=telomeric_repeat;Name=AT5R3300476;class=AthTEL;array_ID=760;global_family_PID=85.714286;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300476
+###
+Chr5	TRASH	repeat_region	3333	3339	.	+	.	ID=AT5R3300477;locus_tag=AT5R3300477;locus_biotype=telomeric_repeat;Name=AT5R3300477;class=AthTEL;array_ID=760;global_family_PID=57.142857;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300477
+###
+Chr5	TRASH	repeat_region	3340	3346	.	+	.	ID=AT5R3300478;locus_tag=AT5R3300478;locus_biotype=telomeric_repeat;Name=AT5R3300478;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300478
+###
+Chr5	TRASH	repeat_region	3347	3353	.	+	.	ID=AT5R3300479;locus_tag=AT5R3300479;locus_biotype=telomeric_repeat;Name=AT5R3300479;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300479
+###
+Chr5	TRASH	repeat_region	3354	3360	.	+	.	ID=AT5R3300480;locus_tag=AT5R3300480;locus_biotype=telomeric_repeat;Name=AT5R3300480;class=AthTEL;array_ID=760;global_family_PID=100.000000;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300480
+###
+Chr5	TRASH	repeat_region	3402	3409	.	+	.	ID=AT5R3300481;locus_tag=AT5R3300481;locus_biotype=telomeric_repeat;Name=AT5R3300481;class=AthTEL;array_ID=760;global_family_PID=85.714286;rpt_type=telomeric_repeat;Note=old_locus_tag:AT5R3300481
+###
+Chr5	Gnomon	gene	4658	8377	.	-	.	ID=AT5G01010;locus_tag=TAIR12_AT5G01010;locus_biotype=protein_coding;Name=AT5G01010;Dbxref=TAIR:AT5G01010_TAIR12;
+Chr5	Gnomon	mRNA	4658	8377	.	-	.	ID=AT5G01010.1;Parent=AT5G01010;Name=AT5G01010.1;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	8148	8377	.	-	.	ID=AT5G01010.1:exon:1;Parent=AT5G01010.1;Name=AT5G01010.1:exon:1;
+Chr5	Gnomon	CDS	8148	8307	.	-	0	ID=AT5G01010.1:CDS:1;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:1;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	7935	8062	.	-	.	ID=AT5G01010.1:exon:2;Parent=AT5G01010.1;Name=AT5G01010.1:exon:2;
+Chr5	Gnomon	CDS	7935	8062	.	-	2	ID=AT5G01010.1:CDS:2;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:2;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	7718	7850	.	-	.	ID=AT5G01010.1:exon:3;Parent=AT5G01010.1;Name=AT5G01010.1:exon:3;
+Chr5	Gnomon	CDS	7718	7850	.	-	0	ID=AT5G01010.1:CDS:3;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:3;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	7485	7641	.	-	.	ID=AT5G01010.1:exon:4;Parent=AT5G01010.1;Name=AT5G01010.1:exon:4;
+Chr5	Gnomon	CDS	7485	7641	.	-	2	ID=AT5G01010.1:CDS:4;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:4;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	7310	7388	.	-	.	ID=AT5G01010.1:exon:5;Parent=AT5G01010.1;Name=AT5G01010.1:exon:5;
+Chr5	Gnomon	CDS	7310	7388	.	-	1	ID=AT5G01010.1:CDS:5;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:5;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	7145	7185	.	-	.	ID=AT5G01010.1:exon:6;Parent=AT5G01010.1;Name=AT5G01010.1:exon:6;
+Chr5	Gnomon	CDS	7145	7185	.	-	0	ID=AT5G01010.1:CDS:6;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:6;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	6926	7042	.	-	.	ID=AT5G01010.1:exon:7;Parent=AT5G01010.1;Name=AT5G01010.1:exon:7;
+Chr5	Gnomon	CDS	6926	7042	.	-	1	ID=AT5G01010.1:CDS:7;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:7;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	6686	6766	.	-	.	ID=AT5G01010.1:exon:8;Parent=AT5G01010.1;Name=AT5G01010.1:exon:8;
+Chr5	Gnomon	CDS	6686	6766	.	-	1	ID=AT5G01010.1:CDS:8;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:8;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	6255	6317	.	-	.	ID=AT5G01010.1:exon:9;Parent=AT5G01010.1;Name=AT5G01010.1:exon:9;
+Chr5	Gnomon	CDS	6255	6317	.	-	1	ID=AT5G01010.1:CDS:9;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:9;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	6131	6182	.	-	.	ID=AT5G01010.1:exon:10;Parent=AT5G01010.1;Name=AT5G01010.1:exon:10;
+Chr5	Gnomon	CDS	6131	6182	.	-	1	ID=AT5G01010.1:CDS:10;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:10;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	5818	5892	.	-	.	ID=AT5G01010.1:exon:11;Parent=AT5G01010.1;Name=AT5G01010.1:exon:11;
+Chr5	Gnomon	CDS	5818	5892	.	-	0	ID=AT5G01010.1:CDS:11;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:11;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	5297	5344	.	-	.	ID=AT5G01010.1:exon:12;Parent=AT5G01010.1;Name=AT5G01010.1:exon:12;
+Chr5	Gnomon	CDS	5297	5344	.	-	0	ID=AT5G01010.1:CDS:12;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:12;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	5128	5163	.	-	.	ID=AT5G01010.1:exon:13;Parent=AT5G01010.1;Name=AT5G01010.1:exon:13;
+Chr5	Gnomon	CDS	5128	5163	.	-	0	ID=AT5G01010.1:CDS:13;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:13;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	4955	5029	.	-	.	ID=AT5G01010.1:exon:14;Parent=AT5G01010.1;Name=AT5G01010.1:exon:14;
+Chr5	Gnomon	CDS	4955	5029	.	-	0	ID=AT5G01010.1:CDS:14;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:14;product=GOLD domain-containing protein;
+Chr5	Gnomon	CDS	4771	4842	.	-	0	ID=AT5G01010.1:CDS:15;Parent=AT5G01010.1;Name=AT5G01010.1:CDS:15;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	4658	4842	.	-	.	ID=AT5G01010.1:exon:15;Parent=AT5G01010.1;Name=AT5G01010.1:exon:15;
+Chr5	Gnomon	mRNA	4658	8377	.	-	.	ID=AT5G01010.2;Parent=AT5G01010;Name=AT5G01010.2;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	8148	8377	.	-	.	ID=AT5G01010.2:exon:1;Parent=AT5G01010.2;Name=AT5G01010.2:exon:1;
+Chr5	Gnomon	CDS	8148	8307	.	-	0	ID=AT5G01010.2:CDS:1;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:1;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	7935	8062	.	-	.	ID=AT5G01010.2:exon:2;Parent=AT5G01010.2;Name=AT5G01010.2:exon:2;
+Chr5	Gnomon	CDS	7935	8062	.	-	2	ID=AT5G01010.2:CDS:2;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:2;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	7718	7850	.	-	.	ID=AT5G01010.2:exon:3;Parent=AT5G01010.2;Name=AT5G01010.2:exon:3;
+Chr5	Gnomon	CDS	7718	7850	.	-	0	ID=AT5G01010.2:CDS:3;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:3;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	7485	7641	.	-	.	ID=AT5G01010.2:exon:4;Parent=AT5G01010.2;Name=AT5G01010.2:exon:4;
+Chr5	Gnomon	CDS	7485	7641	.	-	2	ID=AT5G01010.2:CDS:4;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:4;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	7310	7388	.	-	.	ID=AT5G01010.2:exon:5;Parent=AT5G01010.2;Name=AT5G01010.2:exon:5;
+Chr5	Gnomon	CDS	7310	7388	.	-	1	ID=AT5G01010.2:CDS:5;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:5;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	7145	7185	.	-	.	ID=AT5G01010.2:exon:6;Parent=AT5G01010.2;Name=AT5G01010.2:exon:6;
+Chr5	Gnomon	CDS	7145	7185	.	-	0	ID=AT5G01010.2:CDS:6;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:6;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	6926	7042	.	-	.	ID=AT5G01010.2:exon:7;Parent=AT5G01010.2;Name=AT5G01010.2:exon:7;
+Chr5	Gnomon	CDS	6926	7042	.	-	1	ID=AT5G01010.2:CDS:7;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:7;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	6686	6766	.	-	.	ID=AT5G01010.2:exon:8;Parent=AT5G01010.2;Name=AT5G01010.2:exon:8;
+Chr5	Gnomon	CDS	6686	6766	.	-	1	ID=AT5G01010.2:CDS:8;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:8;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	6255	6317	.	-	.	ID=AT5G01010.2:exon:9;Parent=AT5G01010.2;Name=AT5G01010.2:exon:9;
+Chr5	Gnomon	CDS	6255	6317	.	-	1	ID=AT5G01010.2:CDS:9;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:9;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	6131	6182	.	-	.	ID=AT5G01010.2:exon:10;Parent=AT5G01010.2;Name=AT5G01010.2:exon:10;
+Chr5	Gnomon	CDS	6131	6182	.	-	1	ID=AT5G01010.2:CDS:10;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:10;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	5818	5892	.	-	.	ID=AT5G01010.2:exon:11;Parent=AT5G01010.2;Name=AT5G01010.2:exon:11;
+Chr5	Gnomon	CDS	5818	5892	.	-	0	ID=AT5G01010.2:CDS:11;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:11;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	5267	5344	.	-	.	ID=AT5G01010.2:exon:12;Parent=AT5G01010.2;Name=AT5G01010.2:exon:12;
+Chr5	Gnomon	CDS	5267	5344	.	-	0	ID=AT5G01010.2:CDS:12;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:12;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	5128	5163	.	-	.	ID=AT5G01010.2:exon:13;Parent=AT5G01010.2;Name=AT5G01010.2:exon:13;
+Chr5	Gnomon	CDS	5128	5163	.	-	0	ID=AT5G01010.2:CDS:13;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:13;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	4955	5029	.	-	.	ID=AT5G01010.2:exon:14;Parent=AT5G01010.2;Name=AT5G01010.2:exon:14;
+Chr5	Gnomon	CDS	4955	5029	.	-	0	ID=AT5G01010.2:CDS:14;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:14;product=GOLD domain-containing protein;
+Chr5	Gnomon	CDS	4771	4842	.	-	0	ID=AT5G01010.2:CDS:15;Parent=AT5G01010.2;Name=AT5G01010.2:CDS:15;product=GOLD domain-containing protein;
+Chr5	Gnomon	exon	4658	4842	.	-	.	ID=AT5G01010.2:exon:15;Parent=AT5G01010.2;Name=AT5G01010.2:exon:15;
+###
+Chr5	Gnomon	gene	8670	9171	.	-	.	ID=AT5G01015;locus_tag=TAIR12_AT5G01015;locus_biotype=protein_coding;Name=AT5G01015;Dbxref=TAIR:AT5G01015_TAIR12;
+Chr5	Gnomon	mRNA	8670	9171	.	-	.	ID=AT5G01015.1;Parent=AT5G01015;Name=AT5G01015.1;product=hypothetical protein;
+Chr5	Gnomon	exon	9081	9171	.	-	.	ID=AT5G01015.1:exon:1;Parent=AT5G01015.1;Name=AT5G01015.1:exon:1;
+Chr5	Gnomon	CDS	9081	9153	.	-	0	ID=AT5G01015.1:CDS:1;Parent=AT5G01015.1;Name=AT5G01015.1:CDS:1;product=hypothetical protein;
+Chr5	Gnomon	CDS	8719	8960	.	-	2	ID=AT5G01015.1:CDS:2;Parent=AT5G01015.1;Name=AT5G01015.1:CDS:2;product=hypothetical protein;
+Chr5	Gnomon	exon	8670	8960	.	-	.	ID=AT5G01015.1:exon:2;Parent=AT5G01015.1;Name=AT5G01015.1:exon:2;
+###
+Chr5	Gnomon	gene	9406	11793	.	-	.	ID=AT5G01020;locus_tag=TAIR12_AT5G01020;locus_biotype=protein_coding;gene=PBL8;description=PBS1-Like8;Name=AT5G01020;Dbxref=TAIR:AT5G01020_TAIR12;
+Chr5	Gnomon	mRNA	9406	11793	.	-	.	ID=AT5G01020.1;Parent=AT5G01020;Name=AT5G01020.1;product=putative protein serine/threonine kinase;
+Chr5	Gnomon	exon	11600	11793	.	-	.	ID=AT5G01020.1:exon:1;Parent=AT5G01020.1;Name=AT5G01020.1:exon:1;
+Chr5	Gnomon	CDS	11600	11654	.	-	0	ID=AT5G01020.1:CDS:1;Parent=AT5G01020.1;Name=AT5G01020.1:CDS:1;product=putative protein serine/threonine kinase;
+Chr5	Gnomon	exon	11089	11523	.	-	.	ID=AT5G01020.1:exon:2;Parent=AT5G01020.1;Name=AT5G01020.1:exon:2;
+Chr5	Gnomon	CDS	11089	11523	.	-	2	ID=AT5G01020.1:CDS:2;Parent=AT5G01020.1;Name=AT5G01020.1:CDS:2;product=putative protein serine/threonine kinase;
+Chr5	Gnomon	exon	10824	10960	.	-	.	ID=AT5G01020.1:exon:3;Parent=AT5G01020.1;Name=AT5G01020.1:exon:3;
+Chr5	Gnomon	CDS	10824	10960	.	-	2	ID=AT5G01020.1:CDS:3;Parent=AT5G01020.1;Name=AT5G01020.1:CDS:3;product=putative protein serine/threonine kinase;
+Chr5	Gnomon	exon	10596	10719	.	-	.	ID=AT5G01020.1:exon:4;Parent=AT5G01020.1;Name=AT5G01020.1:exon:4;
+Chr5	Gnomon	CDS	10596	10719	.	-	0	ID=AT5G01020.1:CDS:4;Parent=AT5G01020.1;Name=AT5G01020.1:CDS:4;product=putative protein serine/threonine kinase;
+Chr5	Gnomon	CDS	9693	10174	.	-	2	ID=AT5G01020.1:CDS:5;Parent=AT5G01020.1;Name=AT5G01020.1:CDS:5;product=putative protein serine/threonine kinase[PBS1-Like8];
+Chr5	Gnomon	exon	9406	10174	.	-	.	ID=AT5G01020.1:exon:5;Parent=AT5G01020.1;Name=AT5G01020.1:exon:5;
+###
+Chr5	lncRNAgroup	gene	11068	12371	.	+	.	ID=AT5G67651;locus_tag=TAIR12_AT5G67651;locus_biotype=antisense_RNA;Name=AT5G67651;Dbxref=TAIR:AT5G67651_TAIR12;
+Chr5	lncRNAgroup	ncRNA	11068	12371	.	+	.	ID=AT5G67651.1;Parent=AT5G67651;confidence=high;num_assemblies=1;longread_counts=2;tau=0.9408;cpc2_score=0.7446;cpc2_call=coding;orf_len=99;ncRNA_class=antisense_RNA;Name=AT5G67651.1;
+Chr5	lncRNAgroup	exon	11068	12371	.	+	.	ID=AT5G67651.1:exon:1;Parent=AT5G67651.1;Name=AT5G67651.1:exon:1;
+###
+Chr5	Gnomon	gene	13314	16517	.	+	.	ID=AT5G01030;locus_tag=TAIR12_AT5G01030;locus_biotype=protein_coding;Name=AT5G01030;Dbxref=TAIR:AT5G01030_TAIR12;
+Chr5	Gnomon	mRNA	13314	16517	.	+	.	ID=AT5G01030.1;Parent=AT5G01030;Name=AT5G01030.1;product=DUF3527-domain containing protein;
+Chr5	Gnomon	exon	13314	13556	.	+	.	ID=AT5G01030.1:exon:1;Parent=AT5G01030.1;Name=AT5G01030.1:exon:1;
+Chr5	Gnomon	exon	13958	16049	.	+	.	ID=AT5G01030.1:exon:2;Parent=AT5G01030.1;Name=AT5G01030.1:exon:2;
+Chr5	Gnomon	CDS	14022	16049	.	+	0	ID=AT5G01030.1:CDS:1;Parent=AT5G01030.1;Name=AT5G01030.1:CDS:1;product=DUF3527-domain containing protein;
+Chr5	Gnomon	CDS	16181	16387	.	+	0	ID=AT5G01030.1:CDS:2;Parent=AT5G01030.1;Name=AT5G01030.1:CDS:2;product=DUF3527-domain containing protein;
+Chr5	Gnomon	exon	16181	16517	.	+	.	ID=AT5G01030.1:exon:3;Parent=AT5G01030.1;Name=AT5G01030.1:exon:3;
+Chr5	Gnomon	mRNA	13470	16517	.	+	.	ID=AT5G01030.2;Parent=AT5G01030;Name=AT5G01030.2;product=DUF3527-domain containing protein;
+Chr5	Gnomon	exon	13470	13647	.	+	.	ID=AT5G01030.2:exon:1;Parent=AT5G01030.2;Name=AT5G01030.2:exon:1;
+Chr5	Gnomon	exon	13958	16049	.	+	.	ID=AT5G01030.2:exon:2;Parent=AT5G01030.2;Name=AT5G01030.2:exon:2;
+Chr5	Gnomon	CDS	14022	16049	.	+	0	ID=AT5G01030.2:CDS:1;Parent=AT5G01030.2;Name=AT5G01030.2:CDS:1;product=DUF3527-domain containing protein;
+Chr5	Gnomon	CDS	16181	16387	.	+	0	ID=AT5G01030.2:CDS:2;Parent=AT5G01030.2;Name=AT5G01030.2:CDS:2;product=DUF3527-domain containing protein;
+Chr5	Gnomon	exon	16181	16517	.	+	.	ID=AT5G01030.2:exon:3;Parent=AT5G01030.2;Name=AT5G01030.2:exon:3;
+###
+Chr5	Gnomon	gene	16573	19557	.	-	.	ID=AT5G01040;locus_tag=TAIR12_AT5G01040;locus_biotype=protein_coding;gene=LAC8;description=laccase 8;Name=AT5G01040;Dbxref=TAIR:AT5G01040_TAIR12;
+Chr5	Gnomon	mRNA	16573	19557	.	-	.	ID=AT5G01040.1;Parent=AT5G01040;Name=AT5G01040.1;product=putative oxidoreductase;
+Chr5	Gnomon	exon	19428	19557	.	-	.	ID=AT5G01040.1:exon:1;Parent=AT5G01040.1;Name=AT5G01040.1:exon:1;
+Chr5	Gnomon	CDS	19428	19526	.	-	0	ID=AT5G01040.1:CDS:1;Parent=AT5G01040.1;Name=AT5G01040.1:CDS:1;product=putative oxidoreductase;
+Chr5	Gnomon	exon	18963	19114	.	-	.	ID=AT5G01040.1:exon:2;Parent=AT5G01040.1;Name=AT5G01040.1:exon:2;
+Chr5	Gnomon	CDS	18963	19114	.	-	0	ID=AT5G01040.1:CDS:2;Parent=AT5G01040.1;Name=AT5G01040.1:CDS:2;product=putative oxidoreductase;
+Chr5	Gnomon	exon	18575	18819	.	-	.	ID=AT5G01040.1:exon:3;Parent=AT5G01040.1;Name=AT5G01040.1:exon:3;
+Chr5	Gnomon	CDS	18575	18819	.	-	1	ID=AT5G01040.1:CDS:3;Parent=AT5G01040.1;Name=AT5G01040.1:CDS:3;product=putative oxidoreductase;
+Chr5	Gnomon	exon	18148	18258	.	-	.	ID=AT5G01040.1:exon:4;Parent=AT5G01040.1;Name=AT5G01040.1:exon:4;
+Chr5	Gnomon	CDS	18148	18258	.	-	2	ID=AT5G01040.1:CDS:4;Parent=AT5G01040.1;Name=AT5G01040.1:CDS:4;product=putative oxidoreductase;
+Chr5	Gnomon	exon	17087	18049	.	-	.	ID=AT5G01040.1:exon:5;Parent=AT5G01040.1;Name=AT5G01040.1:exon:5;
+Chr5	Gnomon	CDS	17087	18049	.	-	2	ID=AT5G01040.1:CDS:5;Parent=AT5G01040.1;Name=AT5G01040.1:CDS:5;product=putative oxidoreductase;
+Chr5	Gnomon	CDS	16778	16962	.	-	2	ID=AT5G01040.1:CDS:6;Parent=AT5G01040.1;Name=AT5G01040.1:CDS:6;product=putative oxidoreductase[laccase 8];
+Chr5	Gnomon	exon	16573	16962	.	-	.	ID=AT5G01040.1:exon:6;Parent=AT5G01040.1;Name=AT5G01040.1:exon:6;
+###
+Chr5	Gnomon	gene	21488	24275	.	-	.	ID=AT5G01050;locus_tag=TAIR12_AT5G01050;locus_biotype=protein_coding;Name=AT5G01050;Dbxref=TAIR:AT5G01050_TAIR12;
+Chr5	Gnomon	mRNA	21488	24275	.	-	.	ID=AT5G01050.1;Parent=AT5G01050;Name=AT5G01050.1;product=putative oxidoreductase;
+Chr5	Gnomon	exon	24098	24275	.	-	.	ID=AT5G01050.1:exon:1;Parent=AT5G01050.1;Name=AT5G01050.1:exon:1;
+Chr5	Gnomon	CDS	24098	24196	.	-	0	ID=AT5G01050.1:CDS:1;Parent=AT5G01050.1;Name=AT5G01050.1:CDS:1;product=putative oxidoreductase;
+Chr5	Gnomon	exon	23742	23893	.	-	.	ID=AT5G01050.1:exon:2;Parent=AT5G01050.1;Name=AT5G01050.1:exon:2;
+Chr5	Gnomon	CDS	23742	23893	.	-	0	ID=AT5G01050.1:CDS:2;Parent=AT5G01050.1;Name=AT5G01050.1:CDS:2;product=putative oxidoreductase;
+Chr5	Gnomon	exon	23354	23598	.	-	.	ID=AT5G01050.1:exon:3;Parent=AT5G01050.1;Name=AT5G01050.1:exon:3;
+Chr5	Gnomon	CDS	23354	23598	.	-	1	ID=AT5G01050.1:CDS:3;Parent=AT5G01050.1;Name=AT5G01050.1:CDS:3;product=putative oxidoreductase;
+Chr5	Gnomon	exon	22954	23064	.	-	.	ID=AT5G01050.1:exon:4;Parent=AT5G01050.1;Name=AT5G01050.1:exon:4;
+Chr5	Gnomon	CDS	22954	23064	.	-	2	ID=AT5G01050.1:CDS:4;Parent=AT5G01050.1;Name=AT5G01050.1:CDS:4;product=putative oxidoreductase;
+Chr5	Gnomon	exon	21865	22833	.	-	.	ID=AT5G01050.1:exon:5;Parent=AT5G01050.1;Name=AT5G01050.1:exon:5;
+Chr5	Gnomon	CDS	21865	22833	.	-	2	ID=AT5G01050.1:CDS:5;Parent=AT5G01050.1;Name=AT5G01050.1:CDS:5;product=putative oxidoreductase;
+Chr5	Gnomon	CDS	21593	21777	.	-	2	ID=AT5G01050.1:CDS:6;Parent=AT5G01050.1;Name=AT5G01050.1:CDS:6;product=putative oxidoreductase;
+Chr5	Gnomon	exon	21488	21777	.	-	.	ID=AT5G01050.1:exon:6;Parent=AT5G01050.1;Name=AT5G01050.1:exon:6;
+###
+Chr5	EDTA	mobile_element	24504	24607	324	-	.	ID=AT5TE95381;locus_tag=TAIR12_AT5TE95381;locus_biotype=Copia_LTR_retrotransposon;Name=AT5TE95381;family_name=ATCOPIA50_LTR;classification=LTR/Copia;sequence_ontology=SO:0002264;identity=0.851;method=homology;mobile_element_type=retrotransposon:Copia_LTR;
+###
+Chr5	Gnomon	gene	26048	28356	.	+	.	ID=AT5G01060;locus_tag=TAIR12_AT5G01060;locus_biotype=protein_coding;gene=BSK10;description=brassinosteroid-signaling kinase 10;Name=AT5G01060;Dbxref=TAIR:AT5G01060_TAIR12;
+Chr5	Gnomon	mRNA	26048	28356	.	+	.	ID=AT5G01060.1;Parent=AT5G01060;Name=AT5G01060.1;product=Protein kinase domain-containing protein[brassinosteroid-signaling kinase 10];
+Chr5	Gnomon	exon	26048	26438	.	+	.	ID=AT5G01060.1:exon:1;Parent=AT5G01060.1;Name=AT5G01060.1:exon:1;
+Chr5	Gnomon	CDS	26124	26438	.	+	0	ID=AT5G01060.1:CDS:1;Parent=AT5G01060.1;Name=AT5G01060.1:CDS:1;product=Protein kinase domain-containing protein[brassinosteroid-signaling kinase 10];
+Chr5	Gnomon	exon	26520	26655	.	+	.	ID=AT5G01060.1:exon:2;Parent=AT5G01060.1;Name=AT5G01060.1:exon:2;
+Chr5	Gnomon	CDS	26520	26655	.	+	0	ID=AT5G01060.1:CDS:2;Parent=AT5G01060.1;Name=AT5G01060.1:CDS:2;product=Protein kinase domain-containing protein[brassinosteroid-signaling kinase 10];
+Chr5	Gnomon	exon	26743	26876	.	+	.	ID=AT5G01060.1:exon:3;Parent=AT5G01060.1;Name=AT5G01060.1:exon:3;
+Chr5	Gnomon	CDS	26743	26876	.	+	2	ID=AT5G01060.1:CDS:3;Parent=AT5G01060.1;Name=AT5G01060.1:CDS:3;product=Protein kinase domain-containing protein[brassinosteroid-signaling kinase 10];
+Chr5	Gnomon	exon	26964	27155	.	+	.	ID=AT5G01060.1:exon:4;Parent=AT5G01060.1;Name=AT5G01060.1:exon:4;
+Chr5	Gnomon	CDS	26964	27155	.	+	0	ID=AT5G01060.1:CDS:4;Parent=AT5G01060.1;Name=AT5G01060.1:CDS:4;product=Protein kinase domain-containing protein[brassinosteroid-signaling kinase 10];
+Chr5	Gnomon	exon	27242	27463	.	+	.	ID=AT5G01060.1:exon:5;Parent=AT5G01060.1;Name=AT5G01060.1:exon:5;
+Chr5	Gnomon	CDS	27242	27463	.	+	0	ID=AT5G01060.1:CDS:5;Parent=AT5G01060.1;Name=AT5G01060.1:CDS:5;product=Protein kinase domain-containing protein[brassinosteroid-signaling kinase 10];
+Chr5	Gnomon	exon	27565	27720	.	+	.	ID=AT5G01060.1:exon:6;Parent=AT5G01060.1;Name=AT5G01060.1:exon:6;
+Chr5	Gnomon	CDS	27565	27720	.	+	0	ID=AT5G01060.1:CDS:6;Parent=AT5G01060.1;Name=AT5G01060.1:CDS:6;product=Protein kinase domain-containing protein[brassinosteroid-signaling kinase 10];
+Chr5	Gnomon	exon	27796	27909	.	+	.	ID=AT5G01060.1:exon:7;Parent=AT5G01060.1;Name=AT5G01060.1:exon:7;
+Chr5	Gnomon	CDS	27796	27909	.	+	0	ID=AT5G01060.1:CDS:7;Parent=AT5G01060.1;Name=AT5G01060.1:CDS:7;product=Protein kinase domain-containing protein[brassinosteroid-signaling kinase 10];
+Chr5	Gnomon	CDS	28001	28231	.	+	0	ID=AT5G01060.1:CDS:8;Parent=AT5G01060.1;Name=AT5G01060.1:CDS:8;product=Protein kinase domain-containing protein[brassinosteroid-signaling kinase 10];
+Chr5	Gnomon	exon	28001	28356	.	+	.	ID=AT5G01060.1:exon:8;Parent=AT5G01060.1;Name=AT5G01060.1:exon:8;
+###
+Chr5	Gnomon	gene	28386	29192	.	-	.	ID=AT5G01070;locus_tag=TAIR12_AT5G01070;locus_biotype=protein_coding;Name=AT5G01070;Dbxref=TAIR:AT5G01070_TAIR12;
+Chr5	Gnomon	mRNA	28386	29192	.	-	.	ID=AT5G01070.1;Parent=AT5G01070;Name=AT5G01070.1;product=zinc finger protein;
+Chr5	Gnomon	exon	28813	29192	.	-	.	ID=AT5G01070.1:exon:1;Parent=AT5G01070.1;Name=AT5G01070.1:exon:1;
+Chr5	Gnomon	CDS	28813	29183	.	-	0	ID=AT5G01070.1:CDS:1;Parent=AT5G01070.1;Name=AT5G01070.1:CDS:1;product=zinc finger protein;
+Chr5	Gnomon	CDS	28478	28727	.	-	1	ID=AT5G01070.1:CDS:2;Parent=AT5G01070.1;Name=AT5G01070.1:CDS:2;product=zinc finger protein;
+Chr5	Gnomon	exon	28386	28727	.	-	.	ID=AT5G01070.1:exon:2;Parent=AT5G01070.1;Name=AT5G01070.1:exon:2;
+###
+Chr5	TAIR12	gene	30320	30873	.	-	.	ID=AT5G01075;locus_tag=TAIR12_AT5G01075;locus_biotype=protein_coding;gene=TWS1;description=twisted seed1;Name=AT5G01075;Dbxref=TAIR:AT5G01075_TAIR12;
+Chr5	TAIR12	mRNA	30320	30873	.	-	.	ID=AT5G01075.1;Parent=AT5G01075;Name=AT5G01075.1;product=twisted seed1 protein;
+Chr5	TAIR12	exon	30735	30873	.	-	.	ID=AT5G01075.1:exon:1;Parent=AT5G01075.1;Name=AT5G01075.1:exon:1;
+Chr5	TAIR12	CDS	30735	30807	.	-	0	ID=AT5G01075.1:CDS:1;Parent=AT5G01075.1;Name=AT5G01075.1:CDS:1;product=twisted seed1 protein;
+Chr5	TAIR12	CDS	30479	30651	.	-	2	ID=AT5G01075.1:CDS:2;Parent=AT5G01075.1;Name=AT5G01075.1:CDS:2;product=twisted seed1 protein;
+Chr5	TAIR12	exon	30320	30651	.	-	.	ID=AT5G01075.1:exon:2;Parent=AT5G01075.1;Name=AT5G01075.1:exon:2;
+###
+Chr5	lncRNAgroup	gene	30453	31009	.	+	.	ID=AT5G67652;locus_tag=TAIR12_AT5G67652;locus_biotype=antisense_RNA;Name=AT5G67652;Dbxref=TAIR:AT5G67652_TAIR12;
+Chr5	lncRNAgroup	ncRNA	30453	31009	.	+	.	ID=AT5G67652.1;Parent=AT5G67652;confidence=high;num_assemblies=3;longread_counts=7;tau=0.8769;cpc2_score=0.0281;cpc2_call=noncoding;orf_len=50;ncRNA_class=antisense_RNA;Name=AT5G67652.1;
+Chr5	lncRNAgroup	exon	30453	31009	.	+	.	ID=AT5G67652.1:exon:1;Parent=AT5G67652.1;Name=AT5G67652.1:exon:1;
+Chr5	lncRNAgroup	ncRNA	30466	31009	.	+	.	ID=AT5G67652.2;Parent=AT5G67652;confidence=high;num_assemblies=2;longread_counts=2;tau=0.958;cpc2_score=0.206;cpc2_call=noncoding;orf_len=87;ncRNA_class=antisense_RNA;Name=AT5G67652.2;
+Chr5	lncRNAgroup	exon	30466	30625	.	+	.	ID=AT5G67652.2:exon:1;Parent=AT5G67652.2;Name=AT5G67652.2:exon:1;
+Chr5	lncRNAgroup	exon	30738	31009	.	+	.	ID=AT5G67652.2:exon:2;Parent=AT5G67652.2;Name=AT5G67652.2:exon:2;
+###
+Chr5	TAIR12	gene	31907	33328	.	-	.	ID=AT5G01080;locus_tag=TAIR12_AT5G01080;locus_biotype=protein_coding;Name=AT5G01080;Dbxref=TAIR:AT5G01080_TAIR12;
+Chr5	TAIR12	mRNA	31907	33328	.	-	.	ID=AT5G01080.1;Parent=AT5G01080;Name=AT5G01080.1;product=hypothetical protein;
+Chr5	TAIR12	CDS	31916	33022	.	-	0	ID=AT5G01080.1:CDS:1;Parent=AT5G01080.1;Name=AT5G01080.1:CDS:1;product=hypothetical protein;
+Chr5	TAIR12	exon	31907	33328	.	-	.	ID=AT5G01080.1:exon:1;Parent=AT5G01080.1;Name=AT5G01080.1:exon:1;
+###
+Chr5	Gnomon	gene	36224	37708	.	+	.	ID=AT5G01090;locus_tag=TAIR12_AT5G01090;locus_biotype=protein_coding;Name=AT5G01090;Dbxref=TAIR:AT5G01090_TAIR12;
+Chr5	Gnomon	mRNA	36224	37708	.	+	.	ID=AT5G01090.1;Parent=AT5G01090;Name=AT5G01090.1;product=Concanavalin A-like lectin/glucanase domain superfamily member;
+Chr5	Gnomon	exon	36224	37708	.	+	.	ID=AT5G01090.1:exon:1;Parent=AT5G01090.1;Name=AT5G01090.1:exon:1;
+Chr5	Gnomon	CDS	36439	37500	.	+	0	ID=AT5G01090.1:CDS:1;Parent=AT5G01090.1;Name=AT5G01090.1:CDS:1;product=Concanavalin A-like lectin/glucanase domain superfamily member;
+###
+Chr5	Gnomon	gene	38108	41227	.	-	.	ID=AT5G01100;locus_tag=TAIR12_AT5G01100;locus_biotype=protein_coding;gene=FRB1;description=FRIABLE 1;Name=AT5G01100;Dbxref=TAIR:AT5G01100_TAIR12;
+Chr5	Gnomon	mRNA	38108	41227	.	-	.	ID=AT5G01100.1;Parent=AT5G01100;Name=AT5G01100.1;product=GDP-fucose protein O-fucosyltransferase-like protein[FRIABLE 1];
+Chr5	Gnomon	exon	40580	41227	.	-	.	ID=AT5G01100.1:exon:1;Parent=AT5G01100.1;Name=AT5G01100.1:exon:1;
+Chr5	Gnomon	CDS	40580	41140	.	-	0	ID=AT5G01100.1:CDS:1;Parent=AT5G01100.1;Name=AT5G01100.1:CDS:1;product=GDP-fucose protein O-fucosyltransferase-like protein[FRIABLE 1];
+Chr5	Gnomon	exon	40040	40109	.	-	.	ID=AT5G01100.1:exon:2;Parent=AT5G01100.1;Name=AT5G01100.1:exon:2;
+Chr5	Gnomon	CDS	40040	40109	.	-	0	ID=AT5G01100.1:CDS:2;Parent=AT5G01100.1;Name=AT5G01100.1:CDS:2;product=GDP-fucose protein O-fucosyltransferase-like protein[FRIABLE 1];
+Chr5	Gnomon	exon	39881	39951	.	-	.	ID=AT5G01100.1:exon:3;Parent=AT5G01100.1;Name=AT5G01100.1:exon:3;
+Chr5	Gnomon	CDS	39881	39951	.	-	2	ID=AT5G01100.1:CDS:3;Parent=AT5G01100.1;Name=AT5G01100.1:CDS:3;product=GDP-fucose protein O-fucosyltransferase-like protein[FRIABLE 1];
+Chr5	Gnomon	exon	39711	39799	.	-	.	ID=AT5G01100.1:exon:4;Parent=AT5G01100.1;Name=AT5G01100.1:exon:4;
+Chr5	Gnomon	CDS	39711	39799	.	-	0	ID=AT5G01100.1:CDS:4;Parent=AT5G01100.1;Name=AT5G01100.1:CDS:4;product=GDP-fucose protein O-fucosyltransferase-like protein[FRIABLE 1];
+Chr5	Gnomon	exon	39506	39638	.	-	.	ID=AT5G01100.1:exon:5;Parent=AT5G01100.1;Name=AT5G01100.1:exon:5;
+Chr5	Gnomon	CDS	39506	39638	.	-	1	ID=AT5G01100.1:CDS:5;Parent=AT5G01100.1;Name=AT5G01100.1:CDS:5;product=GDP-fucose protein O-fucosyltransferase-like protein[FRIABLE 1];
+Chr5	Gnomon	exon	39171	39403	.	-	.	ID=AT5G01100.1:exon:6;Parent=AT5G01100.1;Name=AT5G01100.1:exon:6;
+Chr5	Gnomon	CDS	39171	39403	.	-	0	ID=AT5G01100.1:CDS:6;Parent=AT5G01100.1;Name=AT5G01100.1:CDS:6;product=GDP-fucose protein O-fucosyltransferase-like protein[FRIABLE 1];
+Chr5	Gnomon	exon	38603	39079	.	-	.	ID=AT5G01100.1:exon:7;Parent=AT5G01100.1;Name=AT5G01100.1:exon:7;
+Chr5	Gnomon	CDS	38603	39079	.	-	1	ID=AT5G01100.1:CDS:7;Parent=AT5G01100.1;Name=AT5G01100.1:CDS:7;product=GDP-fucose protein O-fucosyltransferase-like protein[FRIABLE 1];
+Chr5	Gnomon	CDS	38256	38517	.	-	1	ID=AT5G01100.1:CDS:8;Parent=AT5G01100.1;Name=AT5G01100.1:CDS:8;product=GDP-fucose protein O-fucosyltransferase-like protein[FRIABLE 1];
+Chr5	Gnomon	exon	38108	38517	.	-	.	ID=AT5G01100.1:exon:8;Parent=AT5G01100.1;Name=AT5G01100.1:exon:8;
+###
+Chr5	Gnomon	gene	45154	47802	.	-	.	ID=AT5G01110;locus_tag=TAIR12_AT5G01110;locus_biotype=protein_coding;Name=AT5G01110;Dbxref=TAIR:AT5G01110_TAIR12;
+Chr5	Gnomon	mRNA	45154	47802	.	-	.	ID=AT5G01110.1;Parent=AT5G01110;Name=AT5G01110.1;product=Mitochondrial RNA Processing CCM1-like protein;
+Chr5	Gnomon	CDS	45498	47771	.	-	0	ID=AT5G01110.1:CDS:1;Parent=AT5G01110.1;Name=AT5G01110.1:CDS:1;product=Mitochondrial RNA Processing CCM1-like protein;
+Chr5	Gnomon	exon	45154	47802	.	-	.	ID=AT5G01110.1:exon:1;Parent=AT5G01110.1;Name=AT5G01110.1:exon:1;
+###
+Chr5	Gnomon	gene	48194	50591	.	+	.	ID=AT5G01120;locus_tag=TAIR12_AT5G01120;locus_biotype=protein_coding;Name=AT5G01120;Dbxref=TAIR:AT5G01120_TAIR12;
+Chr5	Gnomon	mRNA	48194	50591	.	+	.	ID=AT5G01120.1;Parent=AT5G01120;Name=AT5G01120.1;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	48194	48280	.	+	.	ID=AT5G01120.1:exon:1;Parent=AT5G01120.1;Name=AT5G01120.1:exon:1;
+Chr5	Gnomon	exon	48665	49312	.	+	.	ID=AT5G01120.1:exon:2;Parent=AT5G01120.1;Name=AT5G01120.1:exon:2;
+Chr5	Gnomon	CDS	48665	49312	.	+	0	ID=AT5G01120.1:CDS:1;Parent=AT5G01120.1;Name=AT5G01120.1:CDS:1;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	49396	50145	.	+	.	ID=AT5G01120.1:exon:3;Parent=AT5G01120.1;Name=AT5G01120.1:exon:3;
+Chr5	Gnomon	CDS	49396	50145	.	+	0	ID=AT5G01120.1:CDS:2;Parent=AT5G01120.1;Name=AT5G01120.1:CDS:2;product=DUF674-domain containing protein;
+Chr5	Gnomon	CDS	50236	50370	.	+	0	ID=AT5G01120.1:CDS:3;Parent=AT5G01120.1;Name=AT5G01120.1:CDS:3;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	50236	50591	.	+	.	ID=AT5G01120.1:exon:4;Parent=AT5G01120.1;Name=AT5G01120.1:exon:4;
+###
+Chr5	Gnomon	gene	50954	52897	.	+	.	ID=AT5G01130;locus_tag=TAIR12_AT5G01130;locus_biotype=protein_coding;Name=AT5G01130;Dbxref=TAIR:AT5G01130_TAIR12;
+Chr5	Gnomon	mRNA	50954	52897	.	+	.	ID=AT5G01130.1;Parent=AT5G01130;Name=AT5G01130.1;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	50954	51637	.	+	.	ID=AT5G01130.1:exon:1;Parent=AT5G01130.1;Name=AT5G01130.1:exon:1;
+Chr5	Gnomon	CDS	51026	51637	.	+	0	ID=AT5G01130.1:CDS:1;Parent=AT5G01130.1;Name=AT5G01130.1:CDS:1;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	51739	52389	.	+	.	ID=AT5G01130.1:exon:2;Parent=AT5G01130.1;Name=AT5G01130.1:exon:2;
+Chr5	Gnomon	CDS	51739	52389	.	+	0	ID=AT5G01130.1:CDS:2;Parent=AT5G01130.1;Name=AT5G01130.1:CDS:2;product=DUF674-domain containing protein;
+Chr5	Gnomon	CDS	52463	52558	.	+	0	ID=AT5G01130.1:CDS:3;Parent=AT5G01130.1;Name=AT5G01130.1:CDS:3;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	52463	52897	.	+	.	ID=AT5G01130.1:exon:3;Parent=AT5G01130.1;Name=AT5G01130.1:exon:3;
+Chr5	Gnomon	mRNA	50980	52897	.	+	.	ID=AT5G01130.2;Parent=AT5G01130;Name=AT5G01130.2;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	50980	51637	.	+	.	ID=AT5G01130.2:exon:1;Parent=AT5G01130.2;Name=AT5G01130.2:exon:1;
+Chr5	Gnomon	CDS	51026	51637	.	+	0	ID=AT5G01130.2:CDS:1;Parent=AT5G01130.2;Name=AT5G01130.2:CDS:1;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	51739	52389	.	+	.	ID=AT5G01130.2:exon:2;Parent=AT5G01130.2;Name=AT5G01130.2:exon:2;
+Chr5	Gnomon	CDS	51739	52389	.	+	0	ID=AT5G01130.2:CDS:2;Parent=AT5G01130.2;Name=AT5G01130.2:CDS:2;product=DUF674-domain containing protein;
+Chr5	Gnomon	CDS	52463	52558	.	+	0	ID=AT5G01130.2:CDS:3;Parent=AT5G01130.2;Name=AT5G01130.2:CDS:3;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	52463	52583	.	+	.	ID=AT5G01130.2:exon:3;Parent=AT5G01130.2;Name=AT5G01130.2:exon:3;
+Chr5	Gnomon	exon	52667	52897	.	+	.	ID=AT5G01130.2:exon:4;Parent=AT5G01130.2;Name=AT5G01130.2:exon:4;
+###
+Chr5	Gnomon	gene	53175	54994	.	+	.	ID=AT5G01140;locus_tag=TAIR12_AT5G01140;locus_biotype=protein_coding;Name=AT5G01140;Dbxref=TAIR:AT5G01140_TAIR12;
+Chr5	Gnomon	mRNA	53175	54994	.	+	.	ID=AT5G01140.1;Parent=AT5G01140;Name=AT5G01140.1;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	53175	54606	.	+	.	ID=AT5G01140.1:exon:1;Parent=AT5G01140.1;Name=AT5G01140.1:exon:1;
+Chr5	Gnomon	CDS	53275	54606	.	+	0	ID=AT5G01140.1:CDS:1;Parent=AT5G01140.1;Name=AT5G01140.1:CDS:1;product=DUF674-domain containing protein;
+Chr5	Gnomon	CDS	54684	54821	.	+	0	ID=AT5G01140.1:CDS:2;Parent=AT5G01140.1;Name=AT5G01140.1:CDS:2;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	54684	54994	.	+	.	ID=AT5G01140.1:exon:2;Parent=AT5G01140.1;Name=AT5G01140.1:exon:2;
+###
+Chr5	Gnomon	gene	55126	57201	.	+	.	ID=AT5G01150;locus_tag=TAIR12_AT5G01150;locus_biotype=protein_coding;Name=AT5G01150;Dbxref=TAIR:AT5G01150_TAIR12;
+Chr5	Gnomon	mRNA	55126	57201	.	+	.	ID=AT5G01150.1;Parent=AT5G01150;Name=AT5G01150.1;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	55126	56007	.	+	.	ID=AT5G01150.1:exon:1;Parent=AT5G01150.1;Name=AT5G01150.1:exon:1;
+Chr5	Gnomon	CDS	55372	56007	.	+	0	ID=AT5G01150.1:CDS:1;Parent=AT5G01150.1;Name=AT5G01150.1:CDS:1;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	56092	56823	.	+	.	ID=AT5G01150.1:exon:2;Parent=AT5G01150.1;Name=AT5G01150.1:exon:2;
+Chr5	Gnomon	CDS	56092	56823	.	+	0	ID=AT5G01150.1:CDS:2;Parent=AT5G01150.1;Name=AT5G01150.1:CDS:2;product=DUF674-domain containing protein;
+Chr5	Gnomon	CDS	56896	57033	.	+	0	ID=AT5G01150.1:CDS:3;Parent=AT5G01150.1;Name=AT5G01150.1:CDS:3;product=DUF674-domain containing protein;
+Chr5	Gnomon	exon	56896	57201	.	+	.	ID=AT5G01150.1:exon:3;Parent=AT5G01150.1;Name=AT5G01150.1:exon:3;
+###
+Chr5	Gnomon	gene	57494	59247	.	+	.	ID=AT5G01160;locus_tag=TAIR12_AT5G01160;locus_biotype=protein_coding;gene=HAKAI;Name=AT5G01160;Dbxref=TAIR:AT5G01160_TAIR12;
+Chr5	Gnomon	mRNA	57494	59247	.	+	.	ID=AT5G01160.1;Parent=AT5G01160;Name=AT5G01160.1;product=putative ubiquitin protein ligase;
+Chr5	Gnomon	exon	57494	57580	.	+	.	ID=AT5G01160.1:exon:1;Parent=AT5G01160.1;Name=AT5G01160.1:exon:1;
+Chr5	Gnomon	exon	57659	57918	.	+	.	ID=AT5G01160.1:exon:2;Parent=AT5G01160.1;Name=AT5G01160.1:exon:2;
+Chr5	Gnomon	CDS	57664	57918	.	+	0	ID=AT5G01160.1:CDS:1;Parent=AT5G01160.1;Name=AT5G01160.1:CDS:1;product=putative ubiquitin protein ligase;
+Chr5	Gnomon	exon	58041	58099	.	+	.	ID=AT5G01160.1:exon:3;Parent=AT5G01160.1;Name=AT5G01160.1:exon:3;
+Chr5	Gnomon	CDS	58041	58099	.	+	0	ID=AT5G01160.1:CDS:2;Parent=AT5G01160.1;Name=AT5G01160.1:CDS:2;product=putative ubiquitin protein ligase;
+Chr5	Gnomon	CDS	58343	59111	.	+	1	ID=AT5G01160.1:CDS:3;Parent=AT5G01160.1;Name=AT5G01160.1:CDS:3;product=putative ubiquitin protein ligase;
+Chr5	Gnomon	exon	58343	59247	.	+	.	ID=AT5G01160.1:exon:4;Parent=AT5G01160.1;Name=AT5G01160.1:exon:4;
+###
+Chr5	lncRNAgroup	gene	58194	59135	.	-	.	ID=AT5G67653;locus_tag=TAIR12_AT5G67653;locus_biotype=antisense_RNA;Name=AT5G67653;Dbxref=TAIR:AT5G67653_TAIR12;
+Chr5	lncRNAgroup	ncRNA	58194	59135	.	-	.	ID=AT5G67653.1;Parent=AT5G67653;confidence=high;num_assemblies=1;longread_counts=8;tau=0.8555;cpc2_score=0.1439;cpc2_call=noncoding;orf_len=69;ncRNA_class=antisense_RNA;Name=AT5G67653.1;
+Chr5	lncRNAgroup	exon	58194	59135	.	-	.	ID=AT5G67653.1:exon:1;Parent=AT5G67653.1;Name=AT5G67653.1:exon:1;
+###
+Chr5	lncRNAgroup	gene	61373	63445	.	-	.	ID=AT5G67654;locus_tag=TAIR12_AT5G67654;locus_biotype=antisense_RNA;Name=AT5G67654;Dbxref=TAIR:AT5G67654_TAIR12;
+Chr5	lncRNAgroup	ncRNA	61373	63445	.	-	.	ID=AT5G67654.1;Parent=AT5G67654;confidence=high;num_assemblies=3;longread_counts=30;tau=0.6552;cpc2_score=0.3919;cpc2_call=noncoding;orf_len=88;ncRNA_class=antisense_RNA;Name=AT5G67654.1;
+Chr5	lncRNAgroup	exon	61373	63445	.	-	.	ID=AT5G67654.1:exon:1;Parent=AT5G67654.1;Name=AT5G67654.1:exon:1;
+Chr5	lncRNAgroup	ncRNA	61373	63445	.	-	.	ID=AT5G67654.2;Parent=AT5G67654;confidence=high;num_assemblies=1;longread_counts=4;tau=0.9089;cpc2_score=0.3672;cpc2_call=noncoding;orf_len=88;ncRNA_class=antisense_RNA;Name=AT5G67654.2;
+Chr5	lncRNAgroup	exon	62320	63445	.	-	.	ID=AT5G67654.2:exon:1;Parent=AT5G67654.2;Name=AT5G67654.2:exon:1;
+Chr5	lncRNAgroup	exon	61373	62206	.	-	.	ID=AT5G67654.2:exon:2;Parent=AT5G67654.2;Name=AT5G67654.2:exon:2;
+###
+Chr5	TAIR12	gene	61395	63520	.	+	.	ID=AT5G01170;locus_tag=TAIR12_AT5G01170;locus_biotype=protein_coding;gene=OPL1;description=Octopus Like 1;Name=AT5G01170;Dbxref=TAIR:AT5G01170_TAIR12;
+Chr5	TAIR12	mRNA	61395	63520	.	+	.	ID=AT5G01170.1;Parent=AT5G01170;Name=AT5G01170.1;product=Protein OCTOPUS-like protein[Octopus Like 1];
+Chr5	TAIR12	exon	61395	63520	.	+	.	ID=AT5G01170.1:exon:1;Parent=AT5G01170.1;Name=AT5G01170.1:exon:1;
+Chr5	TAIR12	CDS	61699	63405	.	+	0	ID=AT5G01170.1:CDS:1;Parent=AT5G01170.1;Name=AT5G01170.1:CDS:1;product=Protein OCTOPUS-like protein[Octopus Like 1];
+###
+Chr5	lncRNAgroup	gene	63592	64620	.	+	.	ID=AT5G01175;locus_tag=TAIR12_AT5G01175;locus_biotype=antisense_RNA;Name=AT5G01175;Dbxref=TAIR:AT5G01175_TAIR12;
+Chr5	lncRNAgroup	ncRNA	63592	64620	.	+	.	ID=AT5G01175.1;Parent=AT5G01175;confidence=high;num_assemblies=3;longread_counts=61;tau=0.6092;cpc2_score=0.0912;cpc2_call=noncoding;orf_len=31;riboseq=ncORF;ncRNA_class=antisense_RNA;Name=AT5G01175.1;
+Chr5	lncRNAgroup	exon	63592	63821	.	+	.	ID=AT5G01175.1:exon:1;Parent=AT5G01175.1;Name=AT5G01175.1:exon:1;
+Chr5	lncRNAgroup	exon	64301	64620	.	+	.	ID=AT5G01175.1:exon:2;Parent=AT5G01175.1;Name=AT5G01175.1:exon:2;
+###
+Chr5	Gnomon	gene	64506	67246	.	-	.	ID=AT5G01180;locus_tag=TAIR12_AT5G01180;locus_biotype=protein_coding;gene=NPF8.2;description=NRT1/ PTR family 8.2;gene_synonym=PTR5%2CATPTR5%2CAtNPF8.2;Note=peptide transporter 5%2CARABIDOPSIS THALIANA PEPTIDE TRANSPORTER 5;Name=AT5G01180;Dbxref=TAIR:AT5G01180_TAIR12;
+Chr5	Gnomon	mRNA	64506	67246	.	-	.	ID=AT5G01180.1;Parent=AT5G01180;Name=AT5G01180.1;product=dipeptide transmembrane transporter;
+Chr5	Gnomon	exon	67165	67246	.	-	.	ID=AT5G01180.1:exon:1;Parent=AT5G01180.1;Name=AT5G01180.1:exon:1;
+Chr5	Gnomon	exon	66516	66658	.	-	.	ID=AT5G01180.1:exon:2;Parent=AT5G01180.1;Name=AT5G01180.1:exon:2;
+Chr5	Gnomon	CDS	66516	66624	.	-	0	ID=AT5G01180.1:CDS:1;Parent=AT5G01180.1;Name=AT5G01180.1:CDS:1;product=dipeptide transmembrane transporter;
+Chr5	Gnomon	exon	66202	66419	.	-	.	ID=AT5G01180.1:exon:3;Parent=AT5G01180.1;Name=AT5G01180.1:exon:3;
+Chr5	Gnomon	CDS	66202	66419	.	-	2	ID=AT5G01180.1:CDS:2;Parent=AT5G01180.1;Name=AT5G01180.1:CDS:2;product=dipeptide transmembrane transporter;
+Chr5	Gnomon	exon	65550	66100	.	-	.	ID=AT5G01180.1:exon:4;Parent=AT5G01180.1;Name=AT5G01180.1:exon:4;
+Chr5	Gnomon	CDS	65550	66100	.	-	0	ID=AT5G01180.1:CDS:3;Parent=AT5G01180.1;Name=AT5G01180.1:CDS:3;product=dipeptide transmembrane transporter;
+Chr5	Gnomon	CDS	64641	65475	.	-	1	ID=AT5G01180.1:CDS:4;Parent=AT5G01180.1;Name=AT5G01180.1:CDS:4;product=dipeptide transmembrane transporter;
+Chr5	Gnomon	exon	64506	65475	.	-	.	ID=AT5G01180.1:exon:5;Parent=AT5G01180.1;Name=AT5G01180.1:exon:5;
+Chr5	Gnomon	mRNA	64506	67246	.	-	.	ID=AT5G01180.2;Parent=AT5G01180;Name=AT5G01180.2;product=dipeptide transmembrane transporter;
+Chr5	Gnomon	exon	67165	67246	.	-	.	ID=AT5G01180.2:exon:1;Parent=AT5G01180.2;Name=AT5G01180.2:exon:1;
+Chr5	Gnomon	exon	66516	66697	.	-	.	ID=AT5G01180.2:exon:2;Parent=AT5G01180.2;Name=AT5G01180.2:exon:2;
+Chr5	Gnomon	CDS	66516	66624	.	-	0	ID=AT5G01180.2:CDS:1;Parent=AT5G01180.2;Name=AT5G01180.2:CDS:1;product=dipeptide transmembrane transporter;
+Chr5	Gnomon	exon	66202	66419	.	-	.	ID=AT5G01180.2:exon:3;Parent=AT5G01180.2;Name=AT5G01180.2:exon:3;
+Chr5	Gnomon	CDS	66202	66419	.	-	2	ID=AT5G01180.2:CDS:2;Parent=AT5G01180.2;Name=AT5G01180.2:CDS:2;product=dipeptide transmembrane transporter;
+Chr5	Gnomon	exon	65550	66100	.	-	.	ID=AT5G01180.2:exon:4;Parent=AT5G01180.2;Name=AT5G01180.2:exon:4;
+Chr5	Gnomon	CDS	65550	66100	.	-	0	ID=AT5G01180.2:CDS:3;Parent=AT5G01180.2;Name=AT5G01180.2:CDS:3;product=dipeptide transmembrane transporter;
+Chr5	Gnomon	CDS	64641	65475	.	-	1	ID=AT5G01180.2:CDS:4;Parent=AT5G01180.2;Name=AT5G01180.2:CDS:4;product=dipeptide transmembrane transporter[NRT1/ PTR family 8.2];
+Chr5	Gnomon	exon	64506	65475	.	-	.	ID=AT5G01180.2:exon:5;Parent=AT5G01180.2;Name=AT5G01180.2:exon:5;
+###
+Chr5	lncRNAgroup	gene	66979	67553	.	+	.	ID=AT5G67655;locus_tag=TAIR12_AT5G67655;locus_biotype=lncRNA;Name=AT5G67655;Dbxref=TAIR:AT5G67655_TAIR12;
+Chr5	lncRNAgroup	ncRNA	66979	67553	.	+	.	ID=AT5G67655.1;Parent=AT5G67655;confidence=high;num_assemblies=2;longread_counts=7;tau=0.9411;cpc2_score=0.0053;cpc2_call=noncoding;orf_len=17;ncRNA_class=lncRNA;Name=AT5G67655.1;
+Chr5	lncRNAgroup	exon	66979	67553	.	+	.	ID=AT5G67655.1:exon:1;Parent=AT5G67655.1;Name=AT5G67655.1:exon:1;
+###
+Chr5	EDTA	repeat_region	67083	67180	303	-	.	ID=AT5TE95382;locus_tag=AT5TE95382;locus_biotype=satellite_DNA;Name=AT5TE95382;family_name=ATENSAT1;sequence_ontology=SO:0000005;identity=0.773;method=homology
+###
+Chr5	EDTA	repeat_region	68151	74588	.	-	.	ID=AT5TE00230;locus_tag=AT5TE00230;locus_biotype=Copia_LTR_retrotransposon;Name=AT5TE00230;family_name=ATCOPIA27_I;classification=LTR/Copia;sequence_ontology=SO:0000657;ltr_identity=0.9970;method=structural;motif=TGCA;tsd=GCATC;Note=old_locus_tag:AT5TE00230
+Chr5	EDTA	repeat_region	68151	68155	.	-	.	ID=AT5TE00230:repeat_region:1;family_name=ATCOPIA27_I;Parent=AT5TE00230;Name=AT5TE00230:repeat_region:1;classification=LTR/Copia;sequence_ontology=SO:0000434;ltr_identity=0.9970;method=structural;motif=TGCA;tsd=GCATC;rpt_type=other;
+Chr5	EDTA	repeat_region	68156	68492	.	-	.	ID=AT5TE00230:repeat_region:2;family_name=ATCOPIA27_I;Parent=AT5TE00230;Name=AT5TE00230:repeat_region:2;classification=LTR/Copia;sequence_ontology=SO:0000286;ltr_identity=0.9970;method=structural;motif=TGCA;tsd=GCATC;rpt_type=long_terminal_repeat;
+Chr5	EDTA	mobile_element	68156	74583	.	-	.	ID=AT5TE00230:mobile_element:1;family_name=ATCOPIA27_I;Parent=AT5TE00230;Name=AT5TE00230:mobile_element:1;classification=LTR/Copia;sequence_ontology=SO:0002264;ltr_identity=0.9970;method=structural;motif=TGCA;tsd=GCATC;lineage=Bianca;codingcapacity=GAG_PROT_INT_RT_RH;mobile_element_type=retrotransposon:Copia_LTR;
+Chr5	EDTA	repeat_region	74247	74583	.	-	.	ID=AT5TE00230:repeat_region:3;family_name=ATCOPIA27_I;Parent=AT5TE00230;Name=AT5TE00230:repeat_region:3;classification=LTR/Copia;sequence_ontology=SO:0000286;ltr_identity=0.9970;method=structural;motif=TGCA;tsd=GCATC;rpt_type=long_terminal_repeat;
+Chr5	EDTA	repeat_region	74584	74588	.	-	.	ID=AT5TE00230:repeat_region:4;family_name=ATCOPIA27_I;Parent=AT5TE00230;Name=AT5TE00230:repeat_region:4;classification=LTR/Copia;sequence_ontology=SO:0000434;ltr_identity=0.9970;method=structural;motif=TGCA;tsd=GCATC;rpt_type=other;
+###
+Chr5	Gnomon	pseudogene	72180	74272	.	-	.	ID=AT5G01185;locus_tag=TAIR12_AT5G01185;locus_biotype=pseudogene;Name=AT5G01185;Dbxref=TAIR:AT5G01185_TAIR12;
+Chr5	Gnomon	transcript	72180	74272	.	-	.	ID=AT5G01185.1;Parent=AT5G01185;Name=AT5G01185.1;product=pseudogene;
+Chr5	Gnomon	exon	73982	74272	.	-	.	ID=AT5G01185.1:exon:1;Parent=AT5G01185.1;Name=AT5G01185.1:exon:1;
+Chr5	Gnomon	exon	72180	73308	.	-	.	ID=AT5G01185.1:exon:2;Parent=AT5G01185.1;Name=AT5G01185.1:exon:2;
+###
+Chr5	Gnomon	gene	75678	78147	.	+	.	ID=AT5G01190;locus_tag=TAIR12_AT5G01190;locus_biotype=protein_coding;gene=LAC10;description=laccase 10;Name=AT5G01190;Dbxref=TAIR:AT5G01190_TAIR12;
+Chr5	Gnomon	mRNA	75678	78147	.	+	.	ID=AT5G01190.1;Parent=AT5G01190;Name=AT5G01190.1;product=putative oxidoreductase;
+Chr5	Gnomon	exon	75678	75865	.	+	.	ID=AT5G01190.1:exon:1;Parent=AT5G01190.1;Name=AT5G01190.1:exon:1;
+Chr5	Gnomon	CDS	75776	75865	.	+	0	ID=AT5G01190.1:CDS:1;Parent=AT5G01190.1;Name=AT5G01190.1:CDS:1;product=putative oxidoreductase;
+Chr5	Gnomon	exon	76001	76152	.	+	.	ID=AT5G01190.1:exon:2;Parent=AT5G01190.1;Name=AT5G01190.1:exon:2;
+Chr5	Gnomon	CDS	76001	76152	.	+	0	ID=AT5G01190.1:CDS:2;Parent=AT5G01190.1;Name=AT5G01190.1:CDS:2;product=putative oxidoreductase;
+Chr5	Gnomon	exon	76243	76487	.	+	.	ID=AT5G01190.1:exon:3;Parent=AT5G01190.1;Name=AT5G01190.1:exon:3;
+Chr5	Gnomon	CDS	76243	76487	.	+	1	ID=AT5G01190.1:CDS:3;Parent=AT5G01190.1;Name=AT5G01190.1:CDS:3;product=putative oxidoreductase;
+Chr5	Gnomon	exon	76578	76706	.	+	.	ID=AT5G01190.1:exon:4;Parent=AT5G01190.1;Name=AT5G01190.1:exon:4;
+Chr5	Gnomon	CDS	76578	76706	.	+	2	ID=AT5G01190.1:CDS:4;Parent=AT5G01190.1;Name=AT5G01190.1:CDS:4;product=putative oxidoreductase;
+Chr5	Gnomon	exon	76818	77747	.	+	.	ID=AT5G01190.1:exon:5;Parent=AT5G01190.1;Name=AT5G01190.1:exon:5;
+Chr5	Gnomon	CDS	76818	77747	.	+	2	ID=AT5G01190.1:CDS:5;Parent=AT5G01190.1;Name=AT5G01190.1:CDS:5;product=putative oxidoreductase;
+Chr5	Gnomon	CDS	77866	77996	.	+	2	ID=AT5G01190.1:CDS:6;Parent=AT5G01190.1;Name=AT5G01190.1:CDS:6;product=putative oxidoreductase[laccase 10];
+Chr5	Gnomon	exon	77866	78147	.	+	.	ID=AT5G01190.1:exon:6;Parent=AT5G01190.1;Name=AT5G01190.1:exon:6;
+###
+Chr5	lncRNAgroup	gene	76789	77815	.	-	.	ID=AT5G67656;locus_tag=TAIR12_AT5G67656;locus_biotype=antisense_RNA;Name=AT5G67656;Dbxref=TAIR:AT5G67656_TAIR12;
+Chr5	lncRNAgroup	ncRNA	76789	77815	.	-	.	ID=AT5G67656.1;Parent=AT5G67656;confidence=high;num_assemblies=2;longread_counts=3;tau=0.9331;cpc2_score=0.04;cpc2_call=noncoding;orf_len=36;ncRNA_class=antisense_RNA;Name=AT5G67656.1;
+Chr5	lncRNAgroup	exon	76789	77815	.	-	.	ID=AT5G67656.1:exon:1;Parent=AT5G67656.1;Name=AT5G67656.1:exon:1;
+###
+Chr5	Gnomon	gene	80322	81873	.	+	.	ID=AT5G01200;locus_tag=TAIR12_AT5G01200;locus_biotype=protein_coding;Name=AT5G01200;Dbxref=TAIR:AT5G01200_TAIR12;
+Chr5	Gnomon	mRNA	80322	81873	.	+	.	ID=AT5G01200.1;Parent=AT5G01200;Name=AT5G01200.1;product=putative DNA-binding transcription factor;
+Chr5	Gnomon	exon	80322	80960	.	+	.	ID=AT5G01200.1:exon:1;Parent=AT5G01200.1;Name=AT5G01200.1:exon:1;
+Chr5	Gnomon	CDS	80500	80960	.	+	0	ID=AT5G01200.1:CDS:1;Parent=AT5G01200.1;Name=AT5G01200.1:CDS:1;product=putative DNA-binding transcription factor;
+Chr5	Gnomon	CDS	81336	81678	.	+	1	ID=AT5G01200.1:CDS:2;Parent=AT5G01200.1;Name=AT5G01200.1:CDS:2;product=putative DNA-binding transcription factor;
+Chr5	Gnomon	exon	81336	81873	.	+	.	ID=AT5G01200.1:exon:2;Parent=AT5G01200.1;Name=AT5G01200.1:exon:2;
+###
+Chr5	lncRNAgroup	gene	87610	89301	.	-	.	ID=AT5G01215;locus_tag=TAIR12_AT5G01215;locus_biotype=antisense_RNA;Name=AT5G01215;Dbxref=TAIR:AT5G01215_TAIR12;
+Chr5	lncRNAgroup	ncRNA	87610	89301	.	-	.	ID=AT5G01215.1;Parent=AT5G01215;confidence=high;num_assemblies=2;longread_counts=6;tau=0.7814;cpc2_score=0.0805;cpc2_call=noncoding;orf_len=60;ncRNA_class=antisense_RNA;Name=AT5G01215.1;
+Chr5	lncRNAgroup	exon	87610	89301	.	-	.	ID=AT5G01215.1:exon:1;Parent=AT5G01215.1;Name=AT5G01215.1:exon:1;
+Chr5	lncRNAgroup	ncRNA	87610	89301	.	-	.	ID=AT5G01215.2;Parent=AT5G01215;confidence=high;num_assemblies=2;longread_counts=7;tau=0.7726;cpc2_score=0.0574;cpc2_call=noncoding;orf_len=60;ncRNA_class=antisense_RNA;Name=AT5G01215.2;
+Chr5	lncRNAgroup	exon	88741	89301	.	-	.	ID=AT5G01215.2:exon:1;Parent=AT5G01215.2;Name=AT5G01215.2:exon:1;
+Chr5	lncRNAgroup	exon	87610	88645	.	-	.	ID=AT5G01215.2:exon:2;Parent=AT5G01215.2;Name=AT5G01215.2:exon:2;
+###
+Chr5	Gnomon	gene	87863	89579	.	+	.	ID=AT5G01210;locus_tag=TAIR12_AT5G01210;locus_biotype=protein_coding;Name=AT5G01210;Dbxref=TAIR:AT5G01210_TAIR12;
+Chr5	Gnomon	mRNA	87863	89579	.	+	.	ID=AT5G01210.1;Parent=AT5G01210;Name=AT5G01210.1;product=putative acyltransferase%2C transferring groups other than amino-acyl groups;
+Chr5	Gnomon	exon	87863	89579	.	+	.	ID=AT5G01210.1:exon:1;Parent=AT5G01210.1;Name=AT5G01210.1:exon:1;
+Chr5	Gnomon	CDS	87938	89365	.	+	0	ID=AT5G01210.1:CDS:1;Parent=AT5G01210.1;Name=AT5G01210.1:CDS:1;product=putative acyltransferase%2C transferring groups other than amino-acyl groups;
+###
+Chr5	Gnomon	gene	89968	93368	.	-	.	ID=AT5G01220;locus_tag=TAIR12_AT5G01220;locus_biotype=protein_coding;gene=SQD2;description=sulfoquinovosyldiacylglycerol 2;Name=AT5G01220;Dbxref=TAIR:AT5G01220_TAIR12;
+Chr5	Gnomon	mRNA	89968	93368	.	-	.	ID=AT5G01220.1;Parent=AT5G01220;Name=AT5G01220.1;product=UDP-glycosyltransferase;
+Chr5	Gnomon	exon	92923	93368	.	-	.	ID=AT5G01220.1:exon:1;Parent=AT5G01220.1;Name=AT5G01220.1:exon:1;
+Chr5	Gnomon	CDS	92923	93269	.	-	0	ID=AT5G01220.1:CDS:1;Parent=AT5G01220.1;Name=AT5G01220.1:CDS:1;product=UDP-glycosyltransferase;
+Chr5	Gnomon	exon	92487	92553	.	-	.	ID=AT5G01220.1:exon:2;Parent=AT5G01220.1;Name=AT5G01220.1:exon:2;
+Chr5	Gnomon	CDS	92487	92553	.	-	1	ID=AT5G01220.1:CDS:2;Parent=AT5G01220.1;Name=AT5G01220.1:CDS:2;product=UDP-glycosyltransferase;
+Chr5	Gnomon	exon	92276	92346	.	-	.	ID=AT5G01220.1:exon:3;Parent=AT5G01220.1;Name=AT5G01220.1:exon:3;
+Chr5	Gnomon	CDS	92276	92346	.	-	0	ID=AT5G01220.1:CDS:3;Parent=AT5G01220.1;Name=AT5G01220.1:CDS:3;product=UDP-glycosyltransferase;
+Chr5	Gnomon	exon	92085	92202	.	-	.	ID=AT5G01220.1:exon:4;Parent=AT5G01220.1;Name=AT5G01220.1:exon:4;
+Chr5	Gnomon	CDS	92085	92202	.	-	1	ID=AT5G01220.1:CDS:4;Parent=AT5G01220.1;Name=AT5G01220.1:CDS:4;product=UDP-glycosyltransferase;
+Chr5	Gnomon	exon	91909	91982	.	-	.	ID=AT5G01220.1:exon:5;Parent=AT5G01220.1;Name=AT5G01220.1:exon:5;
+Chr5	Gnomon	CDS	91909	91982	.	-	0	ID=AT5G01220.1:CDS:5;Parent=AT5G01220.1;Name=AT5G01220.1:CDS:5;product=UDP-glycosyltransferase;
+Chr5	Gnomon	exon	91772	91827	.	-	.	ID=AT5G01220.1:exon:6;Parent=AT5G01220.1;Name=AT5G01220.1:exon:6;
+Chr5	Gnomon	CDS	91772	91827	.	-	1	ID=AT5G01220.1:CDS:6;Parent=AT5G01220.1;Name=AT5G01220.1:CDS:6;product=UDP-glycosyltransferase;
+Chr5	Gnomon	exon	91588	91671	.	-	.	ID=AT5G01220.1:exon:7;Parent=AT5G01220.1;Name=AT5G01220.1:exon:7;
+Chr5	Gnomon	CDS	91588	91671	.	-	2	ID=AT5G01220.1:CDS:7;Parent=AT5G01220.1;Name=AT5G01220.1:CDS:7;product=UDP-glycosyltransferase;
+Chr5	Gnomon	exon	91411	91498	.	-	.	ID=AT5G01220.1:exon:8;Parent=AT5G01220.1;Name=AT5G01220.1:exon:8;
+Chr5	Gnomon	CDS	91411	91498	.	-	2	ID=AT5G01220.1:CDS:8;Parent=AT5G01220.1;Name=AT5G01220.1:CDS:8;product=UDP-glycosyltransferase;
+Chr5	Gnomon	exon	91242	91319	.	-	.	ID=AT5G01220.1:exon:9;Parent=AT5G01220.1;Name=AT5G01220.1:exon:9;
+Chr5	Gnomon	CDS	91242	91319	.	-	1	ID=AT5G01220.1:CDS:9;Parent=AT5G01220.1;Name=AT5G01220.1:CDS:9;product=UDP-glycosyltransferase;
+Chr5	Gnomon	exon	91108	91164	.	-	.	ID=AT5G01220.1:exon:10;Parent=AT5G01220.1;Name=AT5G01220.1:exon:10;
+Chr5	Gnomon	CDS	91108	91164	.	-	1	ID=AT5G01220.1:CDS:10;Parent=AT5G01220.1;Name=AT5G01220.1:CDS:10;product=UDP-glycosyltransferase;
+Chr5	Gnomon	exon	90798	91014	.	-	.	ID=AT5G01220.1:exon:11;Parent=AT5G01220.1;Name=AT5G01220.1:exon:11;
+Chr5	Gnomon	CDS	90798	91014	.	-	1	ID=AT5G01220.1:CDS:11;Parent=AT5G01220.1;Name=AT5G01220.1:CDS:11;product=UDP-glycosyltransferase;
+Chr5	Gnomon	CDS	90291	90566	.	-	0	ID=AT5G01220.1:CDS:12;Parent=AT5G01220.1;Name=AT5G01220.1:CDS:12;product=UDP-glycosyltransferase[sulfoquinovosyldiacylglycerol 2];
+Chr5	Gnomon	exon	89968	90566	.	-	.	ID=AT5G01220.1:exon:12;Parent=AT5G01220.1;Name=AT5G01220.1:exon:12;
+###
+Chr5	EDTA	mobile_element	94492	94685	325	+	.	ID=AT5TE95383;locus_tag=TAIR12_AT5TE95383;locus_biotype=hAT_TIR_transposon;Name=AT5TE95383;family_name=TE_00000409;classification=DNA/hAT;sequence_ontology=SO:0002279;identity=0.721;method=homology;mobile_element_type=transposon:hAT_TIR;
+###
+Chr5	TAIR12	gene	95249	95802	.	+	.	ID=AT5G01225;locus_tag=TAIR12_AT5G01225;locus_biotype=protein_coding;Name=AT5G01225;Dbxref=TAIR:AT5G01225_TAIR12;
+Chr5	TAIR12	mRNA	95249	95802	.	+	.	ID=AT5G01225.1;Parent=AT5G01225;Name=AT5G01225.1;product=hypothetical protein;
+Chr5	TAIR12	exon	95249	95802	.	+	.	ID=AT5G01225.1:exon:1;Parent=AT5G01225.1;Name=AT5G01225.1:exon:1;
+Chr5	TAIR12	CDS	95304	95708	.	+	0	ID=AT5G01225.1:CDS:1;Parent=AT5G01225.1;Name=AT5G01225.1:CDS:1;product=hypothetical protein;
+###
+Chr5	Gnomon	gene	96021	99075	.	-	.	ID=AT5G01230;locus_tag=TAIR12_AT5G01230;locus_biotype=protein_coding;gene=SCS9;description=UPPRESSOR OF CSB3 9;gene_synonym=TRM7a%2CAtTRM7a;Note=tRNA methyltransferase 7;Name=AT5G01230;Dbxref=TAIR:AT5G01230_TAIR12;
+Chr5	Gnomon	mRNA	96021	99075	.	-	.	ID=AT5G01230.1;Parent=AT5G01230;Name=AT5G01230.1;product=tRNA methyltransferase;
+Chr5	Gnomon	exon	98966	99075	.	-	.	ID=AT5G01230.1:exon:1;Parent=AT5G01230.1;Name=AT5G01230.1:exon:1;
+Chr5	Gnomon	exon	98738	98795	.	-	.	ID=AT5G01230.1:exon:2;Parent=AT5G01230.1;Name=AT5G01230.1:exon:2;
+Chr5	Gnomon	CDS	98738	98764	.	-	0	ID=AT5G01230.1:CDS:1;Parent=AT5G01230.1;Name=AT5G01230.1:CDS:1;product=tRNA methyltransferase;
+Chr5	Gnomon	exon	98539	98632	.	-	.	ID=AT5G01230.1:exon:3;Parent=AT5G01230.1;Name=AT5G01230.1:exon:3;
+Chr5	Gnomon	CDS	98539	98632	.	-	0	ID=AT5G01230.1:CDS:2;Parent=AT5G01230.1;Name=AT5G01230.1:CDS:2;product=tRNA methyltransferase;
+Chr5	Gnomon	exon	98332	98381	.	-	.	ID=AT5G01230.1:exon:4;Parent=AT5G01230.1;Name=AT5G01230.1:exon:4;
+Chr5	Gnomon	CDS	98332	98381	.	-	2	ID=AT5G01230.1:CDS:3;Parent=AT5G01230.1;Name=AT5G01230.1:CDS:3;product=tRNA methyltransferase;
+Chr5	Gnomon	exon	97866	97915	.	-	.	ID=AT5G01230.1:exon:5;Parent=AT5G01230.1;Name=AT5G01230.1:exon:5;
+Chr5	Gnomon	CDS	97866	97915	.	-	0	ID=AT5G01230.1:CDS:4;Parent=AT5G01230.1;Name=AT5G01230.1:CDS:4;product=tRNA methyltransferase;
+Chr5	Gnomon	exon	97648	97756	.	-	.	ID=AT5G01230.1:exon:6;Parent=AT5G01230.1;Name=AT5G01230.1:exon:6;
+Chr5	Gnomon	CDS	97648	97756	.	-	1	ID=AT5G01230.1:CDS:5;Parent=AT5G01230.1;Name=AT5G01230.1:CDS:5;product=tRNA methyltransferase;
+Chr5	Gnomon	exon	97470	97530	.	-	.	ID=AT5G01230.1:exon:7;Parent=AT5G01230.1;Name=AT5G01230.1:exon:7;
+Chr5	Gnomon	CDS	97470	97530	.	-	0	ID=AT5G01230.1:CDS:6;Parent=AT5G01230.1;Name=AT5G01230.1:CDS:6;product=tRNA methyltransferase;
+Chr5	Gnomon	exon	97333	97385	.	-	.	ID=AT5G01230.1:exon:8;Parent=AT5G01230.1;Name=AT5G01230.1:exon:8;
+Chr5	Gnomon	CDS	97333	97385	.	-	2	ID=AT5G01230.1:CDS:7;Parent=AT5G01230.1;Name=AT5G01230.1:CDS:7;product=tRNA methyltransferase;
+Chr5	Gnomon	exon	97118	97210	.	-	.	ID=AT5G01230.1:exon:9;Parent=AT5G01230.1;Name=AT5G01230.1:exon:9;
+Chr5	Gnomon	CDS	97118	97210	.	-	0	ID=AT5G01230.1:CDS:8;Parent=AT5G01230.1;Name=AT5G01230.1:CDS:8;product=tRNA methyltransferase;
+Chr5	Gnomon	exon	96905	96968	.	-	.	ID=AT5G01230.1:exon:10;Parent=AT5G01230.1;Name=AT5G01230.1:exon:10;
+Chr5	Gnomon	CDS	96905	96968	.	-	0	ID=AT5G01230.1:CDS:9;Parent=AT5G01230.1;Name=AT5G01230.1:CDS:9;product=tRNA methyltransferase;
+Chr5	Gnomon	exon	96673	96780	.	-	.	ID=AT5G01230.1:exon:11;Parent=AT5G01230.1;Name=AT5G01230.1:exon:11;
+Chr5	Gnomon	CDS	96673	96780	.	-	2	ID=AT5G01230.1:CDS:10;Parent=AT5G01230.1;Name=AT5G01230.1:CDS:10;product=tRNA methyltransferase;
+Chr5	Gnomon	CDS	96173	96393	.	-	2	ID=AT5G01230.1:CDS:11;Parent=AT5G01230.1;Name=AT5G01230.1:CDS:11;product=tRNA methyltransferase[UPPRESSOR OF CSB3 9];
+Chr5	Gnomon	exon	96021	96393	.	-	.	ID=AT5G01230.1:exon:12;Parent=AT5G01230.1;Name=AT5G01230.1:exon:12;
+###
+Chr5	lncRNAgroup	gene	96149	96882	.	+	.	ID=AT5G67657;locus_tag=TAIR12_AT5G67657;locus_biotype=antisense_RNA;Name=AT5G67657;Dbxref=TAIR:AT5G67657_TAIR12;
+Chr5	lncRNAgroup	ncRNA	96149	96882	.	+	.	ID=AT5G67657.1;Parent=AT5G67657;confidence=high;num_assemblies=1;longread_counts=3;tau=0.8994;cpc2_score=0.0409;cpc2_call=noncoding;orf_len=41;ncRNA_class=antisense_RNA;Name=AT5G67657.1;
+Chr5	lncRNAgroup	exon	96149	96882	.	+	.	ID=AT5G67657.1:exon:1;Parent=AT5G67657.1;Name=AT5G67657.1:exon:1;
+###
