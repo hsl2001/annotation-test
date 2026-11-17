@@ -16,7 +16,14 @@ import numpy as np
 from numba import njit, prange
 from numpy.typing import NDArray
 
-from model import Config, ModelProtocol, build_model, load_model, local_max
+from model import (
+    Config,
+    ModelProtocol,
+    average_precision,
+    build_model,
+    load_model,
+    local_max,
+)
 
 STRANDS = ("+", "-")
 KINDS = ("GS", "IS", "IE", "GE")
@@ -148,7 +155,6 @@ class FilterBank:
                     np.ascontiguousarray(table.imag),
                 )
             )
-        self.channels = 6 * len(self.periods)
 
     def transform(self, codes: NDArray[np.uint8]) -> NDArray[np.float32]:
         return np.concatenate(
@@ -160,6 +166,15 @@ class FilterBank:
         forward = self.transform(codes)
         reverse = self.transform(COMPLEMENT[codes[::-1]])
         return np.concatenate([forward, reverse], axis=0)
+
+
+def one_hot_strands(codes: NDArray[np.uint8]) -> NDArray[np.float32]:
+    """One-hot encode both strands so the network can read motifs directly."""
+    table = np.zeros((5, 4), dtype=np.float32)
+    table[:4] = np.eye(4, dtype=np.float32)
+    forward = table[codes].T
+    reverse = table[COMPLEMENT[codes[::-1]]].T
+    return np.concatenate([forward, reverse], axis=0)
 
 
 def open_text(path: str):
@@ -400,6 +415,48 @@ def motif_mask(
     return _motif_mask(sequence, table, lengths, site in ("GS", "IS"))
 
 
+def motif_mask_matrix(
+    codes: NDArray[np.uint8], motifs: dict[str, set[bytes]], label_names: list[str]
+) -> NDArray[np.bool_]:
+    """Motif-bearing positions for every label, in genomic coordinates."""
+    length = len(codes)
+    mask = np.zeros((len(label_names), length), dtype=bool)
+    index = {label: row for row, label in enumerate(label_names)}
+    stop_codes = {"TAA": (3, 0, 0), "TAG": (3, 0, 2), "TGA": (3, 2, 0)}
+    for strand in STRANDS:
+        oriented_seq = oriented(codes, strand)
+        valid = {kind: motif_mask(oriented_seq, kind, motifs) for kind in KINDS}
+        valid["IE"] = _shift_mask(valid["IE"], -2)
+        valid["GE"] = _shift_mask(valid["GE"], -3)
+        prefix = PREFIX[strand]
+        for kind in KINDS:
+            if kind == "GE":
+                positions = np.flatnonzero(valid["GE"])
+                positions = positions[positions < length - 2]
+                for codon, code in stop_codes.items():
+                    label = f"{prefix}GEm3{codon}"
+                    if label not in index:
+                        continue
+                    match = (
+                        (oriented_seq[positions] == code[0])
+                        & (oriented_seq[positions + 1] == code[1])
+                        & (oriented_seq[positions + 2] == code[2])
+                    )
+                    selected = positions[match]
+                    if strand == "-":
+                        selected = length - 1 - selected
+                    mask[index[label], selected] = True
+            else:
+                label = f"{prefix}{kind}" if kind in ("GS", "IS") else f"{prefix}IEm2"
+                if label not in index:
+                    continue
+                positions = np.flatnonzero(valid[kind])
+                if strand == "-":
+                    positions = length - 1 - positions
+                mask[index[label], positions] = True
+    return mask
+
+
 @dataclass
 class Sites:
     positions: NDArray[np.int64]
@@ -462,21 +519,35 @@ def build_labels(
     }
 
 
+def _strand_values(
+    values: NDArray[np.float32],
+    label_names: list[str],
+    strand: str,
+    combine: Callable[[list[NDArray[np.float32]]], NDArray[np.float32]],
+) -> dict[str, NDArray[np.float32]]:
+    """Group per-label values into the four site kinds for one strand."""
+    prefix = PREFIX[strand]
+    result = {
+        kind: values[label_names.index(f"{prefix}{kind}")]
+        for kind in ("GS", "IS")
+    }
+    result["IE"] = values[label_names.index(f"{prefix}IEm2")]
+    result["GE"] = combine(
+        [
+            values[label_names.index(f"{prefix}GEm3{codon}")]
+            for codon in ("TAA", "TAG", "TGA")
+            if f"{prefix}GEm3{codon}" in label_names
+        ]
+    )
+    return result
+
+
 def strand_scores(
     scores: NDArray[np.float32], label_names: list[str], strand: str
 ) -> dict[str, NDArray[np.float32]]:
-    prefix = PREFIX[strand]
-    result: dict[str, NDArray[np.float32]] = {}
-    for kind in ("GS", "IS"):
-        result[kind] = scores[label_names.index(f"{prefix}{kind}")]
-    result["IE"] = scores[label_names.index(f"{prefix}IEm2")]
-    ge = [
-        scores[label_names.index(f"{prefix}GEm3{codon}")]
-        for codon in ("TAA", "TAG", "TGA")
-        if f"{prefix}GEm3{codon}" in label_names
-    ]
-    result["GE"] = np.stack(ge).max(axis=0)
-    return result
+    return _strand_values(
+        scores, label_names, strand, lambda ge: np.stack(ge).max(axis=0)
+    )
 
 
 @dataclass
@@ -485,7 +556,6 @@ class Candidate:
     strand: str
     transcript: tuple[int, int]
     cds: list[tuple[int, int]]
-    exons: list[tuple[int, int]]
     score: float
 
 
@@ -802,7 +872,6 @@ class Decoder:
                         strand=strand,
                         transcript=(gs_pos, ge_pos),
                         cds=cds,
-                        exons=list(cds),
                         score=float(paths.score[path]),
                     )
                 )
@@ -833,14 +902,6 @@ def roc_auc(scores: NDArray[np.float32], labels: NDArray[np.bool_]) -> float:
     return float((ranks[labels].sum() - n_pos * (n_pos + 1) / 2) / (n_pos * n_neg))
 
 
-def average_precision(scores: NDArray[np.float32], labels: NDArray[np.bool_]) -> float:
-    order = np.argsort(-scores)
-    y = labels[order]
-    tp = np.cumsum(y)
-    precision = tp / np.arange(1, len(y) + 1)
-    return float((precision * y).sum() / max(y.sum(), 1))
-
-
 def best_f1(scores: NDArray[np.float32], labels: NDArray[np.bool_]) -> tuple[float, float]:
     order = np.argsort(-scores)
     y = labels[order]
@@ -863,18 +924,13 @@ def slice_labels(
 
 def kind_thresholds(model: ModelProtocol, strand: str) -> dict[str, float]:
     assert model.thresholds is not None
-    prefix = PREFIX[strand]
-    result: dict[str, float] = {}
-    for kind in ("GS", "IS"):
-        result[kind] = float(model.thresholds[model.label_names.index(f"{prefix}{kind}")])
-    result["IE"] = float(model.thresholds[model.label_names.index(f"{prefix}IEm2")])
-    ge = [
-        float(model.thresholds[model.label_names.index(f"{prefix}GEm3{codon}")])
-        for codon in ("TAA", "TAG", "TGA")
-        if f"{prefix}GEm3{codon}" in model.label_names
-    ]
-    result["GE"] = min(ge)
-    return result
+    values = _strand_values(
+        model.thresholds,
+        model.label_names,
+        strand,
+        lambda ge: np.array(min(ge), dtype=np.float32),
+    )
+    return {kind: float(value) for kind, value in values.items()}
 
 
 def decode_strand(
@@ -899,7 +955,6 @@ def to_genomic(candidates: list[Candidate], length: int) -> list[Candidate]:
             a, b = candidate.transcript
             candidate.transcript = (length - b, length - a)
             candidate.cds = [(length - y, length - x) for x, y in candidate.cds]
-            candidate.exons = [(length - y, length - x) for x, y in candidate.exons]
     return candidates
 
 
@@ -908,8 +963,90 @@ def shift_candidates(candidates: list[Candidate], offset: int) -> list[Candidate
         a, b = candidate.transcript
         candidate.transcript = (a + offset, b + offset)
         candidate.cds = [(x + offset, y + offset) for x, y in candidate.cds]
-        candidate.exons = [(x + offset, y + offset) for x, y in candidate.exons]
     return candidates
+
+
+def _envelope(cds: list[tuple[int, int]]) -> tuple[int, int]:
+    return min(left for left, _ in cds), max(right for _, right in cds)
+
+
+def _overlap(left: tuple[int, int], right: tuple[int, int]) -> int:
+    return max(0, min(left[1], right[1]) - max(left[0], right[0]))
+
+
+def select_top(
+    candidates: list[Candidate], top: int = 3, min_overlap: float = 0.5
+) -> list[Candidate]:
+    """Deduplicate candidates and keep the best isoforms per locus.
+
+    The decoder emits many overlapping chains for the same gene. Without this
+    step every chain is written out, which floods the output with near-duplicate
+    false positives and destroys precision.
+    """
+    if not candidates:
+        return []
+    unique: dict[tuple, Candidate] = {}
+    for candidate in candidates:
+        key = (candidate.seqid, candidate.strand, tuple(sorted(candidate.cds)))
+        if key not in unique or candidate.score > unique[key].score:
+            unique[key] = candidate
+    pool = sorted(unique.values(), key=lambda candidate: -candidate.score)
+
+    envelopes = {id(candidate): _envelope(candidate.cds) for candidate in pool}
+    lengths = {
+        id(candidate): sum(b - a for a, b in candidate.cds) for candidate in pool
+    }
+
+    by_loc: dict[tuple[str, str], list[Candidate]] = defaultdict(list)
+    for candidate in pool:
+        by_loc[(candidate.seqid, candidate.strand)].append(candidate)
+    starts: dict[tuple[str, str], list[int]] = {}
+    max_len: dict[tuple[str, str], int] = {}
+    for loc, group in by_loc.items():
+        group.sort(key=lambda candidate: envelopes[id(candidate)][0])
+        starts[loc] = [envelopes[id(candidate)][0] for candidate in group]
+        max_len[loc] = max(
+            envelopes[id(candidate)][1] - envelopes[id(candidate)][0]
+            for candidate in group
+        )
+
+    selected: list[Candidate] = []
+    assigned: set[int] = set()
+    for primary in pool:
+        if id(primary) in assigned:
+            continue
+        reference = envelopes[id(primary)]
+        loc = (primary.seqid, primary.strand)
+        group_all = by_loc[loc]
+        starts_all = starts[loc]
+        low = bisect_left(starts_all, reference[0] - max_len[loc])
+        high = bisect_right(starts_all, reference[1])
+        group = [
+            candidate
+            for candidate in group_all[low:high]
+            if id(candidate) not in assigned
+            and _overlap(envelopes[id(candidate)], reference)
+            / max(reference[1] - reference[0], 1)
+            >= min_overlap
+        ]
+        for candidate in group:
+            assigned.add(id(candidate))
+        if not group:
+            continue
+        longest = max(group, key=lambda candidate: lengths[id(candidate)])
+        longest_span = envelopes[id(longest)]
+        isoforms = [
+            candidate
+            for candidate in group
+            if _overlap(envelopes[id(candidate)], longest_span)
+            / max(longest_span[1] - longest_span[0], 1)
+            >= min_overlap
+        ]
+        isoforms.sort(
+            key=lambda candidate: (-lengths[id(candidate)], -candidate.score)
+        )
+        selected.extend(isoforms[:top])
+    return selected
 
 
 def write_gff3(path: Path, candidates: list[Candidate]) -> None:
@@ -922,7 +1059,7 @@ def write_gff3(path: Path, candidates: list[Candidate]) -> None:
                 f"{candidate.seqid}\tspot\tmRNA\t{a + 1}\t{b}\t{candidate.score:.4f}\t"
                 f"{candidate.strand}\t.\tID={tid}\n"
             )
-            for exon_index, (left, right) in enumerate(candidate.exons):
+            for exon_index, (left, right) in enumerate(candidate.cds):
                 handle.write(
                     f"{candidate.seqid}\tspot\texon\t{left + 1}\t{right}\t.\t"
                     f"{candidate.strand}\t.\tID={tid}.exon{exon_index + 1};Parent={tid}\n"
@@ -954,17 +1091,21 @@ def run(
     config = Config(
         radius=args.radius,
         epochs=args.epochs,
-        negatives=args.negatives,
         seed=args.seed,
+        hard_negatives=args.hard_negatives,
+        hard_weight=args.hard_weight,
     )
     bank = FilterBank(config.periods)
-    features = bank.transform_strands(sequence)
+    features = np.concatenate(
+        [bank.transform_strands(sequence), one_hot_strands(sequence)], axis=0
+    )
 
     if args.load:
         model = load_model(args.model)
     else:
+        train_motifs = motif_mask_matrix(sequence[:mid], motifs, list(labels))
         model = model_factory(config).fit(
-            features[:, :mid], slice_labels(labels, 0, mid)
+            features[:, :mid], slice_labels(labels, 0, mid), train_motifs
         )
         model.save(args.model)
 
@@ -1000,6 +1141,7 @@ def run(
             thresholds,
         )
         candidates.extend(shift_candidates(to_genomic(found, length - mid), mid))
+    candidates = select_top(candidates)
     candidates.sort(key=lambda candidate: candidate.score, reverse=True)
     write_gff3(Path(args.gff), candidates)
     print(f"candidates={len(candidates)} wrote {args.gff} and {args.model}")
@@ -1013,9 +1155,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--gff", default="spot.gff3")
     parser.add_argument("--model", default="spot.pt")
     parser.add_argument("--epochs", type=int, default=15)
-    parser.add_argument("--negatives", type=int, default=6)
-    parser.add_argument("--radius", type=int, default=20)
+    parser.add_argument("--radius", type=int, default=50)
     parser.add_argument("--threshold-scale", type=float, default=0.95)
+    parser.add_argument("--hard-negatives", type=int, default=2000)
+    parser.add_argument("--hard-weight", type=float, default=5.0)
     parser.add_argument("--load", action="store_true")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)

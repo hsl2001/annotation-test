@@ -53,7 +53,7 @@ class Counts:
         return {
             "tp": self.tp, "fp": self.fp, "fn": self.fn,
             "reference": self.reference, "prediction": self.prediction,
-            "precision": self.tp / self.prediction if self.prediction else 0.0 if total else None,
+            "precision": self.tp / self.prediction if self.prediction else (0.0 if total else None),
             "recall": self.tp / self.reference if self.reference else None,
             "f1": 2 * self.tp / total if total else None,
         }

@@ -8,23 +8,28 @@ import torch
 import torch.nn.functional as F
 from numpy.typing import NDArray
 from torch import nn
-from torch.utils.data import DataLoader, TensorDataset
 
 
 @dataclass
 class Config:
     periods: tuple[int, ...] = (2, 3, 4, 6, 10)
-    radius: int = 20
-    hidden: int = 64
-    dilations: tuple[int, ...] = (1, 2, 4)
-    negatives: int = 8
-    hard_negatives: int = 4
+    radius: int = 50
+    hidden: int = 96
+    dilations: tuple[int, ...] = (1, 2, 4, 8, 16)
     epochs: int = 20
-    batch: int = 512
+    batch: int = 32
+    crop: int = 2048
+    steps: int = 32
+    val_fraction: float = 0.15
+    patience: int = 5
+    hard_negatives: int = 2000
+    hard_weight: float = 5.0
+    hard_start: int = 5
+    hard_interval: int = 2
     lr: float = 1e-3
     weight_decay: float = 1e-2
     dropout: float = 0.1
-    max_pos_weight: float = 100.0
+    max_pos_weight: float = 1000.0
     clip: float = 5.0
     seed: int = 0
     chunk: int = 100_000
@@ -35,7 +40,10 @@ class ModelProtocol(Protocol):
     thresholds: NDArray[np.float32] | None
 
     def fit(
-        self, features: NDArray[np.float32], labels: dict[str, NDArray[np.int64]]
+        self,
+        features: NDArray[np.float32],
+        labels: dict[str, NDArray[np.int64]],
+        motif_mask: NDArray[np.bool_] | None = None,
     ) -> ModelProtocol: ...
 
     def predict(self, features: NDArray[np.float32]) -> NDArray[np.float32]: ...
@@ -63,6 +71,16 @@ def best_threshold_values(
     denominator = 2 * true_positive + false_positive + n_truth - true_positive
     f1 = 2 * true_positive / denominator
     return float(values[order][int(np.argmax(f1))]) - 1e-6
+
+
+def average_precision(
+    scores: NDArray[np.float32], labels: NDArray[np.bool_]
+) -> float:
+    order = np.argsort(-scores)
+    y = labels[order]
+    true_positive = np.cumsum(y)
+    precision = true_positive / np.arange(1, len(y) + 1)
+    return float((precision * y).sum() / max(y.sum(), 1))
 
 
 class ResidualBlock(nn.Module):
@@ -120,71 +138,127 @@ class SpotModel:
         windows = features[:, np.clip(index, 0, features.shape[1] - 1)].transpose(1, 0, 2)
         return windows * valid[:, None, :]
 
+    def _normalize(self, features: NDArray[np.float32]) -> NDArray[np.float32]:
+        assert self.mean is not None and self.std is not None
+        return (features - self.mean) / self.std
+
     def _train(
         self,
         features: NDArray[np.float32],
         truth: NDArray[np.bool_],
-        positions: NDArray[np.int64],
+        rng: np.random.Generator,
+        validation: tuple[NDArray[np.float32], NDArray[np.bool_]] | None = None,
+        motif_mask: NDArray[np.bool_] | None = None,
     ) -> None:
         config = self.config
         assert self.net is not None and self.mean is not None and self.std is not None
-        windows = (self._windows(features, positions) - self.mean) / self.std
-        labels = truth[:, positions].T.astype(np.float32)
+        length = features.shape[1]
+        crop = min(config.crop, length)
+        normalized = self._normalize(features)
         pos_weight = torch.ones(len(self.label_names), dtype=torch.float32)
         for row in range(len(self.label_names)):
-            n_pos = float(labels[:, row].sum())
-            n_neg = len(labels) - n_pos
+            n_pos = float(truth[row].sum())
+            n_neg = length - n_pos
             pos_weight[row] = min(n_neg / max(n_pos, 1.0), config.max_pos_weight)
-        loader = DataLoader(
-            TensorDataset(torch.as_tensor(windows), torch.as_tensor(labels)),
-            batch_size=config.batch,
-            shuffle=True,
-            generator=torch.Generator().manual_seed(config.seed),
-        )
+        hard_weight = np.ones_like(truth, dtype=np.float32)
         optimizer = torch.optim.AdamW(
             self.net.parameters(), lr=config.lr, weight_decay=config.weight_decay
         )
-        self.net.train()
-        for _ in range(config.epochs):
-            for x, y in loader:
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=max(config.epochs, 1)
+        )
+        best_score = -np.inf
+        best_state: dict[str, torch.Tensor] | None = None
+        stale = 0
+        for epoch in range(config.epochs):
+            if (
+                motif_mask is not None
+                and config.hard_negatives > 0
+                and epoch >= config.hard_start
+                and (epoch - config.hard_start) % config.hard_interval == 0
+            ):
+                hard_weight = np.ones_like(truth, dtype=np.float32)
+                scores = self._score(features)
+                for row in range(len(self.label_names)):
+                    candidates = np.flatnonzero(motif_mask[row] & ~truth[row])
+                    if not len(candidates):
+                        continue
+                    count = min(config.hard_negatives, len(candidates))
+                    order = np.argpartition(-scores[row][candidates], count - 1)[:count]
+                    hard_weight[row, candidates[order]] = config.hard_weight
+            self.net.train()
+            for _ in range(config.steps):
+                starts = rng.integers(0, length - crop + 1, size=config.batch)
+                x = torch.as_tensor(
+                    np.stack([normalized[:, s : s + crop] for s in starts]),
+                    dtype=torch.float32,
+                )
+                y = torch.as_tensor(
+                    np.stack([truth[:, s : s + crop] for s in starts]),
+                    dtype=torch.float32,
+                )
+                w = torch.as_tensor(
+                    np.stack([hard_weight[:, s : s + crop] for s in starts]),
+                    dtype=torch.float32,
+                )
                 optimizer.zero_grad(set_to_none=True)
-                logits = self.net(x)[:, :, config.radius]
-                weight = pos_weight * y + (1.0 - y)
+                logits = self.net(x)
+                weight = pos_weight[None, :, None] * y + (1.0 - y)
                 loss = (
-                    F.binary_cross_entropy_with_logits(logits, y, reduction="none") * weight
+                    F.binary_cross_entropy_with_logits(logits, y, reduction="none")
+                    * weight
+                    * w
                 ).mean()
                 loss.backward()
                 if config.clip:
                     torch.nn.utils.clip_grad_norm_(self.net.parameters(), config.clip)
                 optimizer.step()
+            scheduler.step()
+            if validation is None:
+                continue
+            score = self._mean_ap(*validation)
+            if score > best_score:
+                best_score = score
+                best_state = {
+                    key: value.detach().clone()
+                    for key, value in self.net.state_dict().items()
+                }
+                stale = 0
+            else:
+                stale += 1
+                if stale >= config.patience:
+                    break
+        if best_state is not None:
+            self.net.load_state_dict(best_state)
+
+    def _mean_ap(
+        self, features: NDArray[np.float32], truth: NDArray[np.bool_]
+    ) -> float:
+        scores = self._score(features)
+        values = [
+            average_precision(scores[row], truth[row])
+            for row in range(len(self.label_names))
+            if truth[row].any()
+        ]
+        return float(np.mean(values)) if values else 0.0
 
     def _score(self, features: NDArray[np.float32]) -> NDArray[np.float32]:
         assert self.net is not None and self.mean is not None and self.std is not None
         self.net.eval()
         length = features.shape[1]
         out = np.zeros((len(self.label_names), length), dtype=np.float32)
-        margin = 64
+        margin = max(64, 4 * self.config.radius)
         with torch.no_grad():
             for start in range(0, length, self.config.chunk):
                 end = min(start + self.config.chunk, length)
                 low = max(0, start - margin)
                 high = min(length, end + margin)
-                window = (features[:, low:high] - self.mean) / self.std
+                window = self._normalize(features[:, low:high])
                 logits = self.net(torch.as_tensor(window[None], dtype=torch.float32))[0]
                 out[:, start:end] = torch.sigmoid(
                     logits[:, start - low : end - low]
                 ).numpy()
         return out
-
-    def _hard_negatives(
-        self, scores: NDArray[np.float32], exclude: NDArray[np.bool_], count: int
-    ) -> NDArray[np.int64]:
-        max_score = np.where(exclude, -np.inf, scores.max(axis=0))
-        available = int(np.isfinite(max_score).sum())
-        count = min(count, available)
-        if count <= 0:
-            return np.zeros(0, dtype=np.int64)
-        return np.argpartition(-max_score, count - 1)[:count].astype(np.int64)
 
     def _calibrate(
         self, features: NDArray[np.float32], truth: NDArray[np.bool_]
@@ -199,10 +273,14 @@ class SpotModel:
         return thresholds
 
     def fit(
-        self, features: NDArray[np.float32], labels: dict[str, NDArray[np.int64]]
+        self,
+        features: NDArray[np.float32],
+        labels: dict[str, NDArray[np.int64]],
+        motif_mask: NDArray[np.bool_] | None = None,
     ) -> SpotModel:
         config = self.config
         rng = np.random.default_rng(config.seed)
+        torch.manual_seed(config.seed)
         length = features.shape[1]
         self.label_names = list(labels)
         truth = np.zeros((len(self.label_names), length), dtype=bool)
@@ -214,28 +292,20 @@ class SpotModel:
         self.mean = windows.mean(axis=(0, 2))[:, None]
         self.std = windows.std(axis=(0, 2))[:, None] + 1e-6
 
-        positives = np.flatnonzero(truth.any(axis=0))
-        exclude = np.zeros(length, dtype=bool)
-        for offset in range(-config.radius, config.radius + 1):
-            index = positives + offset
-            exclude[index[(index >= 0) & (index < length)]] = True
-        background = np.flatnonzero(~exclude)
-        count = min(len(background), config.negatives * max(len(positives), 1))
-        negatives = rng.choice(background, size=count, replace=False)
-        positions = np.concatenate([positives, negatives])
-
         self.net = SpotNet(features.shape[0], len(self.label_names), config)
-        self._train(features, truth, positions)
-
-        if config.hard_negatives > 0:
-            scores = self._score(features)
-            hard = self._hard_negatives(
-                scores, exclude, config.hard_negatives * max(len(positives), 1)
-            )
-            positions = np.concatenate([positions, hard])
-            self._train(features, truth, positions)
-
-        self.thresholds = self._calibrate(features, truth)
+        if config.val_fraction > 0:
+            split = int(length * (1.0 - config.val_fraction))
+            train_features, train_truth = features[:, :split], truth[:, :split]
+            validation = (features[:, split:], truth[:, split:])
+            calibrate_features, calibrate_truth = validation
+            train_motif = motif_mask[:, :split] if motif_mask is not None else None
+        else:
+            train_features, train_truth = features, truth
+            validation = None
+            calibrate_features, calibrate_truth = features, truth
+            train_motif = motif_mask
+        self._train(train_features, train_truth, rng, validation, train_motif)
+        self.thresholds = self._calibrate(calibrate_features, calibrate_truth)
         return self
 
     def predict(self, features: NDArray[np.float32]) -> NDArray[np.float32]:
@@ -256,7 +326,10 @@ class SpotModel:
 
     @classmethod
     def load(cls, path: str) -> SpotModel:
-        data = torch.load(path, weights_only=False)
+        return cls._from_data(torch.load(path, weights_only=False))
+
+    @classmethod
+    def _from_data(cls, data: dict) -> SpotModel:
         model = cls(data["config"])
         model.label_names = data["label_names"]
         model.net = SpotNet(
