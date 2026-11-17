@@ -8,6 +8,7 @@ from bisect import bisect_left, bisect_right
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import pairwise
+from urllib.parse import unquote
 
 import numpy as np
 from numba import njit, prange
@@ -123,33 +124,49 @@ def read_annotation(path: str) -> list[Transcript]:
             seqid, _, kind, a, b, _, strand, _, attributes = fields
             if kind not in ("exon", "CDS", "five_prime_UTR", "three_prime_UTR"):
                 continue
-            parent = None
+            parents: list[str] = []
             for piece in attributes.split(";"):
                 if piece.startswith("Parent="):
-                    parent = piece[7:]
+                    parents = [unquote(p) for p in piece[7:].split(",") if p]
                     break
-            if parent is None:
+            if not parents:
                 continue
-            entry = transcripts.setdefault(
-                parent,
-                {"seqid": seqid, "strand": strand, "cds": [], "exon": [], "utr": False},
-            )
             span = (int(a) - 1, int(b))
-            if kind == "CDS":
-                entry["cds"].append(span)
-            elif kind == "exon":
-                entry["exon"].append(span)
-            else:
-                entry["utr"] = True
+            for parent in parents:
+                entry = transcripts.setdefault(
+                    parent,
+                    {
+                        "seqid": seqid,
+                        "strand": strand,
+                        "cds": [],
+                        "exon": [],
+                        "utr": False,
+                    },
+                )
+                if kind == "CDS":
+                    entry["cds"].append(span)
+                elif kind == "exon":
+                    entry["exon"].append(span)
+                else:
+                    entry["utr"] = True
 
     result: list[Transcript] = []
     for entry in transcripts.values():
         cds = sorted(entry["cds"])
-        exons = sorted(entry["exon"])
+        # This pipeline predicts protein-coding genes (valid_orf requires a start
+        # and a stop codon), so transcripts without CDS are not usable: treating
+        # their exons as CDS would label GS/GE at transcript ends instead of at
+        # codon boundaries.
         if not cds:
-            cds, exons = exons, []
+            continue
         result.append(
-            Transcript(entry["seqid"], entry["strand"], cds, exons, entry["utr"])
+            Transcript(
+                entry["seqid"],
+                entry["strand"],
+                cds,
+                sorted(entry["exon"]),
+                entry["utr"],
+            )
         )
     return result
 
@@ -250,8 +267,11 @@ def derive_limits(transcripts: list[Transcript], lengths: dict[str, int]) -> Lim
     if not introns or not spans or not exons:
         raise SystemExit("annotation lacks the intervals needed to derive limits")
     return Limits(
-        min_exon=max(3, min(min(exons), 3)),
-        min_intron=max(10, min(min(introns), 10)),
+        # Biological floors. Deriving these from the data is unsafe: annotations
+        # contain 1 bp exons and 1 bp introns (adjacent exons), which would make
+        # the DP accept degenerate models.
+        min_exon=3,
+        min_intron=10,
         min_coding=min(min(spans), 30),
         min_transcript=min(min(utrs) if utrs else min(spans), 30),
         max_exon=int(max(float(np.percentile(exons, 99.9)) * 3, 10_000)),
@@ -556,7 +576,9 @@ def assemble_candidates(
         if not ORF_CHECKS:
             return False
         first = start + (3 - frame) % 3
-        last = end - 2
+        # a codon at p covers [p, p + 3), so it fits inside [start, end) only
+        # when p <= end - 3
+        last = end - 3
         if skip_last:
             last -= 3
         if first > last:

@@ -126,9 +126,11 @@ class Model:
         sites = Y.shape[0]
 
         positives = [np.flatnonzero(Y[site]).astype(np.int64) for site in range(sites)]
+        # A negative within `radius` of a positive has an almost identical window
+        # but the opposite label, so mask the whole window, not just +-2 bp.
         exclude = np.zeros(length, dtype=bool)
         for positions in positives:
-            for offset in range(-2, 3):
+            for offset in range(-self.radius, self.radius + 1):
                 index = positions + offset
                 exclude[index[(index >= 0) & (index < length)]] = True
         background = np.flatnonzero(~exclude)
@@ -154,7 +156,7 @@ class Model:
                 n_negative / max(n_positive, 1.0), self.max_pos_weight
             )
 
-        self._train(self._normalize(windows), labels, pos_weight, rng)
+        self._train(self._normalize(windows), labels, pos_weight)
 
         if self.hard_negatives > 0:
             counts = [
@@ -166,7 +168,8 @@ class Model:
             )
             windows = self._windows(channels, positions)
             labels = truth[:, torch.as_tensor(positions)].t().float()
-            self._train(self._normalize(windows), labels, pos_weight, rng)
+            # warm start: keep the first phase's weights, only add hard negatives
+            self._train(self._normalize(windows), labels, pos_weight)
 
         self.thresholds = self._thresholds(channels, truth)
         return self
@@ -248,14 +251,14 @@ class Model:
         features: torch.Tensor,
         labels: torch.Tensor,
         pos_weight: torch.Tensor,
-        rng: np.random.Generator,
     ) -> None:
         dimension = features.shape[1]
         sites = labels.shape[1]
-        if self.hidden:
-            self.net = MLP(dimension, self.hidden, sites)
-        else:
-            self.net = nn.Linear(dimension, sites)
+        if self.net is None:
+            if self.hidden:
+                self.net = MLP(dimension, self.hidden, sites)
+            else:
+                self.net = nn.Linear(dimension, sites)
 
         optimizer = torch.optim.AdamW(
             self.net.parameters(),
