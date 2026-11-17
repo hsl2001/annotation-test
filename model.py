@@ -4,6 +4,8 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from numpy.typing import NDArray
+from torch import nn
+from torch.utils.data import DataLoader, TensorDataset
 
 FLOAT = torch.float32
 CHUNK = 100_000
@@ -58,14 +60,24 @@ def best_threshold(
     )
 
 
+class MLP(nn.Module):
+    def __init__(self, dimension: int, hidden: int, sites: int):
+        super().__init__()
+        self.fc1 = nn.Linear(dimension, hidden)
+        self.fc2 = nn.Linear(hidden, sites)
+
+    def forward(self, features: torch.Tensor) -> torch.Tensor:
+        return self.fc2(F.relu(self.fc1(features)))
+
+
 class Model:
     def __init__(
         self,
         radius: int = 50,
         hidden: int = 256,
         epochs: int = 100,
-        batch: int = 256,
-        learning_rate: float = 5e-4,
+        batch: int = 1000,
+        learning_rate: float = 1e-3,
         weight_decay: float = 1e-3,
         negatives: int = 8,
         hard_negatives: int = 5,
@@ -87,18 +99,12 @@ class Model:
         self.seed = seed
         self.mean: torch.Tensor | None = None
         self.std: torch.Tensor | None = None
-        self.W1: torch.Tensor | None = None
-        self.b1: torch.Tensor | None = None
-        self.W2: torch.Tensor | None = None
-        self.b2: torch.Tensor | None = None
+        self.net: nn.Module | None = None
         self.thresholds: NDArray[np.float32] | None = None
 
     def _logits(self, features: torch.Tensor) -> torch.Tensor:
-        assert self.W1 is not None and self.b1 is not None
-        hidden = features @ self.W1 + self.b1
-        if self.W2 is None or self.b2 is None:
-            return hidden
-        return torch.relu(hidden) @ self.W2 + self.b2
+        assert self.net is not None
+        return self.net(features)
 
     def _windows(
         self, channels: torch.Tensor, positions: NDArray[np.int64]
@@ -107,6 +113,10 @@ class Model:
             channels, torch.as_tensor(positions), self.radius
         )
         return windows.reshape(len(positions), -1)
+
+    def _normalize(self, windows: torch.Tensor) -> torch.Tensor:
+        assert self.mean is not None and self.std is not None
+        return (windows - self.mean) / self.std
 
     def fit(self, X: NDArray[np.float32], Y: NDArray[np.bool_]) -> Model:
         rng = np.random.default_rng(self.seed)
@@ -144,7 +154,7 @@ class Model:
                 n_negative / max(n_positive, 1.0), self.max_pos_weight
             )
 
-        self._train((windows - self.mean) / self.std, labels, pos_weight, rng)
+        self._train(self._normalize(windows), labels, pos_weight, rng)
 
         if self.hard_negatives > 0:
             counts = [
@@ -156,9 +166,7 @@ class Model:
             )
             windows = self._windows(channels, positions)
             labels = truth[:, torch.as_tensor(positions)].t().float()
-            self._train(
-                (windows - self.mean) / self.std, labels, pos_weight, rng
-            )
+            self._train(self._normalize(windows), labels, pos_weight, rng)
 
         self.thresholds = self._thresholds(channels, truth)
         return self
@@ -175,7 +183,8 @@ class Model:
         padded = F.pad(X[:, low:high], (left, right))
         features = F.unfold(padded[None, :, None, :], (1, self.width))[0].t()
         features = (features - self.mean) / self.std
-        return torch.sigmoid(self._logits(features)).t()
+        with torch.no_grad():
+            return torch.sigmoid(self._logits(features)).t()
 
     def _hard_negatives(
         self,
@@ -241,77 +250,45 @@ class Model:
         pos_weight: torch.Tensor,
         rng: np.random.Generator,
     ) -> None:
-        n, dimension = features.shape
+        dimension = features.shape[1]
         sites = labels.shape[1]
         if self.hidden:
-            self.W1 = torch.as_tensor(
-                rng.normal(0.0, np.sqrt(2.0 / dimension), (dimension, self.hidden)),
-                dtype=FLOAT,
-            )
-            self.b1 = torch.zeros(self.hidden, dtype=FLOAT)
-            self.W2 = torch.as_tensor(
-                rng.normal(0.0, np.sqrt(1.0 / self.hidden), (self.hidden, sites)),
-                dtype=FLOAT,
-            )
-            self.b2 = torch.zeros(sites, dtype=FLOAT)
+            self.net = MLP(dimension, self.hidden, sites)
         else:
-            self.W1 = torch.as_tensor(
-                rng.normal(0.0, np.sqrt(1.0 / dimension), (dimension, sites)),
-                dtype=FLOAT,
-            )
-            self.b1 = torch.zeros(sites, dtype=FLOAT)
-            self.W2 = self.b2 = None
+            self.net = nn.Linear(dimension, sites)
 
-        W1, b1, W2, b2 = self.W1, self.b1, self.W2, self.b2
-        params = [W1, b1] if W2 is None or b2 is None else [W1, b1, W2, b2]
-        optimizer = torch.optim.Adam(params, lr=self.learning_rate)
+        optimizer = torch.optim.AdamW(
+            self.net.parameters(),
+            lr=self.learning_rate,
+            weight_decay=self.weight_decay,
+        )
         weight = pos_weight * labels + (1.0 - labels)
-        decay = self.weight_decay
+        loader = DataLoader(
+            TensorDataset(features, labels, weight),
+            batch_size=self.batch,
+            shuffle=True,
+            generator=torch.Generator().manual_seed(self.seed),
+        )
         for _ in range(self.epochs):
-            order = torch.as_tensor(rng.permutation(n))
-            shuffled_x = features[order]
-            shuffled_y = labels[order]
-            shuffled_w = weight[order]
-            for start in range(0, n, self.batch):
-                x = shuffled_x[start : start + self.batch]
-                y = shuffled_y[start : start + self.batch]
-                w = shuffled_w[start : start + self.batch]
-                pre = torch.addmm(b1, x, W1)
-                if W2 is None or b2 is None:
-                    dlogits = (torch.sigmoid(pre) - y) * w / len(x)
-                    grads = [
-                        torch.addmm(W1, x.t(), dlogits, beta=decay),
-                        dlogits.sum(dim=0),
-                    ]
-                else:
-                    hidden = torch.relu(pre)
-                    logits = torch.addmm(b2, hidden, W2)
-                    dlogits = (torch.sigmoid(logits) - y) * w / len(x)
-                    dhidden = dlogits @ W2.t()
-                    dhidden.mul_(pre > 0)
-                    grads = [
-                        torch.addmm(W1, x.t(), dhidden, beta=decay),
-                        dhidden.sum(dim=0),
-                        torch.addmm(W2, hidden.t(), dlogits, beta=decay),
-                        dlogits.sum(dim=0),
-                    ]
-                if self.clip:
-                    squares = torch.stack(
-                        [torch.linalg.vector_norm(grad) ** 2 for grad in grads]
+            for x, y, w in loader:
+                optimizer.zero_grad(set_to_none=True)
+                loss = (
+                    F.binary_cross_entropy_with_logits(
+                        self._logits(x), y, reduction="none"
                     )
-                    norm = squares.sum().sqrt()
-                    if norm > self.clip:
-                        grads = [grad * (self.clip / norm) for grad in grads]
-                for param, grad in zip(params, grads):
-                    param.grad = grad
+                    * w
+                ).mean()
+                loss.backward()
+                if self.clip:
+                    torch.nn.utils.clip_grad_norm_(self.net.parameters(), self.clip)
                 optimizer.step()
 
     def predict(self, X: NDArray[np.float32]) -> NDArray[np.float32]:
-        if self.W1 is None:
+        if self.net is None:
             raise RuntimeError("model is not fitted")
         channels = torch.as_tensor(X, dtype=FLOAT)
         _, length = channels.shape
-        sites = self.W2.shape[1] if self.W2 is not None else self.W1.shape[1]
+        sites = len(self.thresholds) if self.thresholds is not None else 0
         out = np.zeros((sites, length), dtype=np.float32)
         for start in range(0, length, CHUNK):
             end = min(start + CHUNK, length)

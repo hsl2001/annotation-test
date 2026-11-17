@@ -871,22 +871,21 @@ def build_parser() -> argparse.ArgumentParser:
 def train_models(
     codes: dict[str, NDArray[np.uint8]],
     labels: dict[tuple[str, str, str], NDArray[np.int64]],
-    chunk_size: int,
     radius: int,
-) -> dict[tuple[str, str, int], Model]:
-    models: dict[tuple[str, str, int], Model] = {}
+) -> dict[tuple[str, str], Model]:
+    """One model per (sequence, strand), trained on the whole sequence.
+
+    Training one model per chunk used to mean a prediction on a new region fell
+    back to an arbitrary chunk model, so extra data never reached it.
+    """
+    models: dict[tuple[str, str], Model] = {}
     for name, sequence in codes.items():
         for strand in STRANDS:
-            oriented_sequence = oriented(sequence, strand)
             label_mat = label_matrix(labels, name, strand, len(sequence))
-            starts = range(0, len(sequence), chunk_size) if chunk_size > 0 else (0,)
-            for start in starts:
-                end = min(start + chunk_size, len(sequence)) if chunk_size > 0 else len(sequence)
-                X = features(oriented_sequence[start:end])
-                Y = label_mat[:, start:end]
-                if not Y.any():
-                    continue
-                models[(name, strand, start)] = Model(radius=radius).fit(X, Y)
+            if not label_mat.any():
+                continue
+            X = features(oriented(sequence, strand))
+            models[(name, strand)] = Model(radius=radius).fit(X, label_mat)
     return models
 
 
@@ -898,7 +897,7 @@ def shift_candidate(candidate: Candidate, offset: int, length: int) -> None:
 
 
 def predict_models(
-    models: dict[tuple[str, str, int], Model],
+    models: dict[tuple[str, str], Model],
     predict_codes: dict[str, NDArray[np.uint8]],
     chunk_size: int,
     limits: Limits,
@@ -906,19 +905,19 @@ def predict_models(
     threshold_scale: float,
 ) -> list[Candidate]:
     fallback: dict[str, Model] = {}
-    for (_, strand, _), model in models.items():
+    for (_, strand), model in models.items():
         fallback.setdefault(strand, model)
     candidates: list[Candidate] = []
     for name, sequence in predict_codes.items():
         for strand in STRANDS:
+            model = models.get((name, strand), fallback.get(strand))
+            if model is None:
+                continue
+            assert model.thresholds is not None
             oriented_sequence = oriented(sequence, strand)
             starts = range(0, len(sequence), chunk_size) if chunk_size > 0 else (0,)
             for start in starts:
                 end = min(start + chunk_size, len(sequence)) if chunk_size > 0 else len(sequence)
-                model = models.get((name, strand, start), fallback.get(strand))
-                if model is None:
-                    continue
-                assert model.thresholds is not None
                 scores = model.predict(features(oriented_sequence[start:end]))
                 score_dict = {
                     site: scores[index] - model.thresholds[index] * threshold_scale
@@ -948,7 +947,7 @@ def main(argv: list[str] | None = None) -> int:
     limits = derive_limits(transcripts, lengths)
     motifs = learn_motifs(codes, labels)
 
-    models = train_models(codes, labels, args.chunk_size, args.model_radius)
+    models = train_models(codes, labels, args.model_radius)
     predict_codes = (
         read_fasta(args.predict_fasta) if args.predict_fasta else codes
     )
