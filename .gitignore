@@ -10,3 +10,5 @@ wheels/
 .venv
 
 poc.gff3
+
+note/
