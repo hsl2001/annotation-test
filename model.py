@@ -126,8 +126,6 @@ class Model:
         sites = Y.shape[0]
 
         positives = [np.flatnonzero(Y[site]).astype(np.int64) for site in range(sites)]
-        # A negative within `radius` of a positive has an almost identical window
-        # but the opposite label, so mask the whole window, not just +-2 bp.
         exclude = np.zeros(length, dtype=bool)
         for positions in positives:
             for offset in range(-self.radius, self.radius + 1):

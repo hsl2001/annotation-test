@@ -153,10 +153,6 @@ def read_annotation(path: str) -> list[Transcript]:
     result: list[Transcript] = []
     for entry in transcripts.values():
         cds = sorted(entry["cds"])
-        # This pipeline predicts protein-coding genes (valid_orf requires a start
-        # and a stop codon), so transcripts without CDS are not usable: treating
-        # their exons as CDS would label GS/GE at transcript ends instead of at
-        # codon boundaries.
         if not cds:
             continue
         result.append(
@@ -267,9 +263,6 @@ def derive_limits(transcripts: list[Transcript], lengths: dict[str, int]) -> Lim
     if not introns or not spans or not exons:
         raise SystemExit("annotation lacks the intervals needed to derive limits")
     return Limits(
-        # Biological floors. Deriving these from the data is unsafe: annotations
-        # contain 1 bp exons and 1 bp introns (adjacent exons), which would make
-        # the DP accept degenerate models.
         min_exon=3,
         min_intron=10,
         min_coding=min(min(spans), 30),
@@ -576,8 +569,6 @@ def assemble_candidates(
         if not ORF_CHECKS:
             return False
         first = start + (3 - frame) % 3
-        # a codon at p covers [p, p + 3), so it fits inside [start, end) only
-        # when p <= end - 3
         last = end - 3
         if skip_last:
             last -= 3
