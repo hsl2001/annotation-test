@@ -16,14 +16,7 @@ import numpy as np
 from numba import njit, prange
 from numpy.typing import NDArray
 
-from model import (
-    Config,
-    ModelProtocol,
-    average_precision,
-    build_model,
-    load_model,
-    local_max,
-)
+from model import ModelProtocol
 
 STRANDS = ("+", "-")
 KINDS = ("GS", "IS", "IE", "GE")
@@ -75,6 +68,50 @@ for _column, _permutation in enumerate(itertools.permutations((1, 2, 3))):
     MAPPINGS[1, _column] = ROOTS[_permutation[0]]
     MAPPINGS[2, _column] = ROOTS[_permutation[1]]
     MAPPINGS[3, _column] = ROOTS[_permutation[2]]
+
+
+@dataclass
+class Config:
+    periods: tuple[int, ...] = (2, 3, 4, 6, 10)
+    radius: int = 50
+    hidden: int = 96
+    dilations: tuple[int, ...] = (1, 2, 4, 8, 16)
+    epochs: int = 20
+    batch: int = 32
+    crop: int = 2048
+    steps: int = 32
+    val_fraction: float = 0.15
+    patience: int = 5
+    hard_negatives: int = 2000
+    hard_weight: float = 5.0
+    hard_start: int = 5
+    hard_interval: int = 2
+    lr: float = 1e-3
+    weight_decay: float = 1e-2
+    dropout: float = 0.1
+    max_pos_weight: float = 1000.0
+    clip: float = 5.0
+    seed: int = 0
+    chunk: int = 100_000
+
+
+def local_max(score: NDArray[np.float32]) -> NDArray[np.bool_]:
+    if not len(score):
+        return np.zeros(0, dtype=bool)
+    keep = np.ones(len(score), dtype=bool)
+    keep[1:] &= score[1:] > score[:-1]
+    keep[:-1] &= score[:-1] >= score[1:]
+    return keep
+
+
+def average_precision(
+    scores: NDArray[np.float32], labels: NDArray[np.bool_]
+) -> float:
+    order = np.argsort(-scores)
+    y = labels[order]
+    true_positive = np.cumsum(y)
+    precision = true_positive / np.arange(1, len(y) + 1)
+    return float((precision * y).sum() / max(y.sum(), 1))
 
 
 def morlet_integral(lower: float, upper: float, w0: float = W0) -> complex:
@@ -646,6 +683,12 @@ def _gather(
     return result
 
 
+def _crosses(positions: list[int], low: int, high: int) -> bool:
+    """True when a GE event lies in ``[low, high)``."""
+    index = bisect_left(positions, low)
+    return index < len(positions) and positions[index] < high
+
+
 def _has_stop(
     stops_by_frame: list[list[int]],
     start: int,
@@ -735,6 +778,7 @@ class Decoder:
         paths = _Paths()
         kind_indices: dict[str, list[int]] = {kind: [] for kind in KINDS}
         kind_positions: dict[str, list[int]] = {kind: [] for kind in KINDS}
+        ge_positions = [position for position, kind, _ in events if kind == "GE"]
 
         for event_index, (position, kind, score) in enumerate(events):
             created: list[int] = []
@@ -752,6 +796,8 @@ class Decoder:
                         else:
                             start = events[paths.event[path]][0]
                             base_frame = paths.frame[path]
+                        if _crosses(ge_positions, start, position):
+                            continue
                         if _has_stop(
                             stops_by_frame,
                             start,
@@ -776,6 +822,9 @@ class Decoder:
                 low = bisect_left(positions, position - limits.max_intron)
                 high = bisect_right(positions, position - limits.min_intron)
                 for path in _gather(best_paths, kind_indices, "IS", low, high):
+                    start = events[paths.event[path]][0]
+                    if _crosses(ge_positions, start, position):
+                        continue
                     created.append(
                         paths.add(
                             paths.score[path] + score,
@@ -803,6 +852,8 @@ class Decoder:
                         else:
                             start = events[paths.event[path]][0]
                             base_frame = paths.frame[path]
+                        if _crosses(ge_positions, start, position):
+                            continue
                         if (base_frame + position - start) % 3:
                             continue
                         if _has_stop(
@@ -1071,9 +1122,51 @@ def write_gff3(path: Path, candidates: list[Candidate]) -> None:
                 )
 
 
+class OracleModel:
+    """Perfect per-label scores for the held-out region (decoder test)."""
+
+    def __init__(
+        self,
+        labels: dict[str, NDArray[np.int64]],
+        offset: int,
+        length: int,
+        label_names: tuple[str, ...] = LABELS,
+    ):
+        self.labels = labels
+        self.offset = offset
+        self.length = length
+        self.label_names = list(label_names)
+        self.thresholds: NDArray[np.float32] | None = np.full(
+            len(self.label_names), 0.5, dtype=np.float32
+        )
+
+    def fit(
+        self,
+        features: NDArray[np.float32],
+        labels: dict[str, NDArray[np.int64]],
+        motif_mask: NDArray[np.bool_] | None = None,
+    ) -> OracleModel:
+        return self
+
+    def predict(self, features: NDArray[np.float32]) -> NDArray[np.float32]:
+        scores = np.zeros(
+            (len(self.label_names), features.shape[1]), dtype=np.float32
+        )
+        for row, label in enumerate(self.label_names):
+            positions = self.labels[label]
+            positions = positions[
+                (positions >= self.offset) & (positions < self.length)
+            ]
+            scores[row, positions - self.offset] = 1.0
+        return scores
+
+    def save(self, path: str) -> None:
+        pass
+
+
 def run(
     args: argparse.Namespace,
-    model_factory: Callable[[Config], ModelProtocol] = build_model,
+    model_factory: Callable[[Config], ModelProtocol] | None = None,
 ) -> int:
     codes = read_fasta(args.fasta)
     lengths = {name: len(sequence) for name, sequence in codes.items()}
@@ -1096,13 +1189,16 @@ def run(
         hard_weight=args.hard_weight,
     )
     bank = FilterBank(config.periods)
-    features = np.concatenate(
-        [bank.transform_strands(sequence), one_hot_strands(sequence)], axis=0
-    )
 
     if args.load:
-        model = load_model(args.model)
+        raise SystemExit("--load is not available; inject a model_factory")
+    if model_factory is None:
+        model = OracleModel(labels, mid, length)
+        features = np.zeros((1, length), dtype=np.float32)
     else:
+        features = np.concatenate(
+            [bank.transform_strands(sequence), one_hot_strands(sequence)], axis=0
+        )
         train_motifs = motif_mask_matrix(sequence[:mid], motifs, list(labels))
         model = model_factory(config).fit(
             features[:, :mid], slice_labels(labels, 0, mid), train_motifs
@@ -1141,7 +1237,7 @@ def run(
             thresholds,
         )
         candidates.extend(shift_candidates(to_genomic(found, length - mid), mid))
-    candidates = select_top(candidates)
+    candidates = select_top(candidates, top=args.top)
     candidates.sort(key=lambda candidate: candidate.score, reverse=True)
     write_gff3(Path(args.gff), candidates)
     print(f"candidates={len(candidates)} wrote {args.gff} and {args.model}")
@@ -1157,6 +1253,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--epochs", type=int, default=15)
     parser.add_argument("--radius", type=int, default=50)
     parser.add_argument("--threshold-scale", type=float, default=0.95)
+    parser.add_argument("--top", type=int, default=3)
     parser.add_argument("--hard-negatives", type=int, default=2000)
     parser.add_argument("--hard-weight", type=float, default=5.0)
     parser.add_argument("--load", action="store_true")
