@@ -545,7 +545,9 @@ def build_labels(
                     if len(kmer) == 3
                     else "other"
                 )
-                result[f"{prefix}GEm3{codon}"].append(int(target))
+                label = f"{prefix}GEm3{codon}"
+                if label in result:
+                    result[label].append(int(target))
         elif site == "IE":
             result[f"{prefix}IEm2"].extend(int(x) for x in genomic)
         else:
