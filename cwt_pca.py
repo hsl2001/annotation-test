@@ -1,17 +1,4 @@
 #!/usr/bin/env python3
-"""Per-kind PCA of windowed CWT features.
-
-For each motif kind (GS, IS, IE, GE) the script separates annotated sites
-(positive) from occurrences of the same motif that are not annotated
-(background).  The three chr5 datasets are rendered as a 3 x 4 grid
-(rows = datasets, columns = motif kinds); colour encodes positive/background
-and marker shape encodes strand (+ circle, - square).
-
-CWT responses are computed with chunked FFT convolution over the sequence,
-and only the requested candidate/window positions are kept.  The 2-D view is
-the first two PCA components.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -114,7 +101,9 @@ def morlet_integral(lower: float, upper: float, w0: float = W0) -> complex:
     return norm * integral
 
 
-def build_kernel(dilation: float, w0: float = W0) -> NDArray[np.complex128]:
+def build_kernel(period: float, w0: float = W0) -> NDArray[np.complex128]:
+    """Morlet kernel whose oscillation period is ``period`` base pairs."""
+    dilation = period * w0 / (2 * math.pi)
     radius = math.ceil(MORLET_LIMIT * dilation + 0.5)
     kernel = np.zeros(2 * radius + 1, dtype=np.complex128)
     for tap in range(len(kernel)):
@@ -426,19 +415,10 @@ def build_candidates(
 
 
 class CwtFeatureBank:
-    """Chunked FFT convolution of the sequence with Morlet wavelets.
-
-    Each mapping contributes magnitude (``re^2 + im^2``), real and imaginary
-    parts.  Several ``w0`` values add wavelets with different centre
-    frequencies.  The sequence is processed in chunks; only the requested
-    positions inside each chunk are kept, so the full response map is never
-    materialised.
-    """
-
     def __init__(
         self,
         sequence: NDArray[np.uint8],
-        periods: tuple[int, ...],
+        periods: tuple[float, ...],
         w0s: tuple[float, ...],
         chunk: int = 100_000,
     ):
@@ -626,7 +606,9 @@ def _dataset_panels(
         candidates, args.max_positives, args.negatives_per_positive, rng
     )
     bank = CwtFeatureBank(codes[name], tuple(args.periods), tuple(args.w0), args.chunk)
-    offsets = np.arange(-args.window_radius, args.window_radius + 1)
+    offsets = np.arange(
+        -args.window_radius, args.window_radius + 1, args.window_step
+    )
     positions = (candidates.positions[index][:, None] + offsets[None, :]).ravel()
     strands = np.repeat(candidates.strands[index], len(offsets))
     matrix = bank.gather(positions, strands).reshape(len(index), -1)
@@ -653,11 +635,23 @@ def _dataset_panels(
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default="cwt_pca.png")
-    parser.add_argument("--periods", type=int, nargs="+", default=[2, 3, 4, 6, 10])
+    parser.add_argument(
+        "--periods",
+        type=float,
+        nargs="+",
+        default=[2, 3, 4, 6, 7],
+        help="Morlet periods in base pairs",
+    )
     parser.add_argument("--w0", type=float, nargs="+", default=[4.0, 6.0, 8.0])
-    parser.add_argument("--max-positives", type=int, default=1000)
+    parser.add_argument("--max-positives", type=int, default=2000)
     parser.add_argument("--negatives-per-positive", type=float, default=1.0)
-    parser.add_argument("--window-radius", type=int, default=500)
+    parser.add_argument("--window-radius", type=int, default=10)
+    parser.add_argument(
+        "--window-step",
+        type=int,
+        default=1,
+        help="stride between window offsets in bp",
+    )
     parser.add_argument("--chunk", type=int, default=100_000)
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
