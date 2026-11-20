@@ -23,8 +23,6 @@ from sklearn.preprocessing import StandardScaler
 
 STRANDS = ("+", "-")
 KINDS = ("GS", "IS", "IE", "GE")
-# Forward-strand motifs. The minus strand is searched on the reverse complement,
-# so ATG/CAT, GT/AC, AG/CT and stop/revcomp(stop) are all covered.
 MOTIFS = {
     "GS": (b"ATG",),
     "IS": (b"GT",),
@@ -479,17 +477,17 @@ def main(argv: list[str] | None = None) -> int:
         "--periods",
         type=float,
         nargs="+",
-        default=[2, 3, 4, 6, 7],
+        default=[2, 3, 4, 6, 7, 8, 9, 10, 15, 20, 25, 30,],
         help="Morlet periods in base pairs",
     )
-    parser.add_argument("--w0", type=float, nargs="+", default=[4.0, 6.0, 8.0])
+    parser.add_argument("--w0", type=float, nargs="+", default=[2.0, 4.0, 6.0, 8.0])
     parser.add_argument("--max-positives", type=int, default=2000)
     parser.add_argument("--negatives-per-positive", type=float, default=1.0)
     parser.add_argument("--window-radius", type=int, default=10)
     parser.add_argument(
         "--window-step",
         type=int,
-        default=1,
+        default=2,
         help="stride between window offsets in bp",
     )
     parser.add_argument("--chunk", type=int, default=100_000)
