@@ -5,7 +5,6 @@ import argparse
 import gzip
 import math
 from collections import defaultdict
-from dataclasses import dataclass
 from itertools import pairwise, permutations
 from urllib.parse import unquote
 
@@ -24,19 +23,15 @@ from sklearn.preprocessing import StandardScaler
 
 STRANDS = ("+", "-")
 KINDS = ("GS", "IS", "IE", "GE")
-PREFIX = {"+": "p", "-": "m"}
-LABELS = (
-    "mGS", "pGS", "mIS", "pIS", "mIEm2", "pIEm2",
-    "mGEm3TAA", "mGEm3TAG", "mGEm3TGA",
-    "pGEm3TAA", "pGEm3TAG", "pGEm3TGA",
-)
-STOPS = {(3, 0, 0): "TAA", (3, 0, 2): "TAG", (3, 2, 0): "TGA"}
-STOP_CODES = np.array([a * 16 + b * 4 + c for (a, b, c) in STOPS])
+# Forward-strand motifs. The minus strand is searched on the reverse complement,
+# so ATG/CAT, GT/AC, AG/CT and stop/revcomp(stop) are all covered.
+MOTIFS = {
+    "GS": (b"ATG",),
+    "IS": (b"GT",),
+    "IE": (b"AG",),
+    "GE": (b"TAA", b"TAG", b"TGA"),
+}
 SITE_OFFSET = {"GS": 0, "IS": 0, "IE": 2, "GE": 3}
-MOTIF_OFFSET = {"GS": 0, "IS": 0, "IE": -2, "GE": -3}
-MOTIF_WIDTH = {"GS": 3, "IS": 2, "IE": 2, "GE": 3}
-GE_LABELS = tuple(label for label in LABELS if "GEm3" in label)
-KIND_INDEX = {kind: index for index, kind in enumerate(KINDS)}
 
 MORLET_LIMIT = 8.0
 W0 = 6.0
@@ -62,14 +57,21 @@ for _column, _permutation in enumerate(permutations((1, 2, 3))):
     MAPPINGS[2, _column] = ROOTS[_permutation[1]]
     MAPPINGS[3, _column] = ROOTS[_permutation[2]]
 
+TABLES = {}
+for _kind, _motifs in MOTIFS.items():
+    _table = np.zeros((len(_motifs), max(map(len, _motifs))), dtype=np.uint8)
+    _lengths = np.zeros(len(_motifs), dtype=np.int64)
+    for _row, _motif in enumerate(_motifs):
+        _table[_row, : len(_motif)] = LUT[np.frombuffer(_motif, dtype=np.uint8)]
+        _lengths[_row] = len(_motif)
+    TABLES[_kind] = (_table, _lengths)
+
 DATASETS = tuple(
     (name, f"data/truth.{name}.chr5.fasta", f"data/truth.{name}.chr5.gff3")
     for name in ("nip", "col", "slm")
 )
 POSITIVE_COLOR = "#d62728"
 BACKGROUND_COLOR = "#1f77b4"
-
-Panel = tuple[NDArray[np.float32], NDArray[np.int8], NDArray[np.int8]]
 
 
 def morlet_integral(lower: float, upper: float, w0: float = W0) -> complex:
@@ -137,14 +139,7 @@ def read_fasta(path: str) -> dict[str, NDArray[np.uint8]]:
     return records
 
 
-@dataclass
-class Transcript:
-    seqid: str
-    strand: str
-    cds: list[tuple[int, int]]
-
-
-def read_annotation(path: str) -> list[Transcript]:
+def read_annotation(path: str) -> list[tuple[str, str, list[tuple[int, int]]]]:
     transcripts: dict[str, dict] = defaultdict(lambda: {"cds": []})
     with open_text(path) as handle:
         for line in handle:
@@ -171,7 +166,7 @@ def read_annotation(path: str) -> list[Transcript]:
                 entry["seqid"], entry["strand"] = seqid, strand
                 entry["cds"].append(span)
     return [
-        Transcript(entry["seqid"], entry["strand"], sorted(entry["cds"]))
+        (entry["seqid"], entry["strand"], sorted(entry["cds"]))
         for entry in transcripts.values()
         if entry["cds"]
     ]
@@ -192,51 +187,23 @@ def to_genomic(
     return positions if strand == "+" else length - 1 - positions
 
 
-def site_labels(
-    transcripts: list[Transcript], lengths: dict[str, int]
-) -> dict[tuple[str, str, str], NDArray[np.int64]]:
-    points: dict[tuple[str, str, str], set[int]] = defaultdict(set)
-    for transcript in transcripts:
-        length = lengths.get(transcript.seqid, 0)
-        if length == 0 or not transcript.cds:
+def positive_masks(
+    transcripts: list[tuple[str, str, list[tuple[int, int]]]], name: str, length: int
+) -> dict[tuple[str, str], NDArray[np.bool_]]:
+    masks = {(s, k): np.zeros(length, dtype=bool) for s in STRANDS for k in KINDS}
+    for seqid, strand, spans in transcripts:
+        if seqid != name or not spans:
             continue
-        cds = sorted(
-            oriented_span(span, length, transcript.strand) for span in transcript.cds
-        )
-        key = (transcript.seqid, transcript.strand)
-        points[key + ("GS",)].add(cds[0][0])
-        points[key + ("GE",)].add(cds[-1][1])
+        cds = sorted(oriented_span(span, length, strand) for span in spans)
+        sign = -1 if strand == "+" else 1
+        sites = [("GS", cds[0][0]), ("GE", cds[-1][1])]
         for (_, left), (right, _) in pairwise(cds):
-            points[key + ("IS",)].add(left)
-            points[key + ("IE",)].add(right)
-    return {
-        key: np.array(
-            [v for v in sorted(values) if 0 <= v < lengths[key[0]]], dtype=np.int64
-        )
-        for key, values in points.items()
-    }
-
-
-def learn_motifs(
-    codes: dict[str, NDArray[np.uint8]],
-    labels: dict[tuple[str, str, str], NDArray[np.int64]],
-) -> dict[str, set[bytes]]:
-    motifs: dict[str, set[bytes]] = {
-        "GS": {bytes((0, 3, 2))},
-        "IS": {bytes((2, 3)), bytes((2, 1))},
-        "IE": {bytes((0, 2))},
-        "GE": {bytes((3, 0, 0)), bytes((3, 0, 2)), bytes((3, 2, 0))},
-    }
-    for (name, strand, site), positions in labels.items():
-        if site not in motifs:
-            continue
-        sequence = oriented(codes[name], strand)
-        offset, width = MOTIF_OFFSET[site], MOTIF_WIDTH[site]
-        for position in positions:
-            kmer = sequence[position + offset : position + offset + width]
-            if len(kmer) and np.all(kmer < 4):
-                motifs[site].add(bytes(kmer))
-    return motifs
+            sites += [("IS", left), ("IE", right)]
+        for kind, position in sites:
+            genomic = (position if strand == "+" else length - 1 - position) + sign * SITE_OFFSET[kind]
+            if 0 <= genomic < length:
+                masks[(strand, kind)][genomic] = True
+    return masks
 
 
 @njit(cache=True)
@@ -244,173 +211,56 @@ def _motif_mask(
     sequence: NDArray[np.uint8],
     motifs: NDArray[np.uint8],
     lengths: NDArray[np.int64],
-    forward: bool,
 ) -> NDArray[np.bool_]:
     n = sequence.shape[0]
     mask = np.zeros(n, dtype=np.bool_)
     for row in range(motifs.shape[0]):
         k = lengths[row]
-        if k > n:
-            continue
-        limit = n - k + 1 if forward else n - k
-        for start in range(limit):
+        for start in range(n - k + 1):
             hit = True
             for offset in range(k):
                 if sequence[start + offset] != motifs[row, offset]:
                     hit = False
                     break
             if hit:
-                mask[start if forward else start + k] = True
+                mask[start] = True
     return mask
 
 
-def motif_mask(
-    sequence: NDArray[np.uint8], site: str, motifs: dict[str, set[bytes]]
-) -> NDArray[np.bool_]:
-    if site not in motifs:
-        return np.ones(len(sequence), dtype=bool)
-    found = list(motifs[site])
-    table = np.zeros((len(found), max(len(motif) for motif in found)), dtype=np.uint8)
-    lengths = np.zeros(len(found), dtype=np.int64)
-    for row, motif in enumerate(found):
-        table[row, : len(motif)] = np.frombuffer(motif, dtype=np.uint8)
-        lengths[row] = len(motif)
-    return _motif_mask(sequence, table, lengths, site in ("GS", "IS"))
-
-
-def build_labels(
-    codes: dict[str, NDArray[np.uint8]],
-    labels: dict[tuple[str, str, str], NDArray[np.int64]],
-    name: str,
-) -> dict[str, NDArray[np.int64]]:
-    length = len(codes[name])
-    result: dict[str, list[int]] = {label: [] for label in LABELS}
-    for (seqid, strand, site), positions in labels.items():
-        if seqid != name or site not in KINDS:
-            continue
-        prefix = PREFIX[strand]
-        genomic = to_genomic(positions, length, strand) + (
-            -1 if strand == "+" else 1
-        ) * SITE_OFFSET[site]
-        if site == "GE":
-            sequence = oriented(codes[name], strand)
-            for position, target in zip(positions, genomic):
-                kmer = sequence[int(position) - 3 : int(position)]
-                codon = (
-                    STOPS.get((int(kmer[0]), int(kmer[1]), int(kmer[2])), "other")
-                    if len(kmer) == 3
-                    else "other"
-                )
-                label = f"{prefix}GEm3{codon}"
-                if label in result:
-                    result[label].append(int(target))
-        elif site == "IE":
-            result[f"{prefix}IEm2"].extend(int(x) for x in genomic)
-        else:
-            result[f"{prefix}{site}"].extend(int(x) for x in genomic)
-    return {
-        label: np.array(sorted(set(values)), dtype=np.int64)
-        for label, values in result.items()
-    }
-
-
-def _shift_mask(mask: NDArray[np.bool_], offset: int) -> NDArray[np.bool_]:
-    n = len(mask)
-    out = np.zeros(n, dtype=bool)
-    if offset < 0:
-        out[: n + offset] = mask[-offset:]
-    elif offset > 0:
-        out[offset:] = mask[: n - offset]
-    else:
-        out = mask.copy()
-    return out
-
-
-@dataclass
-class Candidates:
-    positions: NDArray[np.int64]  # genomic, 0-based
-    strands: NDArray[np.int8]  # 0 = "+", 1 = "-"
-    kinds: NDArray[np.int8]  # index into KINDS
-    labels: NDArray[np.int8]  # 1 = annotated site, 0 = background
-
-    def __len__(self) -> int:
-        return len(self.positions)
-
-
-def _mask(values: NDArray[np.int64] | None, length: int) -> NDArray[np.bool_]:
-    mask = np.zeros(length, dtype=bool)
-    if values is not None:
-        mask[values[(values >= 0) & (values < length)]] = True
-    return mask
+def motif_mask(sequence: NDArray[np.uint8], kind: str) -> NDArray[np.bool_]:
+    table, lengths = TABLES[kind]
+    return _motif_mask(sequence, table, lengths)
 
 
 def build_candidates(
-    codes: dict[str, NDArray[np.uint8]],
-    motifs: dict[str, set[bytes]],
-    labels: dict[str, NDArray[np.int64]],
-    name: str,
-) -> Candidates:
-    """Collect every motif-bearing position, labelled by motif kind."""
-    sequence = codes[name]
+    sequence: NDArray[np.uint8],
+    masks: dict[tuple[str, str], NDArray[np.bool_]],
+) -> tuple[
+    NDArray[np.int64], NDArray[np.int8], NDArray[np.int8], NDArray[np.int8]
+]:
+    """Every motif occurrence, labelled 1 if annotated, else 0."""
     length = len(sequence)
-    annotated = {label: _mask(labels.get(label), length) for label in LABELS}
-
-    positions: list[NDArray[np.int64]] = []
-    strands: list[NDArray[np.int8]] = []
-    kinds: list[NDArray[np.int8]] = []
-    targets: list[NDArray[np.int8]] = []
-
+    out: list[list[NDArray]] = [[], [], [], []]
     for strand_index, strand in enumerate(STRANDS):
-        prefix = PREFIX[strand]
         oriented_sequence = oriented(sequence, strand)
-        motif_masks = {
-            kind: motif_mask(oriented_sequence, kind, motifs) for kind in KINDS
-        }
-        motif_masks["IE"] = _shift_mask(motif_masks["IE"], -2)
-        motif_masks["GE"] = _shift_mask(motif_masks["GE"], -3)
-        kind_masks = {
-            "GS": annotated[f"{prefix}GS"],
-            "IS": annotated[f"{prefix}IS"],
-            "IE": annotated[f"{prefix}IEm2"],
-            "GE": np.any(
-                [annotated[label] for label in GE_LABELS if label.startswith(prefix)],
-                axis=0,
-            ),
-        }
-
-        for kind in KINDS:
-            found = np.flatnonzero(motif_masks[kind])
-            if kind == "GE":
-                found = found[found < length - 2]
-                if not len(found):
-                    continue
-                codons = (
-                    oriented_sequence[found].astype(np.int64) * 16
-                    + oriented_sequence[found + 1].astype(np.int64) * 4
-                    + oriented_sequence[found + 2].astype(np.int64)
-                )
-                found = found[np.isin(codons, STOP_CODES)]
+        for kind_index, kind in enumerate(KINDS):
+            found = np.flatnonzero(motif_mask(oriented_sequence, kind))
             if not len(found):
                 continue
-
             genomic = to_genomic(found, length, strand)
-            positions.append(genomic)
-            strands.append(np.full(len(found), strand_index, dtype=np.int8))
-            kinds.append(np.full(len(found), KIND_INDEX[kind], dtype=np.int8))
-            targets.append(kind_masks[kind][genomic].astype(np.int8))
-
-    if not positions:
+            out[0].append(genomic)
+            out[1].append(np.full(len(found), strand_index, dtype=np.int8))
+            out[2].append(np.full(len(found), kind_index, dtype=np.int8))
+            out[3].append(masks[(strand, kind)][genomic].astype(np.int8))
+    if not out[0]:
         empty = np.zeros(0, dtype=np.int64)
-        return Candidates(
-            empty, empty.astype(np.int8), empty.astype(np.int8), empty.astype(np.int8)
-        )
-
-    order = np.lexsort((np.concatenate(strands), np.concatenate(positions)))
-    return Candidates(
-        np.concatenate(positions)[order],
-        np.concatenate(strands)[order],
-        np.concatenate(kinds)[order],
-        np.concatenate(targets)[order],
+        return empty, empty.astype(np.int8), empty.astype(np.int8), empty.astype(np.int8)
+    order = np.lexsort((np.concatenate(out[1]), np.concatenate(out[0])))
+    return (
+        np.concatenate(out[0])[order],
+        np.concatenate(out[1])[order],
+        np.concatenate(out[2])[order],
+        np.concatenate(out[3])[order],
     )
 
 
@@ -508,7 +358,8 @@ class CwtFeatureBank:
 
 
 def sample_candidates(
-    candidates: Candidates,
+    kinds: NDArray[np.int8],
+    labels: NDArray[np.int8],
     max_positives: int,
     negatives_per_positive: float,
     rng: np.random.Generator,
@@ -516,12 +367,8 @@ def sample_candidates(
     """Balanced sample: cap positives per kind and match them with background."""
     selected: list[NDArray[np.int64]] = []
     for kind_index, kind in enumerate(KINDS):
-        positive = np.flatnonzero(
-            (candidates.kinds == kind_index) & (candidates.labels == 1)
-        )
-        negative = np.flatnonzero(
-            (candidates.kinds == kind_index) & (candidates.labels == 0)
-        )
+        positive = np.flatnonzero((kinds == kind_index) & (labels == 1))
+        negative = np.flatnonzero((kinds == kind_index) & (labels == 0))
         if not len(positive):
             print(f"  {kind}: no positives, skipped")
             continue
@@ -538,16 +385,45 @@ def sample_candidates(
     return np.concatenate(selected) if selected else np.zeros(0, dtype=np.int64)
 
 
-def load_dataset(fasta: str, annotation: str):
+def _dataset_panels(
+    args: argparse.Namespace, fasta: str, annotation: str
+) -> dict[str, tuple[NDArray[np.float32], NDArray[np.int8], NDArray[np.int8]]]:
     codes = read_fasta(fasta)
-    lengths = {name: len(sequence) for name, sequence in codes.items()}
-    raw = site_labels(read_annotation(annotation), lengths)
     name = next(iter(codes))
-    return codes, name, learn_motifs(codes, raw), build_labels(codes, raw, name)
+    length = len(codes[name])
+    masks = positive_masks(read_annotation(annotation), name, length)
+    positions, strands, kinds, labels = build_candidates(codes[name], masks)
+    rng = np.random.default_rng(args.seed)
+    index = sample_candidates(
+        kinds, labels, args.max_positives, args.negatives_per_positive, rng
+    )
+    bank = CwtFeatureBank(codes[name], tuple(args.periods), tuple(args.w0), args.chunk)
+    offsets = np.arange(
+        -args.window_radius, args.window_radius + 1, args.window_step
+    )
+    matrix = bank.gather(
+        (positions[index][:, None] + offsets[None, :]).ravel(),
+        np.repeat(strands[index], len(offsets)),
+    ).reshape(len(index), -1)
+    print(f"  features: {matrix.shape} ({matrix.nbytes / 1e9:.2f} GB)")
+
+    panels = {}
+    for kind_index, kind in enumerate(KINDS):
+        selected = kinds[index] == kind_index
+        if selected.sum() < 20:
+            continue
+        embedding = PCA(
+            n_components=2,
+            whiten=True,
+            random_state=args.seed,
+            svd_solver="randomized",
+        ).fit_transform(StandardScaler().fit_transform(matrix[selected]))
+        panels[kind] = (embedding, labels[index][selected], strands[index][selected])
+    return panels
 
 
 def run(args: argparse.Namespace) -> int:
-    panels: dict[str, dict[str, Panel]] = {}
+    panels = {}
     for dataset, fasta, annotation in DATASETS:
         print(f"=== {dataset} ===")
         panels[dataset] = _dataset_panels(args, fasta, annotation)
@@ -594,42 +470,6 @@ def run(args: argparse.Namespace) -> int:
     plt.close(figure)
     print(f"wrote {args.output}")
     return 0
-
-
-def _dataset_panels(
-    args: argparse.Namespace, fasta: str, annotation: str
-) -> dict[str, Panel]:
-    codes, name, motifs, labels = load_dataset(fasta, annotation)
-    candidates = build_candidates(codes, motifs, labels, name)
-    rng = np.random.default_rng(args.seed)
-    index = sample_candidates(
-        candidates, args.max_positives, args.negatives_per_positive, rng
-    )
-    bank = CwtFeatureBank(codes[name], tuple(args.periods), tuple(args.w0), args.chunk)
-    offsets = np.arange(
-        -args.window_radius, args.window_radius + 1, args.window_step
-    )
-    positions = (candidates.positions[index][:, None] + offsets[None, :]).ravel()
-    strands = np.repeat(candidates.strands[index], len(offsets))
-    matrix = bank.gather(positions, strands).reshape(len(index), -1)
-    print(f"  features: {matrix.shape} ({matrix.nbytes / 1e9:.2f} GB)")
-    truth = candidates.labels[index]
-    kinds = candidates.kinds[index]
-    strands = candidates.strands[index]
-
-    panels: dict[str, Panel] = {}
-    for kind_index, kind in enumerate(KINDS):
-        selected = kinds == kind_index
-        if selected.sum() < 20:
-            continue
-        embedding = PCA(
-            n_components=2,
-            whiten=True,
-            random_state=args.seed,
-            svd_solver="randomized",
-        ).fit_transform(StandardScaler().fit_transform(matrix[selected]))
-        panels[kind] = (embedding, truth[selected], strands[selected])
-    return panels
 
 
 def main(argv: list[str] | None = None) -> int:
