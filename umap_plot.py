@@ -17,28 +17,35 @@ import umap
 from matplotlib.lines import Line2D
 from numba import njit
 from scipy.fft import fft, ifft, next_fast_len
+from sklearn.metrics import silhouette_score
 
-KINDS = ("pGS", "mGS", "pIS", "mIS", "pIE", "mIE", "pGE", "mGE")
-MOTIFS = {
-    "pGS": (b"ATG",),
-    "mGS": (b"CAT",),
-    "pIS": (b"GT",),
-    "mIS": (b"AC",),
-    "pIE": (b"AG",),
-    "mIE": (b"CT",),
-    "pGE": (b"TAA",),
-    "mGE": (b"TTA",),
+KINDS = (
+    "ATG", "CAT",
+    "GT", "AC",
+    "AG", "CT",
+    "TAA", "TTA",
+    "TAG", "CTA",
+    "TGA", "TCA",
+)
+MOTIFS = {kind: (kind.encode("ascii"),) for kind in KINDS}
+SITE = {
+    "ATG": ("GS", "+", 0),
+    "CAT": ("GS", "-", 0),
+    "GT": ("IS", "+", 0),
+    "AC": ("IS", "-", 0),
+    "AG": ("IE", "+", 2),
+    "CT": ("IE", "-", 2),
+    "TAA": ("GE", "+", 3),
+    "TTA": ("GE", "-", 3),
+    "TAG": ("GE", "+", 3),
+    "CTA": ("GE", "-", 3),
+    "TGA": ("GE", "+", 3),
+    "TCA": ("GE", "-", 3),
 }
-SITE_OFFSET = {
-    "pGS": 0,
-    "mGS": 0,
-    "pIS": 0,
-    "mIS": 0,
-    "pIE": 2,
-    "mIE": 2,
-    "pGE": 3,
-    "mGE": 3,
-}
+STRANDS = {kind: 0 if strand == "+" else 1 for kind, (_, strand, _) in SITE.items()}
+SITE_KINDS = {}
+for _kind, (_site, _strand, _offset) in SITE.items():
+    SITE_KINDS.setdefault((_site, _strand), []).append((_kind, _offset))
 SEED = 0
 MAX_POSITIVES = 2000
 PERIODS = (2, 3, 4)
@@ -196,15 +203,15 @@ def positive_masks(transcripts, name, length):
         sites = [("GS", cds[0][0]), ("GE", cds[-1][1])]
         for (_, left), (right, _) in pairwise(cds):
             sites += [("IS", left), ("IE", right)]
-        for base_kind, position in sites:
-            kind = ("p" if strand == "+" else "m") + base_kind
-            genomic = (position if strand == "+" else length - 1 - position) + sign * SITE_OFFSET[kind]
-            if 0 <= genomic < length:
-                masks[kind][genomic] = True
+        for site, position in sites:
+            for kind, offset in SITE_KINDS.get((site, strand), ()):
+                genomic = (position if strand == "+" else length - 1 - position) + sign * offset
+                if 0 <= genomic < length:
+                    masks[kind][genomic] = True
     return masks
 
 
-@njit(cache=True)
+@njit
 def _motif_mask(sequence, motifs, lengths):
     n = sequence.shape[0]
     mask = np.zeros(n, dtype=np.bool_)
@@ -228,10 +235,11 @@ def build_candidates(sequence, masks):
         found = np.flatnonzero(_motif_mask(sequence, table, lengths))
         if not len(found):
             continue
-        if kind.startswith("m"):
+        strand = STRANDS[kind]
+        if strand:
             found = found + (max(map(len, MOTIFS[kind])) - 1)
         out[0].append(found.astype(np.int64))
-        out[1].append(np.full(len(found), 1 if kind.startswith("m") else 0, dtype=np.int8))
+        out[1].append(np.full(len(found), strand, dtype=np.int8))
         out[2].append(np.full(len(found), kind_index, dtype=np.int8))
         out[3].append(masks[kind][found].astype(np.int8))
     if not out[0]:
@@ -269,7 +277,7 @@ class CwtFeatureBank:
             for kernel in [build_kernel(period, w0)]
         ]
         self.max_radius = max(radius for radius, _ in kernels)
-        self.channels = 18 * len(kernels)
+        self.channels = 12 * len(kernels)
         self.n_fft = next_fast_len(chunk + 4 * self.max_radius)
         self.kernel_ffts = [
             (radius, np.asarray(fft(kernel, n=self.n_fft), dtype=np.complex128))
@@ -311,8 +319,8 @@ class CwtFeatureBank:
                     dtype=np.complex128,
                 )
                 responses = conv[(chunk_positions - seg_start) + radius]
-                features[rows, kernel_index * 18 : (kernel_index + 1) * 18] = np.hstack(
-                    (responses.real**2 + responses.imag**2, responses.real, responses.imag)
+                features[rows, kernel_index * 12 : (kernel_index + 1) * 12] = np.hstack(
+                    (responses.real, responses.imag)
                 ).astype(np.float32)
         return features
 
@@ -351,15 +359,28 @@ def plot(fasta, truth, output):
     features = cwt_features(bank, positions[index], strands[index])
     labels = labels[index]
     kinds = kinds[index]
-    columns = 2
+    columns = 3
     n_rows = (len(KINDS) + columns - 1) // columns
     figure, axes = plt.subplots(n_rows, columns, figsize=(6 * columns, 6 * n_rows))
+    scores = []
     for ax, kind in zip(axes.ravel(), KINDS):
         mask = kinds == KINDS.index(kind)
         if not mask.any():
             ax.axis("off")
             continue
         n = len(features[mask])
+        y = labels[mask]
+        if n < 3:
+            ax.axis("off")
+            scores.append(
+                {
+                    "kind": kind,
+                    "n": n,
+                    "positive": int(y.sum()),
+                    "silhouette": float("nan"),
+                }
+            )
+            continue
         embedding = umap.UMAP(
             n_components=2,
             n_neighbors=min(15, max(2, n - 1)),
@@ -367,6 +388,17 @@ def plot(fasta, truth, output):
             n_jobs=1,
             compatibility_layout=True,
         ).fit_transform(features[mask])
+        score = float("nan")
+        if len(np.unique(y)) > 1:
+            score = float(silhouette_score(embedding, y))
+        scores.append(
+            {
+                "kind": kind,
+                "n": n,
+                "positive": int(y.sum()),
+                "silhouette": score,
+            }
+        )
         for value, color, marker, label in (
             (0, "#1f77b4", "o", "negative"),
             (1, "#d62728", "^", "positive"),
@@ -395,6 +427,7 @@ def plot(fasta, truth, output):
     figure.savefig(output, dpi=200)
     plt.close(figure)
     print(f"wrote {output}")
+    return scores
 
 
 def main():
