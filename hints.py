@@ -2,7 +2,6 @@
 import argparse
 import gzip
 import math
-import subprocess
 import warnings
 from collections import defaultdict
 from itertools import pairwise, permutations
@@ -20,10 +19,8 @@ from matplotlib.lines import Line2D
 from numba import njit
 from scipy.fft import fft, ifft, next_fast_len
 from sklearn._loss.loss import HalfBinomialLoss
-from sklearn.decomposition import PCA
 from sklearn.ensemble import HistGradientBoostingClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, roc_auc_score
+from sklearn.metrics import precision_score, recall_score, roc_auc_score
 
 warnings.filterwarnings("ignore")
 
@@ -48,14 +45,7 @@ SITE_OFFSET = {
     "pGE": 3,
     "mGE": 3,
 }
-TRAIN = {
-    "col": ("data/truth.col.chr5.fasta", "data/truth.col.chr5.gff3"),
-    "nip": ("data/truth.nip.chr5.fasta", "data/truth.nip.chr5.gff3"),
-    "slm": ("data/truth.slm.chr5.fasta", "data/truth.slm.chr5.gff3"),
-}
 MODEL = "hints_model.pkl"
-HINT_KINDS = ("pGS", "mGS", "pIS", "mIS", "pIE", "mIE")
-SPECIES = "arabidopsis"
 THRESHOLD = 0.5
 F1_FACTOR = 2.0
 EPS = np.finfo(float).eps
@@ -112,31 +102,6 @@ for _kind, _motifs in MOTIFS.items():
         _lengths[_row] = len(_motif)
     TABLES[_kind] = (_table, _lengths)
 
-CONFIG = """[SOURCES]
-M RM
-
-[SOURCE-PARAMETERS]
-T individual_liability
-
-[GENERAL]
-      start        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-       stop        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-        tss        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-        tts        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-        ass        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-        dss        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-   exonpart        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-       exon        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
- intronpart        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-     intron        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-    CDSpart        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-        CDS        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-    UTRpart        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-        UTR        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-     irpart        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-nonexonpart        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1.15
-  genicpart        1       1  M    5  0.2 0.4 0.6 0.8 0.25 0.67 1.5 4 9  RM 1 1
-"""
 
 
 def morlet_integral(lower, upper, w0=W0):
@@ -288,6 +253,22 @@ def build_candidates(sequence, masks):
     return tuple(np.concatenate(x)[order] for x in out)
 
 
+def sample_candidates(kinds, labels, rng):
+    selected = []
+    for kind_index, kind in enumerate(KINDS):
+        positive = np.flatnonzero((kinds == kind_index) & (labels == 1))
+        negative = np.flatnonzero((kinds == kind_index) & (labels == 0))
+        if not len(positive):
+            continue
+        n_positive = min(len(positive), MAX_POSITIVES)
+        n_negative = min(len(negative), n_positive)
+        selected += [
+            rng.choice(positive, size=n_positive, replace=False),
+            rng.choice(negative, size=n_negative, replace=False),
+        ]
+    return np.concatenate(selected) if selected else np.zeros(0, dtype=np.int64)
+
+
 class CwtFeatureBank:
     def __init__(self, sequence, periods, w0s, chunk=100_000):
         self.length = len(sequence)
@@ -358,22 +339,6 @@ class CwtFeatureBank:
                 )
                 features[mask] = self._gather_sequence(codes, oriented_positions)
         return features
-
-
-def sample_candidates(kinds, labels, rng):
-    selected = []
-    for kind_index, kind in enumerate(KINDS):
-        positive = np.flatnonzero((kinds == kind_index) & (labels == 1))
-        negative = np.flatnonzero((kinds == kind_index) & (labels == 0))
-        if not len(positive):
-            continue
-        n_positive = min(len(positive), MAX_POSITIVES)
-        n_negative = min(len(negative), n_positive)
-        selected += [
-            rng.choice(positive, size=n_positive, replace=False),
-            rng.choice(negative, size=n_negative, replace=False),
-        ]
-    return np.concatenate(selected) if selected else np.zeros(0, dtype=np.int64)
 
 
 @njit(cache=True)
@@ -499,6 +464,15 @@ def coding_features(sequence, positions, strands, window=WINDOW):
     return out
 
 
+def cwt_features(bank, positions, strands):
+    offsets = np.arange(-RADIUS, RADIUS + 1)
+    cwt = bank.gather(
+        (positions[:, None] + offsets[None, :]).ravel(),
+        np.repeat(strands, len(offsets)),
+    ).reshape(len(positions), -1)
+    return np.hstack((cwt, coding_features(bank.codes, positions, strands)))
+
+
 class SoftF1Closs:
     def _parts(self, y_true, raw_prediction, sample_weight):
         p = 1.0 / (1.0 + np.exp(-raw_prediction))
@@ -541,11 +515,6 @@ class SoftF1Closs:
         hessian_out[:] = hess
         return gradient_out, hessian_out
 
-    def loss_gradient(self, y_true, raw_prediction, sample_weight=None, loss_out=None, gradient_out=None, n_threads=1):
-        self.loss(y_true, raw_prediction, sample_weight, loss_out, n_threads)
-        self.gradient(y_true, raw_prediction, sample_weight, gradient_out, n_threads)
-        return loss_out, gradient_out
-
 
 class SoftF1Loss(HalfBinomialLoss):
     def __init__(self):
@@ -553,29 +522,9 @@ class SoftF1Loss(HalfBinomialLoss):
         self.closs = SoftF1Closs()
 
 
-def cwt_features(bank, positions, strands):
-    offsets = np.arange(-RADIUS, RADIUS + 1)
-    cwt = bank.gather(
-        (positions[:, None] + offsets[None, :]).ravel(),
-        np.repeat(strands, len(offsets)),
-    ).reshape(len(positions), -1)
-    return np.hstack((cwt, coding_features(bank.codes, positions, strands)))
-
-
-def gather(fasta, gff):
-    codes = read_fasta(fasta)
-    name = next(iter(codes))
-    sequence = codes[name]
-    masks = positive_masks(read_annotation(gff), name, len(sequence))
-    positions, strands, kinds, labels = build_candidates(sequence, masks)
-    index = sample_candidates(kinds, labels, np.random.default_rng(SEED))
-    bank = CwtFeatureBank(sequence, PERIODS, W0S)
-    return cwt_features(bank, positions[index], strands[index]), labels[index], kinds[index]
-
-
 def fit(data, model_path=MODEL):
     model = {}
-    for kind in HINT_KINDS:
+    for kind in KINDS:
         kind_index = KINDS.index(kind)
         xs, ys = [], []
         for matrix, labels, kinds in data.values():
@@ -592,92 +541,31 @@ def fit(data, model_path=MODEL):
     print(f"wrote {model_path}")
 
 
-def train(genomes=("col", "nip", "slm"), model_path=MODEL):
-    fit({genome: gather(*TRAIN[genome]) for genome in genomes}, model_path)
-
-
-def score_sites(bank, positions, strands, kind, model, chunk=50_000):
-    proba = np.empty(len(positions), dtype=np.float32)
-    for start in range(0, len(positions), chunk):
-        end = min(start + chunk, len(positions))
-        features = cwt_features(bank, positions[start:end], strands[start:end])
-        proba[start:end] = model[kind].predict_proba(features)[:, 1]
-    return proba
-
-
-def write_hint(handle, name, kind, position, strand, prob):
-    if kind == "pGS":
-        handle.write(
-            f"{name}\tAUGUSTUS\tstart\t{position + 1}\t{position + 3}\t{prob:.6f}\t+\t.\tgrp={kind}_{position};pri=4;source=M\n"
-        )
-    elif kind == "mGS":
-        handle.write(
-            f"{name}\tAUGUSTUS\tstart\t{position - 1}\t{position + 1}\t{prob:.6f}\t-\t.\tgrp={kind}_{position};pri=4;source=M\n"
-        )
-    elif kind == "pIS":
-        handle.write(
-            f"{name}\tAUGUSTUS\tdss\t{position + 1}\t{position + 1}\t{prob:.6f}\t+\t.\tgrp={kind}_{position};pri=4;source=M\n"
-        )
-    elif kind == "mIS":
-        handle.write(
-            f"{name}\tAUGUSTUS\tdss\t{position + 1}\t{position + 1}\t{prob:.6f}\t-\t.\tgrp={kind}_{position};pri=4;source=M\n"
-        )
-    elif kind == "pIE":
-        handle.write(
-            f"{name}\tAUGUSTUS\tass\t{position + 2}\t{position + 2}\t{prob:.6f}\t+\t.\tgrp={kind}_{position};pri=4;source=M\n"
-        )
-    elif kind == "mIE":
-        handle.write(
-            f"{name}\tAUGUSTUS\tass\t{position}\t{position}\t{prob:.6f}\t-\t.\tgrp={kind}_{position};pri=4;source=M\n"
-        )
-
-
-def predict(fasta, output, model_path=MODEL):
-    codes = read_fasta(fasta)
-    name = next(iter(codes))
-    sequence = codes[name]
-    positions, strands, kinds, _ = build_candidates(
-        sequence, {kind: np.zeros(len(sequence), dtype=bool) for kind in KINDS}
-    )
-    bank = CwtFeatureBank(sequence, PERIODS, W0S)
-    model = joblib.load(model_path)
-    counts = {}
-    with open(output, "w") as handle:
-        for kind in HINT_KINDS:
-            rows = kinds == KINDS.index(kind)
-            if not rows.any():
-                continue
-            pos, st = positions[rows], strands[rows]
-            proba = score_sites(bank, pos, st, kind, model)
-            keep = proba >= THRESHOLD
-            counts[kind] = int(keep.sum())
-            for p, s, prob in zip(pos[keep], st[keep], proba[keep]):
-                write_hint(handle, name, kind, int(p), int(s), float(prob))
-    print("hints:", " ".join(f"{kind}={counts.get(kind, 0)}" for kind in HINT_KINDS))
-    print(f"wrote {output}")
-
-
-def run(fasta, output, model_path=MODEL, species=SPECIES):
-    hints = f"{output}.hints.gff"
-    config = f"{output}.extrinsic.cfg"
-    gff = f"{output}.gff3"
-    predict(fasta, hints, model_path)
-    with open(config, "w") as handle:
-        handle.write(CONFIG)
-    with open(gff, "w") as handle:
-        subprocess.run(
-            [
-                "augustus",
-                f"--species={species}",
-                "--gff3=on",
-                f"--hintsfile={hints}",
-                f"--extrinsicCfgFile={config}",
-                fasta,
-            ],
-            stdout=handle,
-            check=True,
-        )
-    print(f"wrote {gff}")
+def _plot_kind(ax, kind, x, y, model):
+    proba = model[kind].predict_proba(x)[:, 1]
+    bins = np.linspace(0.0, 1.0, 31)
+    for value, color, label in ((0, "#1f77b4", "negative"), (1, "#d62728", "positive")):
+        mask = y == value
+        if mask.any():
+            ax.hist(
+                proba[mask],
+                bins=bins,
+                color=color,
+                alpha=0.6,
+                density=True,
+                label=label,
+            )
+    ax.axvline(THRESHOLD, color="k", linestyle="--", linewidth=1.0)
+    pred = (proba >= THRESHOLD).astype(int)
+    prec = precision_score(y, pred, zero_division="warn")
+    rec = recall_score(y, pred, zero_division="warn")
+    try:
+        auc = roc_auc_score(y, proba)
+    except ValueError:
+        auc = float("nan")
+    ax.set_title(f"{kind} AUC={auc:.3f} prec={prec:.3f} rec={rec:.3f}", fontsize=9)
+    ax.set_xlim(0.0, 1.0)
+    ax.set_yticks([])
 
 
 def plot(fasta, truth, output, model_path=MODEL):
@@ -687,45 +575,35 @@ def plot(fasta, truth, output, model_path=MODEL):
     masks = positive_masks(read_annotation(truth), name, len(sequence))
     positions, strands, kinds, labels = build_candidates(sequence, masks)
     bank = CwtFeatureBank(sequence, PERIODS, W0S)
+    index = sample_candidates(kinds, labels, np.random.default_rng(SEED))
+    fit(
+        {
+            Path(fasta).stem: (
+                cwt_features(bank, positions[index], strands[index]),
+                labels[index],
+                kinds[index],
+            )
+        },
+        model_path,
+    )
     model = joblib.load(model_path)
-    figure, axes = plt.subplots(2, 3, figsize=(18, 12))
-    for ax, kind in zip(axes.ravel(), HINT_KINDS):
-        rows = kinds == KINDS.index(kind)
-        x = cwt_features(bank, positions[rows], strands[rows])
-        y = labels[rows]
-        pca = PCA(2, random_state=SEED).fit(x)
-        z = pca.transform(x)
-        surrogate = LogisticRegression().fit(z, y)
-        pad = 0.5
-        lo, hi = z.min(axis=0) - pad, z.max(axis=0) + pad
-        xx, yy = np.meshgrid(
-            np.linspace(lo[0], hi[0], 200), np.linspace(lo[1], hi[1], 200)
-        )
-        proba = surrogate.predict_proba(np.c_[xx.ravel(), yy.ravel()])[:, 1].reshape(
-            xx.shape
-        )
-        ax.contour(xx, yy, proba, levels=[0.5], colors="k", linewidths=1.2)
-        for value, color, marker in ((0, "#1f77b4", "o"), (1, "#d62728", "^")):
-            mask = y == value
-            if mask.any():
-                ax.scatter(z[mask, 0], z[mask, 1], c=color, marker=marker, s=10, alpha=0.7)
-        proba_model = model[kind].predict_proba(x)[:, 1]
-        pred = (proba_model >= THRESHOLD).astype(int)
-        acc = accuracy_score(y, pred)
-        try:
-            auc = roc_auc_score(y, proba_model)
-        except ValueError:
-            auc = float("nan")
-        ax.set_title(f"{kind} acc={acc:.3f} AUC={auc:.3f}")
-        ax.set_xticks([])
-        ax.set_yticks([])
+    columns = 2
+    n_rows = (len(KINDS) + columns - 1) // columns
+    figure, axes = plt.subplots(n_rows, columns, figsize=(6 * columns, 6 * n_rows))
+    for ax, kind in zip(axes.ravel(), KINDS):
+        mask = kinds == KINDS.index(kind)
+        x = cwt_features(bank, positions[mask], strands[mask])
+        y = labels[mask]
+        _plot_kind(ax, kind, x, y, model)
+    for ax in axes.ravel()[len(KINDS) :]:
+        ax.axis("off")
     handles = [
-        Line2D([], [], marker="o", linestyle="", color="#1f77b4", label="negative"),
-        Line2D([], [], marker="^", linestyle="", color="#d62728", label="positive"),
-        Line2D([], [], color="k", linestyle="-", label="2D logistic approx."),
+        Line2D([], [], color="#1f77b4", label="negative"),
+        Line2D([], [], color="#d62728", label="positive"),
+        Line2D([], [], color="k", linestyle="--", label="threshold"),
     ]
     figure.legend(handles=handles, loc="lower center", ncol=3)
-    figure.tight_layout(rect=(0, 0.04, 1, 1))
+    figure.tight_layout(rect=(0, 0.04, 1, 0.95))
     figure.savefig(output, dpi=200)
     plt.close(figure)
     print(f"wrote {output}")
@@ -733,30 +611,20 @@ def plot(fasta, truth, output, model_path=MODEL):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--hints", action="store_true")
-    parser.add_argument("--run", action="store_true")
     parser.add_argument("--plot", action="store_true")
     parser.add_argument("--fasta", required=True)
     parser.add_argument("--output", required=True)
-    parser.add_argument("--truth")
+    parser.add_argument("--truth", required=True)
     parser.add_argument("--model", default=MODEL)
-    parser.add_argument("--species", default=SPECIES)
     args = parser.parse_args()
-    if args.hints:
-        predict(args.fasta, args.output, args.model)
-    elif args.run:
-        run(args.fasta, args.output, args.model, args.species)
-    else:
-        parser.error("choose --hints or --run")
-    if args.plot:
-        if not args.truth:
-            parser.error("--plot requires --truth")
-        plot(
-            args.fasta,
-            args.truth,
-            str(Path(args.output).with_suffix(".png")),
-            args.model,
-        )
+    if not args.plot:
+        parser.error("choose --plot")
+    plot(
+        args.fasta,
+        args.truth,
+        str(Path(args.output).with_suffix(".png")),
+        args.model,
+    )
 
 
 if __name__ == "__main__":
