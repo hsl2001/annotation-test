@@ -2,27 +2,21 @@
 import argparse
 import gzip
 import math
-import warnings
 from collections import defaultdict
 from itertools import pairwise, permutations
 from pathlib import Path
 from urllib.parse import unquote
 
-import joblib
 import matplotlib
 
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 import numpy as np
+import umap
 from matplotlib.lines import Line2D
 from numba import njit
 from scipy.fft import fft, ifft, next_fast_len
-from sklearn._loss.loss import HalfBinomialLoss
-from sklearn.ensemble import HistGradientBoostingClassifier
-from sklearn.metrics import precision_score, recall_score, roc_auc_score
-
-warnings.filterwarnings("ignore")
 
 KINDS = ("pGS", "mGS", "pIS", "mIS", "pIE", "mIE", "pGE", "mGE")
 MOTIFS = {
@@ -45,18 +39,13 @@ SITE_OFFSET = {
     "pGE": 3,
     "mGE": 3,
 }
-MODEL = "hints_model.pkl"
-THRESHOLD = 0.5
-F1_FACTOR = 2.0
-EPS = np.finfo(float).eps
-MAX_POSITIVES = 2000
 SEED = 0
+MAX_POSITIVES = 2000
 PERIODS = (2, 3, 4)
-W0S = (8.0,)
 RADIUS = 5
 MORLET_LIMIT = 8.0
 W0 = 6.0
-WINDOW = 300
+
 NODES = np.array(
     [
         0.09501250983763744,
@@ -101,7 +90,6 @@ for _kind, _motifs in MOTIFS.items():
         _table[_row, : len(_motif)] = LUT[np.frombuffer(_motif, dtype=np.uint8)]
         _lengths[_row] = len(_motif)
     TABLES[_kind] = (_table, _lengths)
-
 
 
 def morlet_integral(lower, upper, w0=W0):
@@ -270,14 +258,13 @@ def sample_candidates(kinds, labels, rng):
 
 
 class CwtFeatureBank:
-    def __init__(self, sequence, periods, w0s, chunk=100_000):
+    def __init__(self, sequence, periods, w0, chunk=100_000):
         self.length = len(sequence)
         self.codes = sequence
         self.reverse_codes = COMPLEMENT[sequence[::-1]]
         self.chunk = chunk
         kernels = [
             (len(kernel) // 2, kernel)
-            for w0 in w0s
             for period in periods
             for kernel in [build_kernel(period, w0)]
         ]
@@ -341,269 +328,70 @@ class CwtFeatureBank:
         return features
 
 
-@njit(cache=True)
-def _stop_arrays(sequence, window):
-    length = sequence.shape[0]
-    cap = length + window
-    next_stop = np.full((3, length + 3), cap, dtype=np.int64)
-    prev_stop_end = np.zeros((3, length + 3), dtype=np.int64)
-    for frame in range(3):
-        for i in range(length - 1, -1, -1):
-            if i % 3 == frame:
-                is_stop = (
-                    i + 2 < length
-                    and sequence[i] == 3
-                    and sequence[i + 1] == 0
-                    and (sequence[i + 2] == 0 or sequence[i + 2] == 2)
-                ) or (
-                    i + 2 < length
-                    and sequence[i] == 3
-                    and sequence[i + 1] == 2
-                    and sequence[i + 2] == 0
-                )
-                if is_stop:
-                    next_stop[frame, i] = i
-                elif i + 3 < length:
-                    next_stop[frame, i] = next_stop[frame, i + 3]
-            elif i + 1 < length:
-                next_stop[frame, i] = next_stop[frame, i + 1]
-        for i in range(length):
-            if i % 3 == frame:
-                is_stop = (
-                    i + 2 < length
-                    and sequence[i] == 3
-                    and sequence[i + 1] == 0
-                    and (sequence[i + 2] == 0 or sequence[i + 2] == 2)
-                ) or (
-                    i + 2 < length
-                    and sequence[i] == 3
-                    and sequence[i + 1] == 2
-                    and sequence[i + 2] == 0
-                )
-                if is_stop:
-                    prev_stop_end[frame, i] = i + 3
-                elif i - 3 >= 0:
-                    prev_stop_end[frame, i] = prev_stop_end[frame, i - 3]
-            elif i - 1 >= 0:
-                prev_stop_end[frame, i] = prev_stop_end[frame, i - 1]
-    return next_stop, prev_stop_end
 
 
-def _gc(sequence, positions, width):
-    length = len(sequence)
-    out = np.zeros(len(positions), dtype=np.float32)
-    for i, p in enumerate(positions):
-        lo = max(0, p - width // 2)
-        hi = min(length, p + width // 2)
-        if lo < hi:
-            window = sequence[lo:hi]
-            valid = window < 4
-            if valid.any():
-                out[i] = np.isin(window[valid], (1, 2)).mean()
-    return out
-
-
-def _polypyrimidine(sequence, positions, width=20):
-    out = np.zeros(len(positions), dtype=np.float32)
-    for i, p in enumerate(positions):
-        lo = max(0, p - width)
-        hi = max(0, p - 4)
-        if lo < hi:
-            window = sequence[lo:hi]
-            valid = window < 4
-            if valid.any():
-                out[i] = np.isin(window[valid], (1, 3)).mean()
-    return out
-
-
-def coding_features(sequence, positions, strands, window=WINDOW):
-    length = len(sequence)
-    reverse = COMPLEMENT[sequence[::-1]]
-    cap = window / 3.0
-    out = np.zeros((len(positions), 14), dtype=np.float32)
-    for strand_value, seq in ((0, sequence), (1, reverse)):
-        mask = strands == strand_value
-        if not mask.any():
-            continue
-        pos = positions[mask] if strand_value == 0 else length - 1 - positions[mask]
-        next_stop, prev_stop_end = _stop_arrays(seq, window)
-        up = np.zeros((len(pos), 3), dtype=np.float32)
-        down = np.zeros((len(pos), 3), dtype=np.float32)
-        up3 = np.zeros((len(pos), 3), dtype=np.float32)
-        down3 = np.zeros((len(pos), 3), dtype=np.float32)
-        for frame in range(3):
-            up[:, frame] = np.minimum(
-                np.maximum(pos - prev_stop_end[frame, pos], 0), window
-            ) / 3.0
-            down[:, frame] = np.minimum(
-                np.maximum(next_stop[frame, pos] - pos, 0), window
-            ) / 3.0
-            shifted_up = np.maximum(pos - 3, 0)
-            shifted_down = np.minimum(pos + 3, length - 1)
-            up3[:, frame] = np.minimum(
-                np.maximum(shifted_up - prev_stop_end[frame, shifted_up], 0), window
-            ) / 3.0
-            down3[:, frame] = np.minimum(
-                np.maximum(next_stop[frame, shifted_down] - shifted_down, 0), window
-            ) / 3.0
-        rows = np.flatnonzero(mask)
-        out[rows, 0] = up.max(axis=1)
-        out[rows, 1] = up.min(axis=1)
-        out[rows, 2] = up.mean(axis=1)
-        out[rows, 3] = down.max(axis=1)
-        out[rows, 4] = down.min(axis=1)
-        out[rows, 5] = down.mean(axis=1)
-        out[rows, 6] = up3.max(axis=1)
-        out[rows, 7] = down3.max(axis=1)
-        out[rows, 8] = _gc(seq, pos, 100)
-        out[rows, 9] = _gc(seq, pos, 20)
-        out[rows, 10] = _polypyrimidine(seq, pos)
-        out[rows, 11] = out[rows, 0] - out[rows, 3]
-        out[rows, 12] = out[rows, 3] - out[rows, 0]
-        out[rows, 13] = np.minimum(out[rows, 0], cap) - np.minimum(out[rows, 3], cap)
-    return out
 
 
 def cwt_features(bank, positions, strands):
     offsets = np.arange(-RADIUS, RADIUS + 1)
-    cwt = bank.gather(
+    return bank.gather(
         (positions[:, None] + offsets[None, :]).ravel(),
         np.repeat(strands, len(offsets)),
     ).reshape(len(positions), -1)
-    return np.hstack((cwt, coding_features(bank.codes, positions, strands)))
 
 
-class SoftF1Closs:
-    def _parts(self, y_true, raw_prediction, sample_weight):
-        p = 1.0 / (1.0 + np.exp(-raw_prediction))
-        w = np.ones_like(p) if sample_weight is None else sample_weight
-        tp = np.sum(w * y_true * p)
-        fp = np.sum(w * (1.0 - y_true) * p)
-        fn = np.sum(w * y_true * (1.0 - p))
-        return p, w, tp, 2.0 * tp + fp + fn
-
-    def loss(self, y_true, raw_prediction, sample_weight=None, loss_out=None, n_threads=1):
-        p, _, tp, d = self._parts(y_true, raw_prediction, sample_weight)
-        cce = -(y_true * np.log(p + EPS) + (1.0 - y_true) * np.log(1.0 - p + EPS))
-        value = cce + F1_FACTOR * (1.0 - 2.0 * tp / (d + EPS))
-        if loss_out is None:
-            loss_out = np.empty_like(y_true)
-        loss_out[:] = value
-        return loss_out
-
-    def gradient(self, y_true, raw_prediction, sample_weight=None, gradient_out=None, n_threads=1):
-        p, w, tp, d = self._parts(y_true, raw_prediction, sample_weight)
-        grad = (p - y_true) + F1_FACTOR * p * (1.0 - p) * (
-            -w * (2.0 * y_true * d - 2.0 * tp) / (d**2 + EPS)
-        )
-        if gradient_out is None:
-            gradient_out = np.empty_like(raw_prediction)
-        gradient_out[:] = grad
-        return gradient_out
-
-    def gradient_hessian(self, y_true, raw_prediction, sample_weight=None, gradient_out=None, hessian_out=None, n_threads=1):
-        p, w, tp, d = self._parts(y_true, raw_prediction, sample_weight)
-        grad = (p - y_true) + F1_FACTOR * p * (1.0 - p) * (
-            -w * (2.0 * y_true * d - 2.0 * tp) / (d**2 + EPS)
-        )
-        hess = (1.0 + F1_FACTOR) * p * (1.0 - p)
-        if gradient_out is None:
-            gradient_out = np.empty_like(raw_prediction)
-        if hessian_out is None:
-            hessian_out = np.empty_like(raw_prediction)
-        gradient_out[:] = grad
-        hessian_out[:] = hess
-        return gradient_out, hessian_out
-
-
-class SoftF1Loss(HalfBinomialLoss):
-    def __init__(self):
-        super().__init__()
-        self.closs = SoftF1Closs()
-
-
-def fit(data, model_path=MODEL):
-    model = {}
-    for kind in KINDS:
-        kind_index = KINDS.index(kind)
-        xs, ys = [], []
-        for matrix, labels, kinds in data.values():
-            rows = kinds == kind_index
-            xs.append(matrix[rows])
-            ys.append(labels[rows])
-        x, y = np.vstack(xs), np.concatenate(ys)
-        clf = HistGradientBoostingClassifier(
-            loss=SoftF1Loss(), random_state=SEED
-        ).fit(x, y)
-        model[kind] = clf
-        print(f"{kind}: n={len(x)} acc={clf.score(x, y):.3f}")
-    joblib.dump(model, model_path)
-    print(f"wrote {model_path}")
-
-
-def _plot_kind(ax, kind, x, y, model):
-    proba = model[kind].predict_proba(x)[:, 1]
-    bins = np.linspace(0.0, 1.0, 31)
-    for value, color, label in ((0, "#1f77b4", "negative"), (1, "#d62728", "positive")):
-        mask = y == value
-        if mask.any():
-            ax.hist(
-                proba[mask],
-                bins=bins,
-                color=color,
-                alpha=0.6,
-                density=True,
-                label=label,
-            )
-    ax.axvline(THRESHOLD, color="k", linestyle="--", linewidth=1.0)
-    pred = (proba >= THRESHOLD).astype(int)
-    prec = precision_score(y, pred, zero_division="warn")
-    rec = recall_score(y, pred, zero_division="warn")
-    try:
-        auc = roc_auc_score(y, proba)
-    except ValueError:
-        auc = float("nan")
-    ax.set_title(f"{kind} AUC={auc:.3f} prec={prec:.3f} rec={rec:.3f}", fontsize=9)
-    ax.set_xlim(0.0, 1.0)
-    ax.set_yticks([])
-
-
-def plot(fasta, truth, output, model_path=MODEL):
+def plot(fasta, truth, output):
     codes = read_fasta(fasta)
     name = next(iter(codes))
     sequence = codes[name]
     masks = positive_masks(read_annotation(truth), name, len(sequence))
     positions, strands, kinds, labels = build_candidates(sequence, masks)
-    bank = CwtFeatureBank(sequence, PERIODS, W0S)
+    bank = CwtFeatureBank(sequence, PERIODS, W0)
     index = sample_candidates(kinds, labels, np.random.default_rng(SEED))
-    fit(
-        {
-            Path(fasta).stem: (
-                cwt_features(bank, positions[index], strands[index]),
-                labels[index],
-                kinds[index],
-            )
-        },
-        model_path,
-    )
-    model = joblib.load(model_path)
+    features = cwt_features(bank, positions[index], strands[index])
+    labels = labels[index]
+    kinds = kinds[index]
     columns = 2
     n_rows = (len(KINDS) + columns - 1) // columns
     figure, axes = plt.subplots(n_rows, columns, figsize=(6 * columns, 6 * n_rows))
     for ax, kind in zip(axes.ravel(), KINDS):
         mask = kinds == KINDS.index(kind)
-        x = cwt_features(bank, positions[mask], strands[mask])
-        y = labels[mask]
-        _plot_kind(ax, kind, x, y, model)
+        if not mask.any():
+            ax.axis("off")
+            continue
+        n = len(features[mask])
+        embedding = umap.UMAP(
+            n_components=2,
+            n_neighbors=min(15, max(2, n - 1)),
+            random_state=SEED,
+            n_jobs=1,
+            compatibility_layout=True,
+        ).fit_transform(features[mask])
+        for value, color, marker, label in (
+            (0, "#1f77b4", "o", "negative"),
+            (1, "#d62728", "^", "positive"),
+        ):
+            selected = labels[mask] == value
+            if selected.any():
+                ax.scatter(
+                    embedding[selected, 0],
+                    embedding[selected, 1],
+                    c=color,
+                    marker=marker,
+                    s=8,
+                    alpha=0.7,
+                )
+        ax.set_title(kind)
+        ax.set_xticks([])
+        ax.set_yticks([])
     for ax in axes.ravel()[len(KINDS) :]:
         ax.axis("off")
     handles = [
-        Line2D([], [], color="#1f77b4", label="negative"),
-        Line2D([], [], color="#d62728", label="positive"),
-        Line2D([], [], color="k", linestyle="--", label="threshold"),
+        Line2D([], [], marker="o", linestyle="", color="#1f77b4", label="negative"),
+        Line2D([], [], marker="^", linestyle="", color="#d62728", label="positive"),
     ]
-    figure.legend(handles=handles, loc="lower center", ncol=3)
-    figure.tight_layout(rect=(0, 0.04, 1, 0.95))
+    figure.legend(handles=handles, loc="lower center", ncol=2)
+    figure.tight_layout(rect=(0, 0.04, 1, 0.98))
     figure.savefig(output, dpi=200)
     plt.close(figure)
     print(f"wrote {output}")
@@ -611,20 +399,11 @@ def plot(fasta, truth, output, model_path=MODEL):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--plot", action="store_true")
     parser.add_argument("--fasta", required=True)
-    parser.add_argument("--output", required=True)
     parser.add_argument("--truth", required=True)
-    parser.add_argument("--model", default=MODEL)
+    parser.add_argument("--output", required=True)
     args = parser.parse_args()
-    if not args.plot:
-        parser.error("choose --plot")
-    plot(
-        args.fasta,
-        args.truth,
-        str(Path(args.output).with_suffix(".png")),
-        args.model,
-    )
+    plot(args.fasta, args.truth, str(Path(args.output).with_suffix(".png")))
 
 
 if __name__ == "__main__":
