@@ -88,13 +88,13 @@ for _kind, _motifs in MOTIFS.items():
     TABLES[_kind] = (_table, _lengths)
 
 DATASETS = (
-    ("col", "data/truth.col.chr5.fasta.gz", "data/truth.col.chr5.gff3.gz"),
-    ("nip", "data/truth.nip.chr5.fasta.gz", "data/truth.nip.chr5.gff3.gz"),
-    ("slm", "data/truth.slm.chr5.fasta.gz", "data/truth.slm.chr5.gff3.gz"),
+    ("arabidopsis", "data/truth.col.chr5.fasta.gz", "data/truth.col.chr5.gff3.gz"),
+    ("rice", "data/truth.nip.chr5.fasta.gz", "data/truth.nip.chr5.gff3.gz"),
+    ("tomato", "data/truth.slm.chr5.fasta.gz", "data/truth.slm.chr5.gff3.gz"),
     ("human", "data/truth.human.chr21.fasta.gz", "data/truth.human.chr21.gff3.gz"),
     ("mouse", "data/truth.mouse.chr19.fasta.gz", "data/truth.mouse.chr19.gff3.gz"),
     ("zebrafish", "data/truth.zebrafish.chr25.fasta.gz", "data/truth.zebrafish.chr25.gff3.gz"),
-    ("elegans", "data/truth.elegans.chrI.fasta.gz", "data/truth.elegans.chrI.gff3.gz"),
+    ("celegans", "data/truth.elegans.chrI.fasta.gz", "data/truth.elegans.chrI.gff3.gz"),
 )
 
 
