@@ -212,12 +212,35 @@ def plot(output, max_positives=MAX_POSITIVES):
     print(f"wrote {Path(output).with_suffix('.png')}")
 
 
+def export_csv(path, max_positives=MAX_POSITIVES):
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write("dataset\tkind\tx\ty\tlabel\n")
+        for label, fasta, truth in DATASETS:
+            features, labels, kinds = load(fasta, truth, max_positives)
+            if len(features) < 3:
+                continue
+            embedding = umap.UMAP(
+                n_components=2,
+                n_neighbors=min(15, max(2, len(features) - 1)),
+                random_state=SEED,
+                n_jobs=1,
+                compatibility_layout=True,
+            ).fit_transform(features)
+            for (x, y), kind, value in zip(embedding, kinds, labels):
+                handle.write(f"{label}\t{KINDS[kind]}\t{x:.6g}\t{y:.6g}\t{int(value)}\n")
+    print(f"wrote {path}")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default="umap_chr5")
     parser.add_argument("--max-positives", type=int, default=MAX_POSITIVES)
+    parser.add_argument("--csv", default=None, help="export the joint UMAP embedding instead of plotting")
     args = parser.parse_args()
-    plot(args.output, args.max_positives)
+    if args.csv is not None:
+        export_csv(args.csv, args.max_positives)
+    else:
+        plot(args.output, args.max_positives)
 
 
 if __name__ == "__main__":
