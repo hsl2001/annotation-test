@@ -24,7 +24,7 @@ MOTIFS = {kind: (kind.encode("ascii"),) for kind in KINDS}
 SEED = 0
 MAX_POSITIVES = 2000
 PERIODS = (2, 3)
-RADIUS = 3
+
 MORLET_LIMIT = 8.0
 W0 = 6.0
 
@@ -318,11 +318,7 @@ class CwtFeatureBank:
 
 
 def cwt_features(bank, positions, strands):
-    offsets = np.arange(-RADIUS, RADIUS + 1)
-    return bank.gather(
-        (positions[:, None] + offsets[None, :]).ravel(),
-        np.repeat(strands, len(offsets)),
-    ).reshape(len(positions), -1)
+    return bank.gather(positions, strands)
 
 
 def load(fasta, truth, max_positives):
@@ -380,7 +376,7 @@ def plot(output, max_positives=MAX_POSITIVES):
     ]
     figure.legend(handles=handles, loc="lower center", ncol=2)
     figure.tight_layout(rect=(0, 0.03, 1, 0.99))
-    figure.savefig(str(Path(output).with_suffix(".png")), dpi=200)
+    figure.savefig(str(Path(output).with_suffix(".png")), dpi=330)
     plt.close(figure)
     print(f"wrote {Path(output).with_suffix('.png')}")
 
