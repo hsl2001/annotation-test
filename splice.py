@@ -12,7 +12,6 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 import numpy as np
-from numba import njit
 
 from accuracy import read_gff3
 from cwt_features import LUT, PERIODS, W0, CwtFeatureBank, _motif_mask, cwt_features
@@ -25,7 +24,6 @@ GROUP_CONFIG = {
     "RC_ASS": ("-", "CT", 1, 1),
 }
 FEATURE_CHANNELS = 12 * len(PERIODS)
-MAX_TEST_POSITIVES = 2000
 GENES_PER_DATASET = 100
 MATCH_THRESHOLD = 0.025
 TEMPLATE_PATH = "splice_templates_train_100genes.npz"
@@ -229,31 +227,6 @@ def scan_candidates(sequence, group: str):
     return np.flatnonzero(_motif_mask(sequence, motifs, lengths))
 
 
-def sample_candidates(starts, truth, rng, max_positives=MAX_TEST_POSITIVES):
-    positive = np.asarray(sorted(truth), dtype=np.int64)
-    n_positive = min(len(positive), max_positives)
-    n_negative = min(len(starts) - len(positive), n_positive)
-    if not n_positive:
-        return [], 0, 0
-    selected_positive = rng.choice(positive, size=n_positive, replace=False)
-    selected_negative = []
-    seen_negative = set()
-    while len(selected_negative) < n_negative:
-        remaining = n_negative - len(selected_negative)
-        indices = rng.integers(0, len(starts), size=max(32, 2 * remaining))
-        for index in indices:
-            start = int(starts[index])
-            if start not in truth and start not in seen_negative:
-                selected_negative.append(start)
-                seen_negative.add(start)
-                if len(selected_negative) == n_negative:
-                    break
-    selected = np.concatenate(
-        (selected_positive, np.asarray(selected_negative, dtype=np.int64))
-    )
-    selected.sort()
-    return selected.tolist(), n_positive, n_negative
-
 
 def normalize_features(features):
     norms = np.linalg.norm(features, axis=1, keepdims=True)
@@ -265,24 +238,32 @@ def normalize_features(features):
     )
 
 
-@njit(cache=True)
-def nearest_cosine(candidates, templates):
+def nearest_cosine(candidates, templates, chunk_size=8192):
+    """Return each candidate's cosine distance to its nearest template."""
     distances = np.empty(candidates.shape[0], dtype=np.float32)
-    for candidate_index in range(candidates.shape[0]):
-        best_similarity = -np.inf
-        for template_index in range(templates.shape[0]):
-            similarity = 0.0
-            for channel in range(candidates.shape[1]):
-                similarity += (
-                    candidates[candidate_index, channel]
-                    * templates[template_index, channel]
-                )
-            best_similarity = max(best_similarity, similarity)
-        if best_similarity > 1.0:
-            best_similarity = 1.0
-        elif best_similarity < -1.0:
-            best_similarity = -1.0
-        distances[candidate_index] = 1.0 - best_similarity
+    template_matrix = np.ascontiguousarray(templates.T)
+    for start in range(0, len(candidates), chunk_size):
+        end = min(start + chunk_size, len(candidates))
+        similarities = candidates[start:end] @ template_matrix
+        best = similarities.max(axis=1)
+        np.clip(best, -1.0, 1.0, out=best)
+        distances[start:end] = 1.0 - best
+    return distances
+
+
+def score_candidates(bank, starts, group, template_units, chunk_size=100_000):
+    """Score every motif candidate while bounding feature-memory use."""
+    starts = np.asarray(starts, dtype=np.int64)
+    distances = np.empty(len(starts), dtype=np.float32)
+    _, _, strand_code, position_shift = GROUP_CONFIG[group]
+    strands = np.full(min(chunk_size, len(starts)), strand_code, dtype=np.int8)
+    for offset in range(0, len(starts), chunk_size):
+        end = min(offset + chunk_size, len(starts))
+        positions = starts[offset:end] + position_shift
+        features = bank.gather(positions, strands[: end - offset])
+        distances[offset:end] = nearest_cosine(
+            normalize_features(features), template_units[group]
+        )
     return distances
 
 
@@ -304,12 +285,24 @@ def counts(predicted: set[int], truth: set[int]):
 
 
 def result_at_threshold(starts, distances, truth, threshold):
-    predicted = {
-        start
-        for start, distance in zip(starts, distances)
-        if float(distance) <= threshold
+    starts = np.asarray(starts, dtype=np.int64)
+    truth_positions = np.fromiter(truth, dtype=np.int64, count=len(truth))
+    is_truth = np.isin(starts, truth_positions, assume_unique=True)
+    predicted = distances <= threshold
+    tp = int(np.count_nonzero(predicted & is_truth))
+    fp = int(np.count_nonzero(predicted)) - tp
+    fn = len(truth) - tp
+    precision = tp / (tp + fp) if tp + fp else 0.0
+    recall = tp / (tp + fn) if tp + fn else 0.0
+    f1 = 2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else 0.0
+    return {
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
     }
-    return counts(predicted, truth)
 
 
 def aggregate(results):
@@ -338,34 +331,25 @@ def format_result(result):
 
 
 def sn_pr_curve(starts, distances, truth):
+    if not len(distances):
+        empty = np.empty(0, dtype=np.float64)
+        return empty, empty, empty
     order = np.argsort(distances, kind="stable")
     sorted_distances = distances[order]
     sorted_starts = np.asarray(starts, dtype=np.int64)[order]
-    positive_count = len(set(starts) & truth)
-    thresholds = [float("-inf")]
-    sensitivities = [0.0]
-    precisions = [1.0]
-    tp = fp = 0
-    index = 0
-
-    while index < len(sorted_distances):
-        threshold = float(sorted_distances[index])
-        next_index = index
-        while (
-            next_index < len(sorted_distances)
-            and sorted_distances[next_index] == threshold
-        ):
-            if int(sorted_starts[next_index]) in truth:
-                tp += 1
-            else:
-                fp += 1
-            next_index += 1
-        thresholds.append(threshold)
-        sensitivities.append(tp / positive_count if positive_count else 0.0)
-        precisions.append(tp / (tp + fp) if tp + fp else 1.0)
-        index = next_index
-
-    return np.asarray(thresholds), np.asarray(sensitivities), np.asarray(precisions)
+    truth_positions = np.fromiter(truth, dtype=np.int64, count=len(truth))
+    sorted_truth = np.isin(sorted_starts, truth_positions, assume_unique=True)
+    cumulative_tp = np.cumsum(sorted_truth, dtype=np.int64)
+    group_ends = np.r_[
+        np.flatnonzero(sorted_distances[1:] != sorted_distances[:-1]),
+        len(sorted_distances) - 1,
+    ]
+    tp = cumulative_tp[group_ends]
+    predicted = group_ends + 1
+    thresholds = np.r_[float("-inf"), sorted_distances[group_ends]]
+    sensitivities = np.r_[0.0, tp / len(truth) if truth else np.zeros(len(tp))]
+    precisions = np.r_[1.0, tp / predicted]
+    return thresholds, sensitivities, precisions
 
 
 def plot_sn_pr(test_results, threshold, output):
@@ -438,7 +422,6 @@ def test_templates():
     for group in GROUPS:
         print(f"  {group:7s} {len(templates[group]):,}")
 
-    rng = np.random.default_rng(0)
     test_results = {}
     for dataset in TEST_DATASETS:
         fasta, truth_path = DATASETS[dataset]
@@ -449,56 +432,41 @@ def test_templates():
             group: set(canonical_sites(sequence, sites_by_gene, group))
             for group in GROUPS
         }
-        sampled_starts = {}
-        sampled_truth = {}
-        pool_counts = {}
-        for group in GROUPS:
-            starts = scan_candidates(sequence, group)
-            positive_pool = len(truth_by_group[group])
-            selected, _, _ = sample_candidates(
-                starts, truth_by_group[group], rng, MAX_TEST_POSITIVES
-            )
-            sampled_starts[group] = selected
-            sampled_truth[group] = set(selected) & truth_by_group[group]
-            pool_counts[group] = (
-                len(starts),
-                positive_pool,
-                len(starts) - positive_pool,
-            )
-            del starts
-
         bank = CwtFeatureBank(sequence, PERIODS, W0)
-        candidate_features = collect_features(bank, sampled_starts)
         test_results[dataset] = {}
         class_results = []
         print(
-            f"\n{dataset} ({seqid}, {len(sequence):,} bp), threshold={MATCH_THRESHOLD:.3f}"
+            f"\n{dataset} ({seqid}, {len(sequence):,} bp), "
+            f"all motif candidates, threshold={MATCH_THRESHOLD:.3f}",
+            flush=True,
         )
         for group in GROUPS:
-            starts = sampled_starts[group]
-            truth = sampled_truth[group]
-            distances = nearest_cosine(
-                normalize_features(candidate_features[group]),
-                template_units[group],
-            )
+            starts = scan_candidates(sequence, group)
+            truth = truth_by_group[group]
+            distances = score_candidates(bank, starts, group, template_units)
             result = result_at_threshold(starts, distances, truth, MATCH_THRESHOLD)
-            baseline = counts(set(starts), truth)
-            full_candidates, full_positive, full_negative = pool_counts[group]
+            baseline = result_at_threshold(
+                starts, np.zeros(len(starts), dtype=np.float32), truth, 0.0
+            )
+            negative_count = max(0, len(starts) - len(truth))
+            predicted_count = result["tp"] + result["fp"]
             print(
-                f"  {group:7s} pool={full_candidates:,} "
-                f"sample={len(starts):,} ({len(truth):,}+{len(starts) - len(truth):,}) "
-                f"annotated_pool={full_positive:,} negatives_pool={full_negative:,}"
+                f"  {group:7s} candidates={len(starts):,} "
+                f"annotated={len(truth):,} negatives={negative_count:,} "
+                f"CWT-predicted={predicted_count:,}",
+                flush=True,
             )
             print(f"    motif-only: {format_result(baseline)}")
             print(f"    CWT match : {format_result(result)}")
             test_results[dataset][group] = (starts, distances, truth)
             class_results.append(result)
+            del starts, distances
 
-        print(f"  overall:    {format_result(aggregate(class_results))}")
-        del candidate_features, bank, transcripts, sites_by_gene, sequence
+        print(f"  overall:    {format_result(aggregate(class_results))}", flush=True)
+        del bank, transcripts, sites_by_gene, sequence
 
     plot_sn_pr(test_results, MATCH_THRESHOLD, PLOT_PATH)
-    print(f"Sn-Pr curve saved: {PLOT_PATH}")
+    print(f"Full-candidate Sn-Pr curve saved: {PLOT_PATH}")
 
 
 def main(argv: list[str] | None = None) -> int:
