@@ -10,6 +10,6 @@ wheels/
 .venv/
 .tools/
 
-poc.gff3
+*.npz
 
 note/
