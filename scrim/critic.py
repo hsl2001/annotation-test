@@ -498,11 +498,3 @@ def fit_reviewer(
         acceptor.full if acceptor is not None else None,
     )
     return Reviewer(Critic(models), (donor, acceptor))
-
-
-def review(
-    sequences: dict[str, tuple[np.ndarray, np.ndarray]],
-    examples: list[SiteExample],
-) -> tuple[Critic | None, np.ndarray]:
-    reviewer = fit_reviewer(sequences, examples)
-    return reviewer.critic, reviewer.evaluate(sequences, examples)

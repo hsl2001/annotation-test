@@ -57,7 +57,7 @@ class Counts:
 
 
 def read_gff3(path: str) -> tuple[list[Transcript], dict]:
-    transcripts = parse_gff3(path).transcripts
+    transcripts = parse_gff3(path)
     return transcripts, {
         "transcripts_scored": len(transcripts),
         "transcripts_with_CDS": sum(bool(t.spans["CDS"]) for t in transcripts),

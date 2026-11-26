@@ -12,7 +12,7 @@ def _same_file(a: Path, b: Path) -> bool:
         return False
 
 
-def _predict(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace) -> None:
     output = Path(args.output)
     if any(
         _same_file(output, Path(path))
@@ -35,16 +35,12 @@ def _predict(args: argparse.Namespace) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
-    commands = parser.add_subparsers(dest="command", required=True)
-
-    predict = commands.add_parser("predict", add_help=False, allow_abbrev=False)
-    predict.add_argument("--fasta", required=True)
-    predict.add_argument("--target")
-    predict.add_argument("--output", required=True)
-
+    parser.add_argument("--fasta", required=True)
+    parser.add_argument("--target")
+    parser.add_argument("--output", required=True)
     args = parser.parse_args(argv)
     try:
-        _predict(args)
+        run(args)
     except (OSError, ValueError, EOFError, zlib.error) as exc:
         parser.error(str(exc))
     return 0

@@ -231,11 +231,6 @@ def _fit_models(genome: Genome):
             yield replace(model, critic=reviewer.critic), None
 
 
-def fit_rounds(genome: Genome):
-    for model, predictions in _fit_models(genome):
-        yield model, predictions if predictions is not None else predict(genome, model)
-
-
 def fit(genome: Genome):
     rounds = _fit_models(genome)
     model, predictions = next(rounds)
