@@ -9,6 +9,7 @@ from scipy.fft import fft, ifft, next_fast_len
 PERIODS = (2, 3)
 MORLET_LIMIT = 8.0
 W0 = 6.0
+NUC_CHANNELS = 4
 
 NODES = np.array(
     [
@@ -132,6 +133,16 @@ def _motif_mask(sequence, motifs, lengths):
     return mask
 
 
+def _nucleotide_channels(codes, positions):
+    channels = np.zeros((len(positions), NUC_CHANNELS), dtype=np.float32)
+    valid = (positions >= 0) & (positions < len(codes))
+    indices = np.flatnonzero(valid)
+    bases = codes[positions[indices]]
+    in_range = bases < NUC_CHANNELS
+    channels[indices[in_range], bases[in_range]] = 1.0
+    return channels
+
+
 class CwtFeatureBank:
     def __init__(self, sequence, periods, w0, chunk=100_000):
         self.length = len(sequence)
@@ -144,7 +155,8 @@ class CwtFeatureBank:
             for kernel in [build_kernel(period, w0)]
         ]
         self.max_radius = max(radius for radius, _ in kernels)
-        self.channels = 12 * len(kernels)
+        self.cwt_channels = 12 * len(kernels)
+        self.channels = self.cwt_channels + NUC_CHANNELS
         self.n_fft = next_fast_len(chunk + 4 * self.max_radius)
         self.kernel_ffts = [
             (radius, np.asarray(fft(kernel, n=self.n_fft), dtype=np.complex128))
@@ -152,7 +164,7 @@ class CwtFeatureBank:
         ]
 
     def _gather_sequence(self, codes, positions):
-        features = np.empty((len(positions), self.channels), dtype=np.float32)
+        features = np.empty((len(positions), self.cwt_channels), dtype=np.float32)
         if not len(positions):
             return features
         order = np.argsort(positions, kind="stable")
@@ -192,14 +204,20 @@ class CwtFeatureBank:
         return features
 
     def gather(self, positions, strands):
-        features = np.empty((len(positions), self.channels), dtype=np.float32)
+        positions = np.asarray(positions, dtype=np.int64)
+        features = np.zeros((len(positions), self.channels), dtype=np.float32)
         for value, codes in ((0, self.codes), (1, self.reverse_codes)):
             mask = strands == value
             if mask.any():
                 oriented_positions = (
                     positions[mask] if value == 0 else self.length - 1 - positions[mask]
                 )
-                features[mask] = self._gather_sequence(codes, oriented_positions)
+                features[mask, : self.cwt_channels] = self._gather_sequence(
+                    codes, oriented_positions
+                )
+                features[mask, self.cwt_channels :] = _nucleotide_channels(
+                    codes, oriented_positions
+                )
         return features
 
 

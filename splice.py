@@ -15,7 +15,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from accuracy import read_gff3
-from cwt_features import LUT, PERIODS, W0, CwtFeatureBank, _motif_mask, cwt_features
+from cwt_features import (
+    LUT,
+    NUC_CHANNELS,
+    PERIODS,
+    W0,
+    CwtFeatureBank,
+    _motif_mask,
+    cwt_features,
+)
 
 GROUPS = ("DSS", "ASS", "RC_DSS", "RC_ASS")
 GROUP_CONFIG = {
@@ -24,7 +32,7 @@ GROUP_CONFIG = {
     "RC_DSS": ("-", "AC", 1, 1),
     "RC_ASS": ("-", "CT", 1, 1),
 }
-FEATURE_CHANNELS = 12 * len(PERIODS)
+FEATURE_CHANNELS = 12 * len(PERIODS) + NUC_CHANNELS
 GENES_PER_DATASET = 200
 MATCH_THRESHOLD = 0.3
 TEMPLATE_PATH = "splice_templates_train_100genes.npz"
@@ -52,28 +60,32 @@ for _group in GROUPS:
 
 MEAN_TEMPLATES = {
     "DSS": np.array([
-        -0.02364266, 0.23810327, 0.11943467, 0.04194944, 0.27795361, -0.06127755,
-        0.20238194, -0.13684922, 0.30560894, -0.29536816, 0.10945510, -0.15229083,
-        0.02586243, -0.02078278, 0.24460867, -0.32605575, 0.22393815, -0.30008106,
-        0.24218566, -0.28183355, 0.21621098, -0.26116303, -0.08906200, -0.04241679,
+        -0.02015858, 0.20301543, 0.10183430, 0.03576760, 0.23699326, -0.05224745,
+        0.17255813, -0.11668257, 0.26057319, -0.25184153, 0.09332536, -0.12984864,
+        0.02205124, -0.01772014, 0.20856216, -0.27800688, 0.19093773, -0.25585992,
+        0.20649622, -0.24030143, 0.18434927, -0.22267700, -0.07593747, -0.03616608,
+        0.00000000, 0.00000000, 0.52250534, 0.00000000,
     ], dtype=np.float32),
     "ASS": np.array([
-        0.28719362, 0.24415257, 0.26998474, 0.29338006, 0.20720171, 0.27363809,
-        -0.06750981, -0.00107344, -0.04776784, 0.06170959, 0.00145965, 0.04450070,
-        0.36296957, 0.36020169, 0.07136600, 0.36273678, -0.09944337, 0.19469529,
-        -0.22882222, 0.06531644, -0.06078073, 0.23612580, -0.05824565, -0.05547777,
+        0.25847275, 0.21973603, 0.24298485, 0.26404051, 0.18648045, 0.24627284,
+        -0.06075848, -0.00096609, -0.04299080, 0.05553830, 0.00131368, 0.04005040,
+        0.32667070, 0.32417963, 0.06422902, 0.32646119, -0.08949851, 0.17522473,
+        -0.20593880, 0.05878445, -0.05470234, 0.21251198, -0.05242078, -0.04992970,
+        0.43590076, 0.00000000, 0.00000000, 0.00000000,
     ], dtype=np.float32),
     "RC_DSS": np.array([
-        -0.01920437, 0.24046069, 0.12502608, 0.04646850, 0.28001120, -0.05821144,
-        0.19887079, -0.13935185, 0.30355073, -0.29433698, 0.10955854, -0.15010653,
-        0.01745692, -0.02710432, 0.23394252, -0.33188969, 0.22284578, -0.29842519,
-        0.23921626, -0.28205472, 0.20575176, -0.27095797, -0.09903361, -0.05447237,
+        -0.01638368, 0.20514241, 0.10666255, 0.03964332, 0.23888384, -0.04966148,
+        0.16966113, -0.11888419, 0.25896594, -0.25110548, 0.09346684, -0.12805925,
+        0.01489289, -0.02312330, 0.19958161, -0.28314254, 0.19011473, -0.25459323,
+        0.20408075, -0.24062721, 0.17553144, -0.23116033, -0.08448780, -0.04647160,
+        0.00000000, 0.00000000, 0.52171076, 0.00000000,
     ], dtype=np.float32),
     "RC_ASS": np.array([
-        0.29084663, 0.24420598, 0.26863419, 0.29198416, 0.20750628, 0.27749690,
-        -0.06550534, 0.00448528, -0.05101807, 0.06561320, -0.00323989, 0.04340076,
-        0.36309636, 0.36558041, 0.07379231, 0.36337169, -0.09192556, 0.19516978,
-        -0.21850773, 0.06858761, -0.05030582, 0.23430547, -0.05251454, -0.05499858,
+        0.26128365, 0.21938377, 0.24132898, 0.26230556, 0.18641439, 0.24929084,
+        -0.05884708, 0.00402938, -0.04583236, 0.05894397, -0.00291057, 0.03898931,
+        0.32618959, 0.32842114, 0.06629172, 0.32643693, -0.08258182, 0.17533184,
+        -0.19629761, 0.06161605, -0.04519251, 0.21048959, -0.04717672, -0.04940827,
+        0.43926931, 0.00000000, 0.00000000, 0.00000000,
     ], dtype=np.float32),
 }
 
@@ -98,23 +110,12 @@ def read_single_fasta(path: str | Path) -> tuple[str, np.ndarray]:
 
 def genomic_sites(transcripts, seqid: str):
     sites_by_gene = defaultdict(lambda: {group: set() for group in GROUPS})
-    gene_bounds: dict[str, tuple[int, int]] = {}
-
     for transcript in transcripts:
         if transcript.seqid != seqid:
             continue
         spans = transcript.spans.get("CDS")
         if not spans:
             continue
-
-        lo = min(start for start, _ in spans) - 1
-        hi = max(end for _, end in spans)
-        previous = gene_bounds.get(transcript.gid)
-        gene_bounds[transcript.gid] = (
-            min(lo, previous[0]) if previous else lo,
-            max(hi, previous[1]) if previous else hi,
-        )
-
         for (_, left_end), (right_start, _) in pairwise(spans):
             intron_start = left_end + 1
             intron_end = right_start - 1
@@ -132,7 +133,7 @@ def genomic_sites(transcripts, seqid: str):
             sites_by_gene[transcript.gid][donor_group].add(donor_start)
             sites_by_gene[transcript.gid][acceptor_group].add(acceptor_start)
 
-    return sites_by_gene, gene_bounds
+    return sites_by_gene
 
 
 def feature_coordinates(starts, group: str):
@@ -193,7 +194,7 @@ def extract_dataset_templates(name: str, genes_per_dataset: int, rng):
     fasta, truth = DATASETS[name]
     seqid, sequence = read_single_fasta(fasta)
     transcripts, _ = read_gff3(truth)
-    sites_by_gene, _ = genomic_sites(transcripts, seqid)
+    sites_by_gene = genomic_sites(transcripts, seqid)
     gene_positions = {}
     for gene, groups in sites_by_gene.items():
         positions = {
@@ -239,21 +240,10 @@ def write_template_file(path, templates):
         )
 
 
-def load_template_file(path):
-    with np.load(path, allow_pickle=False) as archive:
-        templates = {
-            group: np.asarray(archive[group], dtype=np.float32) for group in GROUPS
-        }
-    for group, matrix in templates.items():
-        if matrix.ndim != 2 or matrix.shape[1] != FEATURE_CHANNELS or not len(matrix):
-            raise ValueError(f"{path}: invalid or empty feature templates for {group}")
-    return templates
-
 
 def scan_candidates(sequence, group: str):
     motifs, lengths = MOTIF_TABLES[group]
     return np.flatnonzero(_motif_mask(sequence, motifs, lengths))
-
 
 
 def normalize_features(features):
@@ -287,10 +277,7 @@ def score_candidates(bank, starts, group, chunk_size=100_000):
     return distances
 
 
-def counts(predicted: set[int], truth: set[int]):
-    tp = len(predicted & truth)
-    fp = len(predicted - truth)
-    fn = len(truth - predicted)
+def _metrics(tp, fp, fn):
     precision = tp / (tp + fp) if tp + fp else 0.0
     recall = tp / (tp + fn) if tp + fn else 0.0
     f1 = 2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else 0.0
@@ -311,35 +298,15 @@ def result_at_threshold(starts, distances, truth, threshold):
     predicted = distances <= threshold
     tp = int(np.count_nonzero(predicted & is_truth))
     fp = int(np.count_nonzero(predicted)) - tp
-    fn = len(truth) - tp
-    precision = tp / (tp + fp) if tp + fp else 0.0
-    recall = tp / (tp + fn) if tp + fn else 0.0
-    f1 = 2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else 0.0
-    return {
-        "tp": tp,
-        "fp": fp,
-        "fn": fn,
-        "precision": precision,
-        "recall": recall,
-        "f1": f1,
-    }
+    return _metrics(tp, fp, len(truth) - tp)
 
 
 def aggregate(results):
-    tp = sum(result["tp"] for result in results)
-    fp = sum(result["fp"] for result in results)
-    fn = sum(result["fn"] for result in results)
-    precision = tp / (tp + fp) if tp + fp else 0.0
-    recall = tp / (tp + fn) if tp + fn else 0.0
-    f1 = 2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else 0.0
-    return {
-        "tp": tp,
-        "fp": fp,
-        "fn": fn,
-        "precision": precision,
-        "recall": recall,
-        "f1": f1,
-    }
+    return _metrics(
+        sum(result["tp"] for result in results),
+        sum(result["fp"] for result in results),
+        sum(result["fn"] for result in results),
+    )
 
 
 def format_result(result):
@@ -380,12 +347,7 @@ def plot_sn_pr(test_results, threshold, output):
             starts, distances, truth = test_results[dataset][group]
             _, sensitivities, precisions = sn_pr_curve(starts, distances, truth)
             axis.plot(precisions, sensitivities, linewidth=1.5)
-            predicted = {
-                start
-                for start, distance in zip(starts, distances)
-                if float(distance) <= threshold
-            }
-            result = counts(predicted, truth)
+            result = result_at_threshold(starts, distances, truth, threshold)
             axis.scatter(
                 [result["precision"]],
                 [result["recall"]],
@@ -482,7 +444,7 @@ def test_templates():
         fasta, truth_path = DATASETS[dataset]
         seqid, sequence = read_single_fasta(fasta)
         transcripts, _ = read_gff3(truth_path)
-        sites_by_gene, _ = genomic_sites(transcripts, seqid)
+        sites_by_gene = genomic_sites(transcripts, seqid)
         truth_by_group = {
             group: set(canonical_sites(sequence, sites_by_gene, group))
             for group in GROUPS
