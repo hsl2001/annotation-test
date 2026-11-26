@@ -98,21 +98,41 @@ def build_kernel(period, w0=W0):
 
 
 def open_text(path):
-    return gzip.open(path, "rt") if path.endswith(".gz") else open(path, "rt")
+    path = str(path)
+    return (gzip.open if path.endswith(".gz") else open)(path, "rt", encoding="utf-8")
 
 
-def read_fasta(path):
-    records, name, chunks = {}, None, []
+def _encode_bases(raw):
+    return LUT[raw]
+
+
+def read_fasta(path, encode=_encode_bases):
+    records, name, bases = {}, None, bytearray()
+
+    def finish():
+        nonlocal bases
+        if not bases:
+            raise ValueError(f"{path}: empty FASTA record {name!r}")
+        records[name] = encode(np.frombuffer(bases, np.uint8))
+        bases = bytearray()
+
     with open_text(path) as handle:
-        for line in handle:
+        for line_number, line in enumerate(handle, 1):
+            line = line.strip()
             if line.startswith(">"):
                 if name is not None:
-                    records[name] = LUT[np.frombuffer(b"".join(chunks), np.uint8)]
-                name, chunks = line[1:].split()[0], []
-            elif name is not None:
-                chunks.append(line.strip().encode("ascii", errors="replace"))
-    if name is not None:
-        records[name] = LUT[np.frombuffer(b"".join(chunks), np.uint8)]
+                    finish()
+                header = line[1:].split(maxsplit=1)
+                if not header or header[0] in records:
+                    raise ValueError(f"{path}:{line_number}: missing or duplicate FASTA ID")
+                name = header[0]
+            elif line:
+                if name is None:
+                    raise ValueError(f"{path}:{line_number}: expected a FASTA header")
+                bases.extend("".join(line.split()).encode("ascii", errors="replace"))
+    if name is None:
+        raise ValueError(f"{path}: no FASTA records")
+    finish()
     return records
 
 
@@ -133,6 +153,21 @@ def _motif_mask(sequence, motifs, lengths):
     return mask
 
 
+def nucleotide_codes(sequence):
+    bases = np.asarray(sequence)
+    if (bases.ndim != 1 or bases.dtype.kind not in "iu" or
+            (bases.size and (bases.max() > 4 or (bases.dtype.kind == "i" and bases.min() < 0)))):
+        raise ValueError("bases must be one-dimensional nucleotide codes in 0..4")
+    return bases.astype(np.uint8, copy=False)
+
+
+def coordinates(positions):
+    indices = np.asarray(positions)
+    if indices.ndim != 1 or (indices.size and indices.dtype.kind not in "iu"):
+        raise ValueError("positions must be a one-dimensional integer array")
+    return indices
+
+
 def _nucleotide_channels(codes, positions):
     channels = np.zeros((len(positions), NUC_CHANNELS), dtype=np.float32)
     valid = (positions >= 0) & (positions < len(codes))
@@ -145,9 +180,11 @@ def _nucleotide_channels(codes, positions):
 
 class CwtFeatureBank:
     def __init__(self, sequence, periods, w0, chunk=100_000):
-        self.length = len(sequence)
-        self.codes = sequence
-        self.reverse_codes = COMPLEMENT[sequence[::-1]]
+        if not isinstance(chunk, (int, np.integer)) or chunk <= 0:
+            raise ValueError("chunk must be a positive integer")
+        self.codes = nucleotide_codes(sequence)
+        self.length = len(self.codes)
+        self.reverse_codes = COMPLEMENT[self.codes[::-1]]
         self.chunk = chunk
         kernels = [
             (len(kernel) // 2, kernel)
@@ -204,14 +241,22 @@ class CwtFeatureBank:
         return features
 
     def gather(self, positions, strands):
-        positions = np.asarray(positions, dtype=np.int64)
+        positions = coordinates(positions)
+        strands = np.asarray(strands)
+        if positions.shape != strands.shape:
+            raise ValueError("positions and strands must be one-dimensional and have the same shape")
+        if not np.all((strands == 0) | (strands == 1)):
+            raise ValueError("strands must contain only 0 or 1")
         features = np.zeros((len(positions), self.channels), dtype=np.float32)
+        overlaps = positions < self.length + self.max_radius
+        if positions.dtype.kind != "u":
+            overlaps &= positions >= -self.max_radius
         for value, codes in ((0, self.codes), (1, self.reverse_codes)):
-            mask = strands == value
+            mask = (strands == value) & overlaps
             if mask.any():
-                oriented_positions = (
-                    positions[mask] if value == 0 else self.length - 1 - positions[mask]
-                )
+                oriented_positions = positions[mask].astype(np.int64, copy=False)
+                if value == 1:
+                    oriented_positions = self.length - 1 - oriented_positions
                 features[mask, : self.cwt_channels] = self._gather_sequence(
                     codes, oriented_positions
                 )

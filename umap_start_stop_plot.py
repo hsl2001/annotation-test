@@ -15,7 +15,7 @@ import umap
 from matplotlib.lines import Line2D
 from sklearn.metrics import silhouette_score
 
-from cwt_features import (
+from scrim.cwt_features import (
     COMPLEMENT as COMPLEMENT,
     LUT,
     MAPPINGS as MAPPINGS,

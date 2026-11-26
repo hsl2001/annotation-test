@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from accuracy import read_gff3
-from cwt_features import (
+from scrim.cwt_features import (
     LUT,
     NUC_CHANNELS,
     PERIODS,

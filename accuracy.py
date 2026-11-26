@@ -2,36 +2,22 @@
 from __future__ import annotations
 
 import argparse
-import gzip
 import json
 from bisect import bisect_left
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from itertools import pairwise
-from urllib.parse import unquote
 
-Span = tuple[int, int]
+from scrim.gff3 import TRANSCRIPT_TYPES as TRANSCRIPT_TYPES, Span, Transcript, merge, parse_gff3
+
 Loc = tuple[str, str]
 IntervalKey = tuple[str, str, int, int]
 Chain = tuple[str, str, tuple[Span, ...]]
-TRANSCRIPT_TYPES = {
-    "mrna", "transcript", "primary_transcript", "ncrna", "lnc_rna",
-    "trna", "rrna", "mirna", "snrna", "snorna", "pseudogenic_transcript",
-}
 ORDER = (
     "nt", "exon-segment", "intron-segment",
     "donor-site", "acceptor-site", "start-site", "stop-site",
     "transcript-CDS-chain", "alternative-isoform",
 )
-
-
-@dataclass(slots=True)
-class Transcript:
-    tid: str
-    gid: str
-    seqid: str
-    strand: str
-    spans: dict[str, list[Span]] = field(default_factory=dict)
 
 
 @dataclass(frozen=True, slots=True)
@@ -59,69 +45,8 @@ class Counts:
         }
 
 
-def merge(spans: list[Span]) -> list[Span]:
-    result: list[Span] = []
-    for a, b in sorted(spans):
-        if result and a <= result[-1][1] + 1:
-            result[-1] = (result[-1][0], max(b, result[-1][1]))
-        else:
-            result.append((a, b))
-    return result
-
-
 def read_gff3(path: str) -> tuple[list[Transcript], dict]:
-    path = str(path)
-    definitions: dict[str, tuple[str, Loc]] = {}
-    models: dict[str, Transcript] = {}
-    with (gzip.open if path.endswith(".gz") else open)(path, "rt", encoding="utf-8") as handle:
-        for line_no, line in enumerate(handle, 1):
-            if line.startswith("##FASTA"):
-                break
-            if not line.strip() or line.startswith("#"):
-                continue
-            fields = line.rstrip("\r\n").split("\t")
-            if len(fields) != 9:
-                raise ValueError(f"{path}:{line_no}: expected 9 tab-separated fields")
-            seqid, _, kind, a, b, _, strand, _, attributes = fields
-            kind = kind.lower()
-            if kind not in TRANSCRIPT_TYPES and kind not in ("cds", "exon"):
-                continue
-            try:
-                start, end = int(a), int(b)
-            except ValueError as exc:
-                raise ValueError(f"{path}:{line_no}: invalid feature coordinates") from exc
-            if start < 1 or end < start or strand not in ("+", "-"):
-                raise ValueError(f"{path}:{line_no}: invalid interval or strand")
-            attrs = dict(piece.strip().split("=", 1) for piece in attributes.split(";") if "=" in piece)
-            parents = [unquote(p) for p in attrs.get("Parent", "").split(",") if p]
-            if kind in TRANSCRIPT_TYPES:
-                tid = unquote(attrs.get("ID", ""))
-                if tid:
-                    definition = (parents[0] if parents else tid, (seqid, strand))
-                    if tid in definitions and definitions[tid] != definition:
-                        raise ValueError(f"{path}:{line_no}: conflicting transcript ID {tid!r}")
-                    definitions[tid] = definition
-                continue
-            if not parents:
-                raise ValueError(f"{path}:{line_no}: {kind} lacks Parent=")
-            for tid in parents:
-                if tid not in models:
-                    models[tid] = Transcript(tid, tid, seqid, strand)
-                t = models[tid]
-                if (t.seqid, t.strand) != (seqid, strand):
-                    raise ValueError(f"{path}:{line_no}: transcript {tid!r} spans different contigs or strands")
-                if kind == "cds":
-                    t.spans.pop("exon", None)
-                    t.spans.setdefault("CDS", []).append((start, end))
-                elif not t.spans.get("CDS"):
-                    t.spans.setdefault("exon", []).append((start, end))
-    for tid, t in models.items():
-        t.gid, loc = definitions.get(tid, (tid, (t.seqid, t.strand)))
-        if loc != (t.seqid, t.strand):
-            raise ValueError(f"{path}: {tid!r} location/strand conflicts with parent transcript")
-        cds = merge(t.spans.get("CDS", []))
-        t.spans = {"exon": cds or merge(t.spans.get("exon", [])), "CDS": cds}
-    transcripts = list(models.values())
+    transcripts = parse_gff3(path).transcripts
     return transcripts, {
         "transcripts_scored": len(transcripts),
         "transcripts_with_CDS": sum(bool(t.spans["CDS"]) for t in transcripts),
