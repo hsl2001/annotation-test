@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from bisect import bisect_right
 from dataclasses import dataclass, field
+from functools import partial
 from itertools import pairwise
 from pathlib import Path
 from urllib.parse import quote
@@ -10,16 +11,17 @@ import numpy as np
 from numba import njit
 
 from .critic import ACCEPTOR, DONOR, Critic, motif_sites, signal_prior
-from .cwt_features import COMPLEMENT, LUT, nucleotide_codes, read_fasta as read_records
+from .cwt_features import COMPLEMENT, LUT, nucleotide_codes
+from .cwt_features import read_fasta as read_records
 
 ORDER = 5
 N_CONTEXTS = 4**ORDER
 CONTEXT_SIZES = 4 ** np.arange(ORDER + 1)
 CONTEXT_OFFSETS = (CONTEXT_SIZES - 1) // 3
 MIN_INTRON = 32
-INTRON_DELAY = MIN_INTRON * np.array([1, 2, 4])
-INTRON_MEAN = np.array([55.0, 140.0, 1100.0])
-INTRON_MIX = np.array([0.10, 0.75, 0.15])
+INTRON_DELAY = MIN_INTRON * np.array([1])
+INTRON_MEAN = np.array([270.0])
+INTRON_MIX = np.array([1.0])
 SPLICE_PHASES = np.array([0.5, 0.25, 0.25])
 EXON_EXIT = 1 / 160
 SPLICE_FRACTION = 0.8
@@ -31,8 +33,17 @@ MASK_COST = np.log(2) / (ORDER + 1)
 GC_DONOR = 0.02
 EMPTY_MASK = np.empty(0, dtype=bool)
 PHASE = np.array([0, 1, 1, 2, 2, 2], dtype=np.int8)
-NEXT_STATE = np.array([[1, 1, 1, 2], [3, 3, 3, 3], [4, 3, 5, 3],
-                       [0, 0, 0, 0], [-1, 0, -1, 0], [-1, 0, 0, 0]], dtype=np.int8)
+NEXT_STATE = np.array(
+    [
+        [1, 1, 1, 2],
+        [3, 3, 3, 3],
+        [4, 3, 5, 3],
+        [0, 0, 0, 0],
+        [-1, 0, -1, 0],
+        [-1, 0, 0, 0],
+    ],
+    dtype=np.int8,
+)
 N_STATES = len(PHASE)
 Span = tuple[int, int]
 
@@ -63,9 +74,13 @@ class Model:
     critic: Critic | None = None
 
     def __post_init__(self):
-        shapes = {"background": (N_CONTEXTS, 4), "coding": (3, N_CONTEXTS, 4),
-                  "intron_mix": INTRON_DELAY.shape,
-                  "phases": (3,), "intron_mean": INTRON_DELAY.shape}
+        shapes = {
+            "background": (N_CONTEXTS, 4),
+            "coding": (3, N_CONTEXTS, 4),
+            "intron_mix": INTRON_DELAY.shape,
+            "phases": (3,),
+            "intron_mean": INTRON_DELAY.shape,
+        }
         for name, shape in shapes.items():
             value = getattr(self, name)
             array = np.asarray(value)
@@ -101,7 +116,10 @@ def read_fasta(path: str | Path) -> dict[str, Strand]:
 
 
 def orient(records: dict[str, Strand]) -> Genome:
-    return {name: (s, Strand(COMPLEMENT[s.bases[::-1]], s.mask[::-1])) for name, s in records.items()}
+    return {
+        name: (s, Strand(COMPLEMENT[s.bases[::-1]], s.mask[::-1]))
+        for name, s in records.items()
+    }
 
 
 def reverse_spans(spans, length):
@@ -165,7 +183,9 @@ def _motif_odds(sequence, positions, length, background, mask):
         score = 0.0
         for j in range(p, p + length):
             base = sequence[j]
-            score -= background[CONTEXT_OFFSETS[depth] + context, base] + _mask_cost(mask, j)
+            score -= background[CONTEXT_OFFSETS[depth] + context, base] + _mask_cost(
+                mask, j
+            )
             context, depth = advance_context(context, depth, base)
         scores[i] = score
     return scores
@@ -174,9 +194,13 @@ def _motif_odds(sequence, positions, length, background, mask):
 def _splice_signal(sequence, kind, critic, background):
     sites = motif_sites(sequence, kind)
     score = signal_prior if critic is None else critic.score
-    scores = score(sequence, sites, kind) + _motif_odds(sequence, sites, 2, background, EMPTY_MASK)
+    scores = score(sequence, sites, kind) + _motif_odds(
+        sequence, sites, 2, background, EMPTY_MASK
+    )
     if kind == DONOR:
-        scores += np.where(sequence[sites + 1] == 1, np.log(GC_DONOR), np.log1p(-GC_DONOR))
+        scores += np.where(
+            sequence[sites + 1] == 1, np.log(GC_DONOR), np.log1p(-GC_DONOR)
+        )
     else:
         sites += 2
     return sites.astype(np.int32), scores.astype(np.float32)
@@ -191,8 +215,23 @@ def _context_logits(probabilities):
 
 
 @njit(cache=True)
-def _decode(sequence, masked, coding, background, starts, start_scores, stops, stop_scores,
-            donors, donor_scores, acceptors, acceptor_scores, intron_open, intron_extend, phase_scores):
+def _decode(
+    sequence,
+    masked,
+    coding,
+    background,
+    starts,
+    start_scores,
+    stops,
+    stop_scores,
+    donors,
+    donor_scores,
+    acceptors,
+    acceptor_scores,
+    intron_open,
+    intron_extend,
+    phase_scores,
+):
     n = len(sequence)
     start_prev = np.empty(len(starts), dtype=np.int32)
     end_key = np.empty(len(stops), dtype=np.int32)
@@ -228,7 +267,10 @@ def _decode(sequence, masked, coding, background, starts, start_scores, stops, s
             intergenic, last_gene = stop_ring[slot], stop_ids[slot]
         stop_ring[slot] = -np.inf
         if start_ring[slot] > exon[start_age, 0]:
-            exon[start_age, 0], keys[start_age, 0] = start_ring[slot], -(start_ids[slot] + 1)
+            exon[start_age, 0], keys[start_age, 0] = (
+                start_ring[slot],
+                -(start_ids[slot] + 1),
+            )
             active[start_age] = True
         start_ring[slot] = -np.inf
 
@@ -252,9 +294,14 @@ def _decode(sequence, masked, coding, background, starts, start_scores, stops, s
             for age in range(1, ORDER + 1):
                 if active[age]:
                     for state in range(N_STATES):
-                        candidate = exon[age, state] + splice + phase_scores[PHASE[state]]
+                        candidate = (
+                            exon[age, state] + splice + phase_scores[PHASE[state]]
+                        )
                         if candidate > donor_ring[ring, state]:
-                            donor_ring[ring, state], key_ring[ring, state] = candidate, keys[age, state]
+                            donor_ring[ring, state], key_ring[ring, state] = (
+                                candidate,
+                                keys[age, state],
+                            )
             pos_ring[ring] = p
             di += 1
 
@@ -298,7 +345,9 @@ def _decode(sequence, masked, coding, background, starts, start_scores, stops, s
             block_start, context, depth = p + 1, 0, 0
             continue
         position_context = CONTEXT_OFFSETS[depth] + context
-        penalty = background[position_context, base] - EXON_CONTINUE + _mask_cost(masked, p)
+        penalty = (
+            background[position_context, base] - EXON_CONTINUE + _mask_cost(masked, p)
+        )
         next_exon[:] = -np.inf
         next_active[:] = False
         for age in range(ORDER + 1):
@@ -309,9 +358,14 @@ def _decode(sequence, masked, coding, background, starts, start_scores, stops, s
             for state in range(N_STATES):
                 target = NEXT_STATE[state, base]
                 if target >= 0:
-                    candidate = exon[age, state] + coding[PHASE[state], k, base] - penalty
+                    candidate = (
+                        exon[age, state] + coding[PHASE[state], k, base] - penalty
+                    )
                     if candidate > next_exon[next_age, target]:
-                        next_exon[next_age, target], next_keys[next_age, target] = candidate, keys[age, state]
+                        next_exon[next_age, target], next_keys[next_age, target] = (
+                            candidate,
+                            keys[age, state],
+                        )
                         next_active[next_age] = True
         exon, next_exon = next_exon, exon
         keys, next_keys = next_keys, keys
@@ -337,10 +391,21 @@ def _predict_strand(strand: Strand, model: Model, direction: str) -> list[Gene]:
         raise ValueError("too many acceptor candidates for 32-bit traceback")
     opening, extension = intron_parameters(model)
     index, start_prev, end_key, end_total, trace_prev, trace_donor = _decode(
-        sequence, strand.mask, _context_logits(model.coding), background,
-        starts, _motif_odds(sequence, starts, 3, background, strand.mask),
-        stops, _motif_odds(sequence, stops, 3, background, strand.mask),
-        donors, ds, acceptors, ac, opening - DONOR_COST, extension, np.log(3 * model.phases),
+        sequence,
+        strand.mask,
+        _context_logits(model.coding),
+        background,
+        starts,
+        _motif_odds(sequence, starts, 3, background, strand.mask),
+        stops,
+        _motif_odds(sequence, stops, 3, background, strand.mask),
+        donors,
+        ds,
+        acceptors,
+        ac,
+        opening - DONOR_COST,
+        extension,
+        np.log(3 * model.phases),
     )
     genes = []
     while index >= 0:
@@ -385,11 +450,23 @@ def _resolve(genes):
 
 
 def predict(genome: Genome, model: Model) -> dict[str, list[Gene]]:
-    return {name: _resolve(_predict_strand(forward, model, "+") + _predict_strand(reverse, model, "-"))
-            for name, (forward, reverse) in genome.items()}
+    return {
+        name: _resolve(
+            _predict_strand(forward, model, "+") + _predict_strand(reverse, model, "-")
+        )
+        for name, (forward, reverse) in genome.items()
+    }
 
 
-def write_gff3(path: str | Path, genome: Genome, predictions: dict[str, list[Gene]]) -> None:
+def _emit(handle, escaped, strand, kind, a, b, phase, attributes):
+    handle.write(
+        f"{escaped}\tGHMM\t{kind}\t{a}\t{b}\t.\t{strand}\t{phase}\t{attributes}\n"
+    )
+
+
+def write_gff3(
+    path: str | Path, genome: Genome, predictions: dict[str, list[Gene]]
+) -> None:
     with open(path, "w", encoding="utf-8") as handle:
         handle.write("##gff-version 3\n")
         index = 0
@@ -401,8 +478,7 @@ def write_gff3(path: str | Path, genome: Genome, predictions: dict[str, list[Gen
                 gid, tid = f"ghmm{index}", f"ghmm{index}.t1"
                 start, end = gene.cds[0][0] + 1, gene.cds[-1][1]
 
-                def emit(kind, a, b, phase, attributes):
-                    handle.write(f"{escaped}\tGHMM\t{kind}\t{a}\t{b}\t.\t{gene.strand}\t{phase}\t{attributes}\n")
+                emit = partial(_emit, handle, escaped, gene.strand)
 
                 emit("gene", start, end, ".", f"ID={gid}")
                 emit("mRNA", start, end, ".", f"ID={tid};Parent={gid}")

@@ -49,7 +49,9 @@ def _count(sequence, ignored, runs, phases):
 
 def counts(strand, runs, phases=1, ignore_mask=False):
     ignored = strand.mask if ignore_mask else EMPTY_MASK
-    result = _count(strand.bases, ignored, np.asarray(runs, dtype=np.float64).reshape(-1, 4), phases)
+    result = _count(
+        strand.bases, ignored, np.asarray(runs, dtype=np.float64).reshape(-1, 4), phases
+    )
     return result if phases > 1 else result[0]
 
 
@@ -96,7 +98,11 @@ def bootstrap(genome: Genome) -> Model:
             for start, end in _seeds(record.bases):
                 if len(record.mask) and record.mask[start:end].mean() > 0.5:
                     continue
-                lo, hi = (start, end + 3) if strand == 0 else (length - end - 3, length - start)
+                lo, hi = (
+                    (start, end + 3)
+                    if strand == 0
+                    else (length - end - 3, length - start)
+                )
                 candidates.append((end - start, lo, hi, strand, start, end))
         for _, lo, hi, strand, start, end in sorted(candidates, reverse=True):
             if not occupied[lo:hi].any():
@@ -133,14 +139,21 @@ def _duration(lengths, phases, confidence, anchor):
     strength = sqrt(len(lengths))
     pseudo = anchor.intron_mix * strength
     mass = responsibility.sum(axis=0) + pseudo
-    means = ((responsibility * lengths).sum(axis=0) + pseudo * anchor.intron_mean) / mass
+    means = (
+        (responsibility * lengths).sum(axis=0) + pseudo * anchor.intron_mean
+    ) / mass
     mixture = mass / mass.sum()
-    phase_prob = np.bincount(phases, weights=confidence, minlength=3) + anchor.phases * strength
+    phase_prob = (
+        np.bincount(phases, weights=confidence, minlength=3) + anchor.phases * strength
+    )
     return means, mixture, phase_prob / phase_prob.sum()
 
 
 def _training_batch(genome, predictions):
-    sequences = {name: (forward.bases, reverse.bases) for name, (forward, reverse) in genome.items()}
+    sequences = {
+        name: (forward.bases, reverse.bases)
+        for name, (forward, reverse) in genome.items()
+    }
     sites, genes = [], []
     for name, predictions_on_contig in predictions.items():
         length = len(sequences[name][0])
@@ -149,8 +162,12 @@ def _training_batch(genome, predictions):
             cds = oriented_cds(gene, length)
             first = len(sites)
             for donor, acceptor in junctions(cds):
-                sites.extend((SiteExample(name, strand, DONOR, donor),
-                              SiteExample(name, strand, ACCEPTOR, acceptor - 2)))
+                sites.extend(
+                    (
+                        SiteExample(name, strand, DONOR, donor),
+                        SiteExample(name, strand, ACCEPTOR, acceptor - 2),
+                    )
+                )
             genes.append((name, strand, cds, gene.score, slice(first, len(sites))))
     return sequences, sites, genes
 
@@ -181,8 +198,12 @@ def refit(genome, predictions, anchor, reviewer):
     for name, (forward, reverse) in genome.items():
         length = len(forward.bases)
         gaps = list(_gaps(predictions[name], length))
-        reverse_gaps = [(a, b, phase, weight) for (a, b), (_, _, phase, weight) in
-                        zip(reverse_spans([(a, b) for a, b, _, _ in gaps], length), reversed(gaps))]
+        reverse_gaps = [
+            (a, b, phase, weight)
+            for (a, b), (_, _, phase, weight) in zip(
+                reverse_spans([(a, b) for a, b, _, _ in gaps], length), reversed(gaps)
+            )
+        ]
         for strand, record in enumerate((forward, reverse)):
             background += counts(record, gaps if strand == 0 else reverse_gaps)
             coding += counts(record, exon_runs[name, strand], 3, ignore_mask=True)
@@ -216,6 +237,8 @@ def fit_rounds(genome: Genome):
 
 
 def fit(genome: Genome):
-    for model, predictions in _fit_models(genome):
+    rounds = _fit_models(genome)
+    model, predictions = next(rounds)
+    for model, predictions in rounds:
         pass
     return model, predictions if predictions is not None else predict(genome, model)

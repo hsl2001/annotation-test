@@ -62,9 +62,9 @@ def morlet_integral(lower, upper, w0=W0):
     if lower >= upper:
         return 0.0
     squared = w0 * w0
-    norm_squared = -math.expm1(-squared) + 2.0 * math.exp(
-        -0.75 * squared
-    ) * math.expm1(-0.25 * squared)
+    norm_squared = -math.expm1(-squared) + 2.0 * math.exp(-0.75 * squared) * math.expm1(
+        -0.25 * squared
+    )
     norm = 1.0 / math.sqrt(math.sqrt(math.pi) * norm_squared)
     correction = math.exp(-0.5 * squared)
     segments = math.ceil((upper - lower) * 2.0)
@@ -124,7 +124,9 @@ def read_fasta(path, encode=_encode_bases):
                     finish()
                 header = line[1:].split(maxsplit=1)
                 if not header or header[0] in records:
-                    raise ValueError(f"{path}:{line_number}: missing or duplicate FASTA ID")
+                    raise ValueError(
+                        f"{path}:{line_number}: missing or duplicate FASTA ID"
+                    )
                 name = header[0]
             elif line:
                 if name is None:
@@ -155,8 +157,14 @@ def _motif_mask(sequence, motifs, lengths):
 
 def nucleotide_codes(sequence):
     bases = np.asarray(sequence)
-    if (bases.ndim != 1 or bases.dtype.kind not in "iu" or
-            (bases.size and (bases.max() > 4 or (bases.dtype.kind == "i" and bases.min() < 0)))):
+    if (
+        bases.ndim != 1
+        or bases.dtype.kind not in "iu"
+        or (
+            bases.size
+            and (bases.max() > 4 or (bases.dtype.kind == "i" and bases.min() < 0))
+        )
+    ):
         raise ValueError("bases must be one-dimensional nucleotide codes in 0..4")
     return bases.astype(np.uint8, copy=False)
 
@@ -212,7 +220,9 @@ class CwtFeatureBank:
             self.max_radius,
             self.n_fft,
         )
-        for start in range(int(sorted_positions[0]), int(sorted_positions[-1]) + 1, chunk):
+        for start in range(
+            int(sorted_positions[0]), int(sorted_positions[-1]) + 1, chunk
+        ):
             end = start + chunk
             lo = np.searchsorted(sorted_positions, start, side="left")
             hi = np.searchsorted(sorted_positions, end, side="left")
@@ -244,7 +254,9 @@ class CwtFeatureBank:
         positions = coordinates(positions)
         strands = np.asarray(strands)
         if positions.shape != strands.shape:
-            raise ValueError("positions and strands must be one-dimensional and have the same shape")
+            raise ValueError(
+                "positions and strands must be one-dimensional and have the same shape"
+            )
         if not np.all((strands == 0) | (strands == 1)):
             raise ValueError("strands must contain only 0 or 1")
         features = np.zeros((len(positions), self.channels), dtype=np.float32)

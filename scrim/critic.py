@@ -29,7 +29,9 @@ _PSEUDO_NOISE = 0.01
 
 def _ratios(probabilities):
     probabilities = np.asarray(probabilities, dtype=np.float64)
-    return np.concatenate((4 * probabilities, np.ones((*probabilities.shape[:-1], 1))), axis=-1)
+    return np.concatenate(
+        (4 * probabilities, np.ones((*probabilities.shape[:-1], 1))), axis=-1
+    )
 
 
 _DONOR_OFFSETS = np.array([-2, -1, 2, 3, 4, 5])
@@ -39,22 +41,30 @@ _DONOR_INTRON = (
     (0.13, 0.10, 0.65, 0.12),
     (0.18, 0.16, 0.20, 0.46),
 )
-_DONOR_LOG_RATIOS = np.log(_ratios((
-    ((0.55, 0.15, 0.18, 0.12), (0.10, 0.08, 0.75, 0.07), *_DONOR_INTRON),
-    ((0.65, 0.12, 0.14, 0.09), (0.08, 0.06, 0.81, 0.05), *_DONOR_INTRON),
-)))
+_DONOR_LOG_RATIOS = np.log(
+    _ratios(
+        (
+            ((0.55, 0.15, 0.18, 0.12), (0.10, 0.08, 0.75, 0.07), *_DONOR_INTRON),
+            ((0.65, 0.12, 0.14, 0.09), (0.08, 0.06, 0.81, 0.05), *_DONOR_INTRON),
+        )
+    )
+)
 _ACCEPTOR_OFFSETS = np.array([-1, 2])
-_ACCEPTOR_LOG_RATIOS = np.log(_ratios(((0.10, 0.40, 0.10, 0.40), (0.31, 0.19, 0.31, 0.19))))
+_ACCEPTOR_LOG_RATIOS = np.log(
+    _ratios(((0.10, 0.40, 0.10, 0.40), (0.31, 0.19, 0.31, 0.19)))
+)
 _TRACT_OFFSETS = np.arange(-18, -3)
 _TRACT_LOG_RATIOS = np.log(_ratios((0.20, 0.29, 0.20, 0.31)))
 _BRANCH_CENTERS = np.arange(-37, -19)
 _BRANCH_OFFSETS = np.array([-3, -2, 0, 1])
-_BRANCH_RATIOS = _ratios((
-    (0.19, 0.31, 0.19, 0.31),
-    (0.15, 0.15, 0.15, 0.55),
-    (0.65, 0.12, 0.11, 0.12),
-    (0.19, 0.31, 0.19, 0.31),
-))
+_BRANCH_RATIOS = _ratios(
+    (
+        (0.19, 0.31, 0.19, 0.31),
+        (0.15, 0.15, 0.15, 0.55),
+        (0.65, 0.12, 0.11, 0.12),
+        (0.19, 0.31, 0.19, 0.31),
+    )
+)
 
 _BASE_OFFSETS = np.r_[-6:0, 2:6]
 _ANCHORS = (-14, 15)
@@ -124,7 +134,9 @@ def _prior_batch(sequence, positions, kind):
             context = _DONOR_LOG_RATIOS[int(sequence[p + 1] == 1)]
             scores[i] = _positional_evidence(sequence, p, _DONOR_OFFSETS, context)
         else:
-            evidence = _positional_evidence(sequence, p, _ACCEPTOR_OFFSETS, _ACCEPTOR_LOG_RATIOS)
+            evidence = _positional_evidence(
+                sequence, p, _ACCEPTOR_OFFSETS, _ACCEPTOR_LOG_RATIOS
+            )
             for offset in _TRACT_OFFSETS:
                 evidence += _TRACT_LOG_RATIOS[_base_at(sequence, p + offset)]
             branch = 0.0
@@ -139,8 +151,11 @@ def _prior_batch(sequence, positions, kind):
 
 @cache
 def _wavelets():
-    waves = [(anchor - len(kernel) // 2, kernel)
-             for kernel in map(build_kernel, PERIODS) for anchor in _ANCHORS]
+    waves = [
+        (anchor - len(kernel) // 2, kernel)
+        for kernel in map(build_kernel, PERIODS)
+        for anchor in _ANCHORS
+    ]
     starts = np.array([start for start, _ in waves])
     sizes = np.array([len(kernel) for _, kernel in waves])
     taps = np.zeros((len(waves), sizes.max(), *_CONTRASTS.shape), dtype=np.complex64)
@@ -149,16 +164,21 @@ def _wavelets():
         weights = kernel[::-1].copy()
         weights[(offsets == 0) | (offsets == 1)] = 0
         weights /= np.linalg.norm(weights)
-        taps[i, :len(kernel)] = weights[:, None, None] * _CONTRASTS
-    flank = max(-int(_BRANCH_CENTERS[0] + _BRANCH_OFFSETS[0]),
-                -int(starts.min()), int((starts + sizes).max()) - 2)
+        taps[i, : len(kernel)] = weights[:, None, None] * _CONTRASTS
+    flank = max(
+        -int(_BRANCH_CENTERS[0] + _BRANCH_OFFSETS[0]),
+        -int(starts.min()),
+        int((starts + sizes).max()) - 2,
+    )
     return (taps, starts, sizes), flank
 
 
 @njit
 def _context_batch(sequence, positions, taps, starts, sizes):
     nuc_width = 4 * len(_BASE_OFFSETS)
-    features = np.zeros((len(positions), nuc_width + len(starts) * taps.shape[-1]), dtype=np.float32)
+    features = np.zeros(
+        (len(positions), nuc_width + len(starts) * taps.shape[-1]), dtype=np.float32
+    )
     for i, p in enumerate(positions):
         for j, offset in enumerate(_BASE_OFFSETS):
             base = _base_at(sequence, p + offset)
@@ -206,12 +226,14 @@ def _score(sequence, sites, kind, model):
     sequence = nucleotide_codes(sequence)
     scores = np.zeros(len(positions), dtype=np.float64)
     for start in range(0, len(positions), _BATCH):
-        chunk = positions[start:start + _BATCH]
+        chunk = positions[start : start + _BATCH]
         valid = np.flatnonzero((chunk >= 0) & (chunk < len(sequence) - 1))
         p = chunk[valid].astype(np.intp, copy=False)
         matches = _is_core(sequence[p], sequence[p + 1], kind)
         if matches.any():
-            scores[start + valid[matches]] = _score_valid(sequence, p[matches], kind, model)
+            scores[start + valid[matches]] = _score_valid(
+                sequence, p[matches], kind, model
+            )
     return scores
 
 
@@ -241,9 +263,12 @@ def _block_bounds(length, block):
 def _match_block(sequences, sites, kind, block, flank, occupied, rng):
     length = len(sequences[0])
     lo, hi = _block_bounds(length, block)
-    genomic = rng.permutation(np.fromiter(
-        (p for p in range(lo + flank, hi - flank - 1) if p not in occupied), dtype=np.intp,
-    ))
+    genomic = rng.permutation(
+        np.fromiter(
+            (p for p in range(lo + flank, hi - flank - 1) if p not in occupied),
+            dtype=np.intp,
+        )
+    )
     if not len(genomic):
         return {}
     strands, positions = np.asarray(sites, dtype=np.intp).T
@@ -257,9 +282,8 @@ def _match_block(sequences, sites, kind, block, flank, occupied, rng):
         columns = np.flatnonzero(_is_core(sequence[decoys], second, kind))
         positives = positions[rows, None]
         eligible[np.ix_(rows, columns)] = (
-            (sequence[positives + 1] == second[columns])
-            & (np.abs(positives - decoys[columns]) >= 2 * flank + 2)
-        )
+            sequence[positives + 1] == second[columns]
+        ) & (np.abs(positives - decoys[columns]) >= 2 * flank + 2)
 
     assigned = maximum_bipartite_matching(csr_matrix(eligible), perm_type="column")
     matched = {}
@@ -272,17 +296,23 @@ def _match_block(sequences, sites, kind, block, flank, occupied, rng):
 
 
 def _matched_groups(sequences, groups, occupied, kind, flank, rng):
-    candidates = [(block, strand, p) for block, entries in groups.items() for strand, p in entries]
+    candidates = [
+        (block, strand, p) for block, entries in groups.items() for strand, p in entries
+    ]
     if len(candidates) < _MIN_PAIRS:
         return {}
     sampled = defaultdict(list)
-    for i in rng.choice(len(candidates), min(len(candidates), _MAX_PAIRS), replace=False):
+    for i in rng.choice(
+        len(candidates), min(len(candidates), _MAX_PAIRS), replace=False
+    ):
         block, strand, position = candidates[i]
         sampled[block].append((strand, position))
     matched = {}
     for key, sites in sampled.items():
         seqid, block = key
-        strands = _match_block(sequences[seqid], sites, kind, block, flank, occupied[seqid], rng)
+        strands = _match_block(
+            sequences[seqid], sites, kind, block, flank, occupied[seqid], rng
+        )
         if strands:
             matched[key] = strands
     return matched
@@ -362,11 +392,16 @@ def _fit_kind(sequences, groups, occupied, kind, flank, rng):
             return None
         fits.append(model)
         oof[test] = _learned_evidence(
-            prior[test].ravel(), features[test].reshape(-1, features.shape[-1]), model,
+            prior[test].ravel(),
+            features[test].reshape(-1, features.shape[-1]),
+            model,
         ).reshape(-1, 2)
 
     loss = _pair_loss(oof)
-    if not all(_improves(loss, baseline, blocks, counts) for baseline in (_pair_loss(prior), np.log(2))):
+    if not all(
+        _improves(loss, baseline, blocks, counts)
+        for baseline in (_pair_loss(prior), np.log(2))
+    ):
         return None
     fitted = _fit(features, prior, pair_weight)
     if fitted is None:
@@ -382,7 +417,11 @@ def _example_groups(sequences, examples, flank, occupied=None):
         if seqid not in sequences:
             continue
         try:
-            strand, kind, p = index(example.strand), index(example.kind), index(example.position)
+            strand, kind, p = (
+                index(example.strand),
+                index(example.kind),
+                index(example.position),
+            )
         except TypeError:
             continue
         if strand not in (0, 1) or kind not in (DONOR, ACCEPTOR):
@@ -425,9 +464,13 @@ class Reviewer:
                 fold = fit.fold_by_block.get(block)
                 model = fit.full if fold is None else fit.folds[fold]
                 for strand in (0, 1):
-                    positions = np.array([p for s, p in entries if s == strand], dtype=np.intp)
+                    positions = np.array(
+                        [p for s, p in entries if s == strand], dtype=np.intp
+                    )
                     if len(positions):
-                        evidence = _score_valid(sequences[block[0]][strand], positions, kind, model)
+                        evidence = _score_valid(
+                            sequences[block[0]][strand], positions, kind, model
+                        )
                         for p, probability in zip(positions, expit(evidence)):
                             weights[entries[strand, p]] = probability
         return weights
@@ -443,12 +486,17 @@ def fit_reviewer(
     occupied = defaultdict(set)
     groups = _example_groups(sequences, examples, flank, occupied)
     donor, acceptor = (
-        _fit_kind(sequences, groups[kind], occupied, kind, flank, np.random.default_rng(kind))
+        _fit_kind(
+            sequences, groups[kind], occupied, kind, flank, np.random.default_rng(kind)
+        )
         for kind in (DONOR, ACCEPTOR)
     )
     if donor is None and acceptor is None:
         return Reviewer(None, (None, None))
-    models = (donor.full if donor is not None else None, acceptor.full if acceptor is not None else None)
+    models = (
+        donor.full if donor is not None else None,
+        acceptor.full if acceptor is not None else None,
+    )
     return Reviewer(Critic(models), (donor, acceptor))
 
 
