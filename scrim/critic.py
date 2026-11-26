@@ -242,7 +242,7 @@ def signal_prior(sequence: np.ndarray, sites: np.ndarray, kind: int) -> np.ndarr
     return _score(sequence, sites, kind, None)
 
 
-@dataclass(frozen=True, slots=True, eq=False)
+@dataclass(frozen=True, slots=True)
 class Critic:
     _models: tuple[np.ndarray | None, np.ndarray | None]
 
@@ -348,7 +348,7 @@ def _improves(loss, baseline, blocks, counts):
     return gain.mean() > max(np.finfo(float).eps, gain.std(ddof=1) / np.sqrt(len(gain)))
 
 
-@dataclass(frozen=True, slots=True, eq=False)
+@dataclass(frozen=True, slots=True)
 class _KindFit:
     full: np.ndarray
     folds: tuple[np.ndarray, ...]
@@ -443,7 +443,7 @@ def _example_groups(sequences, examples, flank, occupied=None):
     return groups
 
 
-@dataclass(frozen=True, slots=True, eq=False)
+@dataclass(frozen=True, slots=True)
 class Reviewer:
     critic: Critic | None
     _fits: tuple[_KindFit | None, _KindFit | None]

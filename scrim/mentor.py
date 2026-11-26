@@ -26,7 +26,7 @@ from .student import (
     reverse_spans,
 )
 
-UPDATES = 5
+UPDATES = 7
 
 
 @njit(cache=True)
@@ -221,10 +221,8 @@ def _fit_models(genome: Genome):
     reviewer = fit_reviewer(sequences, sites)
     for _ in range(UPDATES):
         if any(blind.values()):
-            updated = refit(genome, blind, anchor, reviewer)
-            if updated is not model:
-                model = updated
-                blind = predict(genome, model)
+            model = refit(genome, blind, anchor, reviewer)
+            blind = predict(genome, model)
         if reviewer.critic is None:
             yield model, blind
         else:

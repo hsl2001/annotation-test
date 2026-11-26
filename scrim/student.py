@@ -48,7 +48,7 @@ N_STATES = len(PHASE)
 Span = tuple[int, int]
 
 
-@dataclass(frozen=True, slots=True, eq=False)
+@dataclass(frozen=True, slots=True)
 class Strand:
     bases: np.ndarray
     mask: np.ndarray = field(default_factory=lambda: EMPTY_MASK)
@@ -64,7 +64,7 @@ class Strand:
 Genome = dict[str, tuple[Strand, Strand]]
 
 
-@dataclass(frozen=True, slots=True, eq=False)
+@dataclass(frozen=True, slots=True)
 class Model:
     background: np.ndarray
     coding: np.ndarray
