@@ -26,7 +26,7 @@ from .student import (
     reverse_spans,
 )
 
-UPDATES = 7
+UPDATES = 5
 
 
 @njit(cache=True)
