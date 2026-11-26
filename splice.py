@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import re
 from collections import defaultdict
 from itertools import pairwise
 from pathlib import Path
@@ -24,8 +25,8 @@ GROUP_CONFIG = {
     "RC_ASS": ("-", "CT", 1, 1),
 }
 FEATURE_CHANNELS = 12 * len(PERIODS)
-GENES_PER_DATASET = 100
-MATCH_THRESHOLD = 0.025
+GENES_PER_DATASET = 200
+MATCH_THRESHOLD = 0.3
 TEMPLATE_PATH = "splice_templates_train_100genes.npz"
 PLOT_PATH = "splice_sn_pr_human_vp.png"
 DATASETS = {
@@ -48,6 +49,33 @@ for _group in GROUPS:
     _motif = GROUP_CONFIG[_group][1]
     _codes = LUT[np.frombuffer(_motif.encode("ascii"), dtype=np.uint8)]
     MOTIF_TABLES[_group] = (_codes.reshape(1, 2), np.array([2], dtype=np.int64))
+
+MEAN_TEMPLATES = {
+    "DSS": np.array([
+        -0.02364266, 0.23810327, 0.11943467, 0.04194944, 0.27795361, -0.06127755,
+        0.20238194, -0.13684922, 0.30560894, -0.29536816, 0.10945510, -0.15229083,
+        0.02586243, -0.02078278, 0.24460867, -0.32605575, 0.22393815, -0.30008106,
+        0.24218566, -0.28183355, 0.21621098, -0.26116303, -0.08906200, -0.04241679,
+    ], dtype=np.float32),
+    "ASS": np.array([
+        0.28719362, 0.24415257, 0.26998474, 0.29338006, 0.20720171, 0.27363809,
+        -0.06750981, -0.00107344, -0.04776784, 0.06170959, 0.00145965, 0.04450070,
+        0.36296957, 0.36020169, 0.07136600, 0.36273678, -0.09944337, 0.19469529,
+        -0.22882222, 0.06531644, -0.06078073, 0.23612580, -0.05824565, -0.05547777,
+    ], dtype=np.float32),
+    "RC_DSS": np.array([
+        -0.01920437, 0.24046069, 0.12502608, 0.04646850, 0.28001120, -0.05821144,
+        0.19887079, -0.13935185, 0.30355073, -0.29433698, 0.10955854, -0.15010653,
+        0.01745692, -0.02710432, 0.23394252, -0.33188969, 0.22284578, -0.29842519,
+        0.23921626, -0.28205472, 0.20575176, -0.27095797, -0.09903361, -0.05447237,
+    ], dtype=np.float32),
+    "RC_ASS": np.array([
+        0.29084663, 0.24420598, 0.26863419, 0.29198416, 0.20750628, 0.27749690,
+        -0.06550534, 0.00448528, -0.05101807, 0.06561320, -0.00323989, 0.04340076,
+        0.36309636, 0.36558041, 0.07379231, 0.36337169, -0.09192556, 0.19516978,
+        -0.21850773, 0.06858761, -0.05030582, 0.23430547, -0.05251454, -0.05499858,
+    ], dtype=np.float32),
+}
 
 
 def read_single_fasta(path: str | Path) -> tuple[str, np.ndarray]:
@@ -238,21 +266,13 @@ def normalize_features(features):
     )
 
 
-def nearest_cosine(candidates, templates, chunk_size=8192):
-    """Return each candidate's cosine distance to its nearest template."""
-    distances = np.empty(candidates.shape[0], dtype=np.float32)
-    template_matrix = np.ascontiguousarray(templates.T)
-    for start in range(0, len(candidates), chunk_size):
-        end = min(start + chunk_size, len(candidates))
-        similarities = candidates[start:end] @ template_matrix
-        best = similarities.max(axis=1)
-        np.clip(best, -1.0, 1.0, out=best)
-        distances[start:end] = 1.0 - best
+def mean_template_distance(features, group):
+    distances = 1.0 - features @ MEAN_TEMPLATES[group]
+    np.clip(distances, 0.0, 2.0, out=distances)
     return distances
 
 
-def score_candidates(bank, starts, group, template_units, chunk_size=100_000):
-    """Score every motif candidate while bounding feature-memory use."""
+def score_candidates(bank, starts, group, chunk_size=100_000):
     starts = np.asarray(starts, dtype=np.int64)
     distances = np.empty(len(starts), dtype=np.float32)
     _, _, strand_code, position_shift = GROUP_CONFIG[group]
@@ -261,8 +281,8 @@ def score_candidates(bank, starts, group, template_units, chunk_size=100_000):
         end = min(offset + chunk_size, len(starts))
         positions = starts[offset:end] + position_shift
         features = bank.gather(positions, strands[: end - offset])
-        distances[offset:end] = nearest_cosine(
-            normalize_features(features), template_units[group]
+        distances[offset:end] = mean_template_distance(
+            normalize_features(features), group
         )
     return distances
 
@@ -385,6 +405,39 @@ def plot_sn_pr(test_results, threshold, output):
     plt.close(figure)
 
 
+def _format_mean_templates(means):
+    lines = ["MEAN_TEMPLATES = {"]
+    for group in GROUPS:
+        vector = means[group]
+        lines.append(f'    "{group}": np.array([')
+        for start in range(0, len(vector), 6):
+            chunk = ", ".join(f"{value:.8f}" for value in vector[start : start + 6])
+            lines.append(f"        {chunk},")
+        lines.append("    ], dtype=np.float32),")
+    lines.append("}")
+    return "\n".join(lines)
+
+
+def update_mean_templates(templates):
+    means = {}
+    for group in GROUPS:
+        mean = templates[group].astype(np.float64).mean(axis=0)
+        mean /= np.linalg.norm(mean)
+        means[group] = mean
+
+    source_path = Path(__file__)
+    text = source_path.read_text(encoding="utf-8")
+    pattern = re.compile(r"MEAN_TEMPLATES = \{.*?\n\}", re.DOTALL)
+    if not pattern.search(text):
+        raise ValueError("could not locate MEAN_TEMPLATES block to update")
+    text = pattern.sub(lambda _match: _format_mean_templates(means), text, count=1)
+    source_path.write_text(text, encoding="utf-8")
+
+    for group in GROUPS:
+        MEAN_TEMPLATES[group] = means[group].astype(np.float32)
+    return means
+
+
 def train_templates():
     chunks = {group: [] for group in GROUPS}
     rng = np.random.default_rng(0)
@@ -414,13 +467,15 @@ def train_templates():
         print(f"  {group:7s} {len(templates[group]):,}")
     print(f"Template bank written: {TEMPLATE_PATH}")
 
+    means = update_mean_templates(templates)
+    print("Updated MEAN_TEMPLATES in splice.py:")
+    for group in GROUPS:
+        print(f"  {group:7s} |mean|={np.linalg.norm(means[group]):.4f}")
 
 def test_templates():
-    templates = load_template_file(TEMPLATE_PATH)
-    template_units = {group: normalize_features(templates[group]) for group in GROUPS}
-    print("Training template counts:")
+    print("Using hardcoded mean templates:")
     for group in GROUPS:
-        print(f"  {group:7s} {len(templates[group]):,}")
+        print(f"  {group:7s} dim={len(MEAN_TEMPLATES[group])}")
 
     test_results = {}
     for dataset in TEST_DATASETS:
@@ -437,26 +492,20 @@ def test_templates():
         class_results = []
         print(
             f"\n{dataset} ({seqid}, {len(sequence):,} bp), "
-            f"all motif candidates, threshold={MATCH_THRESHOLD:.3f}",
+            f"all motif candidates, mean template, threshold={MATCH_THRESHOLD:.3f}",
             flush=True,
         )
         for group in GROUPS:
             starts = scan_candidates(sequence, group)
             truth = truth_by_group[group]
-            distances = score_candidates(bank, starts, group, template_units)
+            distances = score_candidates(bank, starts, group)
             result = result_at_threshold(starts, distances, truth, MATCH_THRESHOLD)
-            baseline = result_at_threshold(
-                starts, np.zeros(len(starts), dtype=np.float32), truth, 0.0
-            )
-            negative_count = max(0, len(starts) - len(truth))
             predicted_count = result["tp"] + result["fp"]
             print(
                 f"  {group:7s} candidates={len(starts):,} "
-                f"annotated={len(truth):,} negatives={negative_count:,} "
-                f"CWT-predicted={predicted_count:,}",
+                f"annotated={len(truth):,} CWT-predicted={predicted_count:,}",
                 flush=True,
             )
-            print(f"    motif-only: {format_result(baseline)}")
             print(f"    CWT match : {format_result(result)}")
             test_results[dataset][group] = (starts, distances, truth)
             class_results.append(result)
