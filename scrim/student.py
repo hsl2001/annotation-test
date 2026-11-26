@@ -60,17 +60,14 @@ class Model:
     intron_mean: np.ndarray = field(default_factory=lambda: INTRON_MEAN.copy())
     intron_mix: np.ndarray = field(default_factory=lambda: INTRON_MIX.copy())
     phases: np.ndarray = field(default_factory=lambda: SPLICE_PHASES.copy())
-    intron: np.ndarray | None = None
     critic: Critic | None = None
 
     def __post_init__(self):
         shapes = {"background": (N_CONTEXTS, 4), "coding": (3, N_CONTEXTS, 4),
-                  "intron": (N_CONTEXTS, 4), "intron_mix": INTRON_DELAY.shape,
+                  "intron_mix": INTRON_DELAY.shape,
                   "phases": (3,), "intron_mean": INTRON_DELAY.shape}
         for name, shape in shapes.items():
             value = getattr(self, name)
-            if value is None and name == "intron":
-                continue
             array = np.asarray(value)
             if array.shape != shape or array.dtype.kind not in "fiu":
                 raise ValueError(f"invalid {name} parameters")
@@ -194,7 +191,7 @@ def _context_logits(probabilities):
 
 
 @njit(cache=True)
-def _decode(sequence, masked, coding, background, intronic, starts, start_scores, stops, stop_scores,
+def _decode(sequence, masked, coding, background, starts, start_scores, stops, stop_scores,
             donors, donor_scores, acceptors, acceptor_scores, intron_open, intron_extend, phase_scores):
     n = len(sequence)
     start_prev = np.empty(len(starts), dtype=np.int32)
@@ -221,7 +218,7 @@ def _decode(sequence, masked, coding, background, intronic, starts, start_scores
     start_ids = np.zeros(3, dtype=np.int32)
     stop_ids = np.zeros(3, dtype=np.int32)
 
-    intergenic = intron_prefix = 0.0
+    intergenic = 0.0
     last_gene = -1
     si = ti = di = ai = context = depth = block_start = 0
     start_age = min(3, ORDER)
@@ -251,7 +248,7 @@ def _decode(sequence, masked, coding, background, intronic, starts, start_scores
         if di < len(donors) and donors[di] == p:
             ring = p % ring_size
             donor_ring[ring, :] = -np.inf
-            splice = donor_scores[di] - intron_prefix
+            splice = donor_scores[di]
             for age in range(1, ORDER + 1):
                 if active[age]:
                     for state in range(N_STATES):
@@ -263,7 +260,7 @@ def _decode(sequence, masked, coding, background, intronic, starts, start_scores
 
         if ai < len(acceptors) and acceptors[ai] == p:
             for m in range(len(intron_open)):
-                offset = acceptor_scores[ai] + intron_prefix + p * intron_extend[m]
+                offset = acceptor_scores[ai] + p * intron_extend[m]
                 for state in range(N_STATES):
                     candidate = intron[m, state] + offset
                     if candidate > exon[0, state]:
@@ -298,10 +295,9 @@ def _decode(sequence, masked, coding, background, intronic, starts, start_scores
             active[:] = False
             exon[:] = -np.inf
             intron[:, :] = -np.inf
-            block_start, context, depth, intron_prefix = p + 1, 0, 0, 0.0
+            block_start, context, depth = p + 1, 0, 0
             continue
         position_context = CONTEXT_OFFSETS[depth] + context
-        intron_prefix += intronic[position_context, base]
         penalty = background[position_context, base] - EXON_CONTINUE + _mask_cost(masked, p)
         next_exon[:] = -np.inf
         next_active[:] = False
@@ -335,14 +331,13 @@ def _predict_strand(strand: Strand, model: Model, direction: str) -> list[Gene]:
     if not (len(starts) and len(stops)):
         return []
     background = _context_logits(model.background)
-    spliced = background if model.intron is None else _context_logits(model.intron)
-    donors, ds = _splice_signal(sequence, DONOR, model.critic, spliced)
-    acceptors, ac = _splice_signal(sequence, ACCEPTOR, model.critic, spliced)
+    donors, ds = _splice_signal(sequence, DONOR, model.critic, background)
+    acceptors, ac = _splice_signal(sequence, ACCEPTOR, model.critic, background)
     if len(acceptors) * N_STATES > limit:
         raise ValueError("too many acceptor candidates for 32-bit traceback")
     opening, extension = intron_parameters(model)
     index, start_prev, end_key, end_total, trace_prev, trace_donor = _decode(
-        sequence, strand.mask, _context_logits(model.coding), background, spliced - background,
+        sequence, strand.mask, _context_logits(model.coding), background,
         starts, _motif_odds(sequence, starts, 3, background, strand.mask),
         stops, _motif_odds(sequence, stops, 3, background, strand.mask),
         donors, ds, acceptors, ac, opening - DONOR_COST, extension, np.log(3 * model.phases),

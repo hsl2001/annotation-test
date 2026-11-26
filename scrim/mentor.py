@@ -159,7 +159,6 @@ def refit(genome, predictions, anchor, reviewer):
     sequences, sites, genes = _training_batch(genome, predictions)
     reliability = reviewer.evaluate(sequences, sites)
     exon_runs = {(name, strand): [] for name in genome for strand in range(2)}
-    intron_runs = {key: [] for key in exon_runs}
     lengths, phases, confidence = [], [], []
     for name, strand, cds, score, selection in genes:
         weights = reliability[selection].reshape(-1, 2).min(axis=1)
@@ -172,7 +171,6 @@ def refit(genome, predictions, anchor, reviewer):
             exon_runs[name, strand].append((a, end, phase, trust * min(left, right)))
             if i:
                 donor = cds[i - 1][1]
-                intron_runs[name, strand].append((donor + 2, a - 2, 0, trust * left))
                 lengths.append(a - donor)
                 phases.append(phase)
                 confidence.append(trust * left)
@@ -180,8 +178,6 @@ def refit(genome, predictions, anchor, reviewer):
 
     background = np.zeros_like(anchor.background)
     coding = np.zeros_like(anchor.coding)
-    intron = np.zeros_like(anchor.background)
-    typical_intron = float(np.median(lengths)) if lengths else 0.0
     for name, (forward, reverse) in genome.items():
         length = len(forward.bases)
         gaps = list(_gaps(predictions[name], length))
@@ -190,14 +186,10 @@ def refit(genome, predictions, anchor, reviewer):
         for strand, record in enumerate((forward, reverse)):
             background += counts(record, gaps if strand == 0 else reverse_gaps)
             coding += counts(record, exon_runs[name, strand], 3, ignore_mask=True)
-            intervals = [(a, b, phase, weight * min(1.0, typical_intron / (b - a)))
-                         for a, b, phase, weight in intron_runs[name, strand]]
-            intron += counts(record, intervals, ignore_mask=True)
     background = _probabilities(background, anchor.background)
     coding = _probabilities(coding, anchor.coding) if coding.any() else anchor.coding
-    intron = _probabilities(intron, background) if intron.any() else None
     mean, mix, phase_prob = _duration(lengths, phases, confidence, anchor)
-    return Model(background, coding, mean, mix, phase_prob, intron)
+    return Model(background, coding, mean, mix, phase_prob)
 
 
 def _fit_models(genome: Genome):
