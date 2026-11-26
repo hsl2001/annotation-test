@@ -24,6 +24,7 @@ from .student import (
 )
 
 UPDATES = 1
+ANCHOR_WEIGHT = 0.75
 
 
 @njit(cache=True)
@@ -63,7 +64,11 @@ def _probabilities(count, anchor=None):
         backoff = np.tile(probs, (*([1] * len(shape)), contexts // probs.shape[-2], 1))
         pooled += 4 * backoff
         probs = pooled / pooled.sum(axis=-1, keepdims=True)
-    return probs if anchor is None else (anchor + probs) / 2
+    return (
+        probs
+        if anchor is None
+        else ANCHOR_WEIGHT * anchor + (1 - ANCHOR_WEIGHT) * probs
+    )
 
 
 @njit(cache=True)
