@@ -21,7 +21,6 @@ CONTEXT_OFFSETS = (CONTEXT_SIZES - 1) // 3
 MIN_INTRON = 32
 INTRON_DELAY = MIN_INTRON * np.array([1])
 INTRON_MEAN = np.array([270.0])
-INTRON_MIX = np.array([1.0])
 SPLICE_PHASES = np.array([0.5, 0.25, 0.25])
 EXON_EXIT = 1 / 160
 SPLICE_FRACTION = 0.8
@@ -69,7 +68,6 @@ class Model:
     background: np.ndarray
     coding: np.ndarray
     intron_mean: np.ndarray = field(default_factory=lambda: INTRON_MEAN.copy())
-    intron_mix: np.ndarray = field(default_factory=lambda: INTRON_MIX.copy())
     phases: np.ndarray = field(default_factory=lambda: SPLICE_PHASES.copy())
     critic: Critic | None = None
 
@@ -77,7 +75,6 @@ class Model:
         shapes = {
             "background": (N_CONTEXTS, 4),
             "coding": (3, N_CONTEXTS, 4),
-            "intron_mix": INTRON_DELAY.shape,
             "phases": (3,),
             "intron_mean": INTRON_DELAY.shape,
         }
@@ -136,7 +133,7 @@ def junctions(cds):
 
 def intron_parameters(model: Model) -> tuple[np.ndarray, np.ndarray]:
     hazard = 1 / (model.intron_mean - INTRON_DELAY + 1)
-    return np.log(model.intron_mix) + np.log(hazard), np.log1p(-hazard)
+    return np.log(hazard), np.log1p(-hazard)
 
 
 @njit(cache=True, inline="always")

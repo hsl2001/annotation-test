@@ -5,19 +5,16 @@ from math import sqrt
 
 import numpy as np
 from numba import njit
-from scipy.special import softmax
 
 from .critic import ACCEPTOR, DONOR, SiteExample, fit_reviewer
 from .student import (
     EMPTY_MASK,
     ENTRY_COST,
-    INTRON_DELAY,
     N_CONTEXTS,
     ORDER,
     Genome,
     Model,
     advance_context,
-    intron_parameters,
     is_start,
     is_stop,
     junctions,
@@ -26,7 +23,7 @@ from .student import (
     reverse_spans,
 )
 
-UPDATES = 5
+UPDATES = 1
 
 
 @njit(cache=True)
@@ -129,24 +126,16 @@ def _gaps(predictions, length):
 
 def _duration(lengths, phases, confidence, anchor):
     if not lengths:
-        return anchor.intron_mean, anchor.intron_mix, anchor.phases
-    lengths = np.asarray(lengths)[:, None]
-    confidence = np.asarray(confidence)
-    opening, extension = intron_parameters(anchor)
-    delta = lengths - INTRON_DELAY
-    log_mass = np.where(delta >= 0, opening + delta * extension, -np.inf)
-    responsibility = softmax(log_mass, axis=1) * confidence[:, None]
+        return anchor.intron_mean, anchor.phases
+    lengths = np.asarray(lengths, dtype=np.float64)
+    confidence = np.asarray(confidence, dtype=np.float64)
     strength = sqrt(len(lengths))
-    pseudo = anchor.intron_mix * strength
-    mass = responsibility.sum(axis=0) + pseudo
-    means = (
-        (responsibility * lengths).sum(axis=0) + pseudo * anchor.intron_mean
-    ) / mass
-    mixture = mass / mass.sum()
+    mean = (confidence * lengths).sum() + strength * anchor.intron_mean[0]
+    mean /= confidence.sum() + strength
     phase_prob = (
         np.bincount(phases, weights=confidence, minlength=3) + anchor.phases * strength
     )
-    return means, mixture, phase_prob / phase_prob.sum()
+    return np.array([mean]), phase_prob / phase_prob.sum()
 
 
 def _training_batch(genome, predictions):
@@ -209,8 +198,8 @@ def refit(genome, predictions, anchor, reviewer):
             coding += counts(record, exon_runs[name, strand], 3, ignore_mask=True)
     background = _probabilities(background, anchor.background)
     coding = _probabilities(coding, anchor.coding) if coding.any() else anchor.coding
-    mean, mix, phase_prob = _duration(lengths, phases, confidence, anchor)
-    return Model(background, coding, mean, mix, phase_prob)
+    mean, phase_prob = _duration(lengths, phases, confidence, anchor)
+    return Model(background, coding, mean, phase_prob)
 
 
 def _fit_models(genome: Genome):
