@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from math import sqrt
 
 import numpy as np
@@ -7,7 +8,6 @@ from numba import njit
 
 from .critic import ACCEPTOR, DONOR, SiteExample, fit_reviewer
 from .student import (
-    EMPTY_MASK,
     ENTRY_COST,
     N_CONTEXTS,
     ORDER,
@@ -27,14 +27,14 @@ ANCHOR_WEIGHT = 0.5
 
 
 @njit(cache=True)
-def _count(sequence, ignored, runs, phases):
+def _count(sequence, runs, phases):
     result = np.zeros((phases, N_CONTEXTS, 4), dtype=np.float64)
     for start, end, phase, weight in runs:
         phase = int(phase)
         context = known = 0
         for p in range(int(start), int(end)):
             base = sequence[p]
-            if base < 4 and not (len(ignored) and ignored[p]):
+            if base < 4:
                 if known >= ORDER:
                     result[phase, context, base] += weight
                 context, known = advance_context(context, known, base)
@@ -44,10 +44,9 @@ def _count(sequence, ignored, runs, phases):
     return result
 
 
-def counts(strand, runs, phases=1, ignore_mask=False):
-    ignored = strand.mask if ignore_mask else EMPTY_MASK
+def counts(strand, runs, phases=1):
     result = _count(
-        strand.bases, ignored, np.asarray(runs, dtype=np.float64).reshape(-1, 4), phases
+        strand.bases, np.asarray(runs, dtype=np.float64).reshape(-1, 4), phases
     )
     return result if phases > 1 else result[0]
 
@@ -97,8 +96,6 @@ def bootstrap(genome: Genome) -> Model:
         for strand, record in enumerate(strands):
             background += counts(record, [(0, length, 0, 1)])
             for start, end in _seeds(record.bases):
-                if len(record.mask) and record.mask[start:end].mean() > 0.5:
-                    continue
                 lo, hi = (
                     (start, end + 3)
                     if strand == 0
@@ -110,7 +107,7 @@ def bootstrap(genome: Genome) -> Model:
                 occupied[lo:hi] = True
                 runs[strand].append((start, end, 0, 1))
         for record, selected in zip(strands, runs):
-            coding += counts(record, selected, 3, ignore_mask=True)
+            coding += counts(record, selected, 3)
     background = _probabilities(background)
     prior = np.broadcast_to(background, coding.shape)
     return Model(background, _probabilities(coding, prior) if coding.any() else prior)
@@ -128,7 +125,7 @@ def _gaps(predictions, length):
         yield cursor, length, 0, 1.0
 
 
-def _duration(lengths, phases, confidence, anchor):
+def _duration(lengths, confidence, anchor):
     if not lengths:
         return anchor.intron_mean, anchor.phases
     lengths = np.asarray(lengths, dtype=np.float64)
@@ -136,10 +133,7 @@ def _duration(lengths, phases, confidence, anchor):
     strength = sqrt(len(lengths))
     mean = (confidence * lengths).sum() + strength * anchor.intron_mean[0]
     mean /= confidence.sum() + strength
-    phase_prob = (
-        np.bincount(phases, weights=confidence, minlength=3) + anchor.phases * strength
-    )
-    return np.array([mean]), phase_prob / phase_prob.sum()
+    return np.array([mean]), anchor.phases
 
 
 def _training_batch(genome, predictions):
@@ -165,13 +159,12 @@ def _training_batch(genome, predictions):
     return sequences, sites, genes
 
 
-def refit(genome, predictions, anchor, reviewer):
-    sequences, sites, genes = _training_batch(genome, predictions)
-    reliability = reviewer.evaluate(sequences, sites)
+def refit(genome, predictions, anchor):
+    _, _, genes = _training_batch(genome, predictions)
     exon_runs = {(name, strand): [] for name in genome for strand in range(2)}
-    lengths, phases, confidence = [], [], []
+    lengths, confidence = [], []
     for name, strand, cds, score, selection in genes:
-        weights = reliability[selection].reshape(-1, 2).min(axis=1)
+        weights = np.ones((selection.stop - selection.start) // 2, dtype=np.float64)
         trust = score / (score + ENTRY_COST)
         phase = 0
         for i, (a, b) in enumerate(cds):
@@ -182,7 +175,6 @@ def refit(genome, predictions, anchor, reviewer):
             if i:
                 donor = cds[i - 1][1]
                 lengths.append(a - donor)
-                phases.append(phase)
                 confidence.append(trust * left)
             phase = (phase + b - a) % 3
 
@@ -199,10 +191,10 @@ def refit(genome, predictions, anchor, reviewer):
         ]
         for strand, record in enumerate((forward, reverse)):
             background += counts(record, gaps if strand == 0 else reverse_gaps)
-            coding += counts(record, exon_runs[name, strand], 3, ignore_mask=True)
+            coding += counts(record, exon_runs[name, strand], 3)
     background = _probabilities(background, anchor.background)
     coding = _probabilities(coding, anchor.coding) if coding.any() else anchor.coding
-    mean, phase_prob = _duration(lengths, phases, confidence, anchor)
+    mean, phase_prob = _duration(lengths, confidence, anchor)
     return Model(background, coding, mean, phase_prob)
 
 
@@ -214,9 +206,11 @@ def _fit_models(genome: Genome):
     reviewer = fit_reviewer(sequences, sites)
     for _ in range(UPDATES):
         if any(blind.values()):
-            model = refit(genome, blind, anchor, reviewer)
+            model = refit(genome, blind, anchor)
             blind = predict(genome, model)
         yield model, blind
+    model = replace(model, critic=reviewer)
+    yield model, predict(genome, model)
 
 
 def fit(genome: Genome):

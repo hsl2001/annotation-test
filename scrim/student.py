@@ -10,27 +10,25 @@ from urllib.parse import quote
 import numpy as np
 from numba import njit
 
-from .critic import ACCEPTOR, DONOR, motif_sites
+from .critic import ACCEPTOR, DONOR, Reviewer, motif_sites
 from .cwt_features import COMPLEMENT, LUT, nucleotide_codes
 from .cwt_features import read_fasta as read_records
 
-ORDER = 5
+ORDER = 2
 N_CONTEXTS = 4**ORDER
 CONTEXT_SIZES = 4 ** np.arange(ORDER + 1)
 CONTEXT_OFFSETS = (CONTEXT_SIZES - 1) // 3
-MIN_INTRON = 32
+MIN_INTRON = 72
 INTRON_DELAY = MIN_INTRON * np.array([1])
-INTRON_MEAN = np.array([270.0])
+INTRON_MEAN = np.array([134.0])
 SPLICE_PHASES = np.array([0.5, 0.25, 0.25])
-EXON_EXIT = 1 / 160
-SPLICE_FRACTION = 0.8
-ENTRY_COST = np.log(5000)
+EXON_EXIT = 1 / 110
+SPLICE_FRACTION = 0.58
+ENTRY_COST = 7.4
 STOP_COST = -np.log(EXON_EXIT * (1 - SPLICE_FRACTION) / 3)
 DONOR_COST = -np.log(EXON_EXIT * SPLICE_FRACTION)
 EXON_CONTINUE = np.log1p(-EXON_EXIT)
-MASK_COST = np.log(2) / (ORDER + 1)
-GC_DONOR = 0.02
-EMPTY_MASK = np.empty(0, dtype=bool)
+GC_DONOR = 0.057
 PHASE = np.array([0, 1, 1, 2, 2, 2], dtype=np.int8)
 NEXT_STATE = np.array(
     [
@@ -50,14 +48,9 @@ Span = tuple[int, int]
 @dataclass(frozen=True, slots=True)
 class Strand:
     bases: np.ndarray
-    mask: np.ndarray = field(default_factory=lambda: EMPTY_MASK)
 
     def __post_init__(self):
-        bases, mask = nucleotide_codes(self.bases), np.asarray(self.mask)
-        if mask.ndim != 1 or mask.dtype != np.bool_ or mask.size not in (0, bases.size):
-            raise ValueError("mask must be empty or have one boolean per base")
-        object.__setattr__(self, "bases", bases)
-        object.__setattr__(self, "mask", mask)
+        object.__setattr__(self, "bases", nucleotide_codes(self.bases))
 
 
 Genome = dict[str, tuple[Strand, Strand]]
@@ -69,6 +62,7 @@ class Model:
     coding: np.ndarray
     intron_mean: np.ndarray = field(default_factory=lambda: INTRON_MEAN.copy())
     phases: np.ndarray = field(default_factory=lambda: SPLICE_PHASES.copy())
+    critic: Reviewer | None = None
 
     def __post_init__(self):
         shapes = {
@@ -101,10 +95,7 @@ class Gene:
 
 
 def _encode(raw):
-    bases = LUT[raw]
-    lower = (bases < 4) & (raw >= ord("a"))
-    mask = lower if lower.any() and np.any((bases < 4) & ~lower) else EMPTY_MASK
-    return Strand(bases, mask)
+    return Strand(LUT[raw])
 
 
 def read_fasta(path: str | Path) -> dict[str, Strand]:
@@ -112,10 +103,7 @@ def read_fasta(path: str | Path) -> dict[str, Strand]:
 
 
 def orient(records: dict[str, Strand]) -> Genome:
-    return {
-        name: (s, Strand(COMPLEMENT[s.bases[::-1]], s.mask[::-1]))
-        for name, s in records.items()
-    }
+    return {name: (s, Strand(COMPLEMENT[s.bases[::-1]])) for name, s in records.items()}
 
 
 def reverse_spans(spans, length):
@@ -164,13 +152,8 @@ def advance_context(context, depth, base):
     return (4 * context + base) % N_CONTEXTS, min(depth + 1, ORDER)
 
 
-@njit(cache=True, inline="always")
-def _mask_cost(mask, position):
-    return MASK_COST if len(mask) and mask[position] else 0.0
-
-
 @njit(cache=True)
-def _motif_odds(sequence, positions, length, background, mask):
+def _motif_odds(sequence, positions, length, background):
     scores = np.empty(len(positions), dtype=np.float64)
     for i, p in enumerate(positions):
         context = depth = 0
@@ -179,17 +162,17 @@ def _motif_odds(sequence, positions, length, background, mask):
         score = 0.0
         for j in range(p, p + length):
             base = sequence[j]
-            score -= background[CONTEXT_OFFSETS[depth] + context, base] + _mask_cost(
-                mask, j
-            )
+            score -= background[CONTEXT_OFFSETS[depth] + context, base]
             context, depth = advance_context(context, depth, base)
         scores[i] = score
     return scores
 
 
-def _splice_signal(sequence, kind, background):
+def _splice_signal(sequence, kind, background, critic=None):
     sites = motif_sites(sequence, kind)
-    scores = _motif_odds(sequence, sites, 2, background, EMPTY_MASK)
+    scores = _motif_odds(sequence, sites, 2, background)
+    if critic is not None:
+        scores += critic.score(sequence, sites, kind)
     if kind == DONOR:
         scores += np.where(
             sequence[sites + 1] == 1, np.log(GC_DONOR), np.log1p(-GC_DONOR)
@@ -210,7 +193,6 @@ def _context_logits(probabilities):
 @njit(cache=True)
 def _decode(
     sequence,
-    masked,
     coding,
     background,
     starts,
@@ -312,12 +294,7 @@ def _decode(
             ai += 1
 
         if si < len(starts) and starts[si] == p:
-            kozak = 0.0
-            if p >= 3 and sequence[p - 3] < 4:
-                kozak += np.log(1.4 if sequence[p - 3] % 2 == 0 else 0.6)
-            if p + 3 < n and sequence[p + 3] < 4:
-                kozak += np.log(1.6 if sequence[p + 3] == 2 else 0.8)
-            start_ring[slot] = intergenic + start_scores[si] - ENTRY_COST + kozak
+            start_ring[slot] = intergenic + start_scores[si] - ENTRY_COST
             start_ids[slot], start_prev[si] = si, last_gene
             si += 1
 
@@ -338,9 +315,7 @@ def _decode(
             block_start, context, depth = p + 1, 0, 0
             continue
         position_context = CONTEXT_OFFSETS[depth] + context
-        penalty = (
-            background[position_context, base] - EXON_CONTINUE + _mask_cost(masked, p)
-        )
+        penalty = background[position_context, base] - EXON_CONTINUE
         next_exon[:] = -np.inf
         next_active[:] = False
         for age in range(ORDER + 1):
@@ -378,20 +353,19 @@ def _predict_strand(strand: Strand, model: Model, direction: str) -> list[Gene]:
     if not (len(starts) and len(stops)):
         return []
     background = _context_logits(model.background)
-    donors, ds = _splice_signal(sequence, DONOR, background)
-    acceptors, ac = _splice_signal(sequence, ACCEPTOR, background)
+    donors, ds = _splice_signal(sequence, DONOR, background, model.critic)
+    acceptors, ac = _splice_signal(sequence, ACCEPTOR, background, model.critic)
     if len(acceptors) * N_STATES > limit:
         raise ValueError("too many acceptor candidates for 32-bit traceback")
     opening, extension = intron_parameters(model)
     index, start_prev, end_key, end_total, trace_prev, trace_donor = _decode(
         sequence,
-        strand.mask,
         _context_logits(model.coding),
         background,
         starts,
-        _motif_odds(sequence, starts, 3, background, strand.mask),
+        _motif_odds(sequence, starts, 3, background),
         stops,
-        _motif_odds(sequence, stops, 3, background, strand.mask),
+        _motif_odds(sequence, stops, 3, background),
         donors,
         ds,
         acceptors,
