@@ -22,7 +22,7 @@ from .student import (
     reverse_spans,
 )
 
-UPDATES = 1
+UPDATES = 5
 ANCHOR_WEIGHT = 0.5
 
 
@@ -201,16 +201,14 @@ def refit(genome, predictions, anchor):
 def _fit_models(genome: Genome):
     anchor = model = bootstrap(genome)
     blind = predict(genome, model)
-    yield model, blind
-    sequences, sites, _ = _training_batch(genome, blind)
-    reviewer = fit_reviewer(sequences, sites)
-    for _ in range(UPDATES):
-        if any(blind.values()):
+    for round_index in range(UPDATES + 1):
+        sequences, sites, _ = _training_batch(genome, blind)
+        reviewer = fit_reviewer(sequences, sites)
+        if round_index:
             model = refit(genome, blind, anchor)
-            blind = predict(genome, model)
+        model = replace(model, critic=reviewer)
+        blind = predict(genome, model)
         yield model, blind
-    model = replace(model, critic=reviewer)
-    yield model, predict(genome, model)
 
 
 def fit(genome: Genome):
