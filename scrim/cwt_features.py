@@ -48,15 +48,6 @@ for _column, _permutation in enumerate(permutations((1, 2, 3))):
     MAPPINGS[3, _column] = ROOTS[_permutation[2]]
 
 
-_PHI = np.array([0, 4, 2, 3, 1, 5])
-
-
-def magnitude_summary(features):
-    w = features.reshape(features.shape[0], 12)
-    mag = np.hypot(w[:, :6], w[:, 6:])
-    return np.minimum(mag, mag[:, _PHI]).sum(axis=1)
-
-
 def morlet_integral(lower, upper, w0=W0):
     lower, upper = max(lower, -MORLET_LIMIT), min(upper, MORLET_LIMIT)
     if lower >= upper:

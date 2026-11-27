@@ -10,7 +10,7 @@ from urllib.parse import quote
 import numpy as np
 from numba import njit
 
-from .critic import ACCEPTOR, DONOR, Critic, motif_sites, signal_prior
+from .critic import ACCEPTOR, DONOR, motif_sites
 from .cwt_features import COMPLEMENT, LUT, nucleotide_codes
 from .cwt_features import read_fasta as read_records
 
@@ -69,7 +69,6 @@ class Model:
     coding: np.ndarray
     intron_mean: np.ndarray = field(default_factory=lambda: INTRON_MEAN.copy())
     phases: np.ndarray = field(default_factory=lambda: SPLICE_PHASES.copy())
-    critic: Critic | None = None
 
     def __post_init__(self):
         shapes = {
@@ -188,12 +187,9 @@ def _motif_odds(sequence, positions, length, background, mask):
     return scores
 
 
-def _splice_signal(sequence, kind, critic, background):
+def _splice_signal(sequence, kind, background):
     sites = motif_sites(sequence, kind)
-    score = signal_prior if critic is None else critic.score
-    scores = score(sequence, sites, kind) + _motif_odds(
-        sequence, sites, 2, background, EMPTY_MASK
-    )
+    scores = _motif_odds(sequence, sites, 2, background, EMPTY_MASK)
     if kind == DONOR:
         scores += np.where(
             sequence[sites + 1] == 1, np.log(GC_DONOR), np.log1p(-GC_DONOR)
@@ -382,8 +378,8 @@ def _predict_strand(strand: Strand, model: Model, direction: str) -> list[Gene]:
     if not (len(starts) and len(stops)):
         return []
     background = _context_logits(model.background)
-    donors, ds = _splice_signal(sequence, DONOR, model.critic, background)
-    acceptors, ac = _splice_signal(sequence, ACCEPTOR, model.critic, background)
+    donors, ds = _splice_signal(sequence, DONOR, background)
+    acceptors, ac = _splice_signal(sequence, ACCEPTOR, background)
     if len(acceptors) * N_STATES > limit:
         raise ValueError("too many acceptor candidates for 32-bit traceback")
     opening, extension = intron_parameters(model)

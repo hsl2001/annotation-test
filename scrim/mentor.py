@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import replace
 from math import sqrt
 
 import numpy as np
@@ -24,7 +23,7 @@ from .student import (
 )
 
 UPDATES = 1
-ANCHOR_WEIGHT = 0.75
+ANCHOR_WEIGHT = 0.5
 
 
 @njit(cache=True)
@@ -217,10 +216,7 @@ def _fit_models(genome: Genome):
         if any(blind.values()):
             model = refit(genome, blind, anchor, reviewer)
             blind = predict(genome, model)
-        if reviewer.critic is None:
-            yield model, blind
-        else:
-            yield replace(model, critic=reviewer.critic), None
+        yield model, blind
 
 
 def fit(genome: Genome):
@@ -228,4 +224,4 @@ def fit(genome: Genome):
     model, predictions = next(rounds)
     for model, predictions in rounds:
         pass
-    return model, predictions if predictions is not None else predict(genome, model)
+    return model, predictions

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
-from functools import cache
 from operator import index
 
 import numpy as np
@@ -13,12 +12,18 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import maximum_bipartite_matching
 from scipy.special import expit, logit
 
-from .cwt_features import PERIODS, build_kernel, coordinates, nucleotide_codes
+from .cwt_features import (
+    PERIODS,
+    W0,
+    CwtFeatureBank,
+    build_kernel,
+    nucleotide_codes,
+)
 
 DONOR = 0
 ACCEPTOR = 1
 
-_BATCH = 8192
+
 _BLOCK_SIZE = 4096
 _MIN_BLOCKS = 3
 _MIN_PAIRS = 24
@@ -27,51 +32,9 @@ _MAX_FOLDS = 5
 _PSEUDO_NOISE = 0.01
 
 
-def _ratios(probabilities):
-    probabilities = np.asarray(probabilities, dtype=np.float64)
-    return np.concatenate(
-        (4 * probabilities, np.ones((*probabilities.shape[:-1], 1))), axis=-1
-    )
-
-
-_DONOR_OFFSETS = np.array([-2, -1, 2, 3, 4, 5])
-_DONOR_INTRON = (
-    (0.48, 0.09, 0.34, 0.09),
-    (0.60, 0.11, 0.17, 0.12),
-    (0.13, 0.10, 0.65, 0.12),
-    (0.18, 0.16, 0.20, 0.46),
-)
-_DONOR_LOG_RATIOS = np.log(
-    _ratios(
-        (
-            ((0.55, 0.15, 0.18, 0.12), (0.10, 0.08, 0.75, 0.07), *_DONOR_INTRON),
-            ((0.65, 0.12, 0.14, 0.09), (0.08, 0.06, 0.81, 0.05), *_DONOR_INTRON),
-        )
-    )
-)
-_ACCEPTOR_OFFSETS = np.array([-1, 2])
-_ACCEPTOR_LOG_RATIOS = np.log(
-    _ratios(((0.10, 0.40, 0.10, 0.40), (0.31, 0.19, 0.31, 0.19)))
-)
-_TRACT_OFFSETS = np.arange(-18, -3)
-_TRACT_LOG_RATIOS = np.log(_ratios((0.20, 0.29, 0.20, 0.31)))
-_BRANCH_CENTERS = np.arange(-37, -19)
-_BRANCH_OFFSETS = np.array([-3, -2, 0, 1])
-_BRANCH_RATIOS = _ratios(
-    (
-        (0.19, 0.31, 0.19, 0.31),
-        (0.15, 0.15, 0.15, 0.55),
-        (0.65, 0.12, 0.11, 0.12),
-        (0.19, 0.31, 0.19, 0.31),
-    )
-)
-
 _BASE_OFFSETS = np.r_[-6:0, 2:6]
-_ANCHORS = (-14, 15)
-_CONTRASTS = np.array(
-    [[1, 1, 1], [-1, -1, 1], [1, -1, -1], [-1, 1, -1], [0, 0, 0]],
-    dtype=np.float32,
-)
+_CWT_CHANNELS = 12 * len(PERIODS)
+_CWT_FLANK = max(len(build_kernel(period)) // 2 for period in PERIODS)
 
 
 @dataclass(frozen=True, slots=True)
@@ -118,90 +81,42 @@ def _base_at(sequence, position):
     return sequence[position] if 0 <= position < len(sequence) else 4
 
 
-@njit(inline="always")
-def _positional_evidence(sequence, position, offsets, log_ratios):
-    evidence = 0.0
-    for i, offset in enumerate(offsets):
-        evidence += log_ratios[i, _base_at(sequence, position + offset)]
-    return evidence
-
-
 @njit
-def _prior_batch(sequence, positions, kind):
-    scores = np.empty(len(positions), dtype=np.float64)
-    for i, p in enumerate(positions):
-        if kind == DONOR:
-            context = _DONOR_LOG_RATIOS[int(sequence[p + 1] == 1)]
-            scores[i] = _positional_evidence(sequence, p, _DONOR_OFFSETS, context)
-        else:
-            evidence = _positional_evidence(
-                sequence, p, _ACCEPTOR_OFFSETS, _ACCEPTOR_LOG_RATIOS
-            )
-            for offset in _TRACT_OFFSETS:
-                evidence += _TRACT_LOG_RATIOS[_base_at(sequence, p + offset)]
-            branch = 0.0
-            for center in _BRANCH_CENTERS:
-                ratio = 1.0
-                for j, offset in enumerate(_BRANCH_OFFSETS):
-                    ratio *= _BRANCH_RATIOS[j, _base_at(sequence, p + center + offset)]
-                branch += ratio
-            scores[i] = evidence + np.log(branch / len(_BRANCH_CENTERS))
-    return scores
-
-
-@cache
-def _wavelets():
-    waves = [
-        (anchor - len(kernel) // 2, kernel)
-        for kernel in map(build_kernel, PERIODS)
-        for anchor in _ANCHORS
-    ]
-    starts = np.array([start for start, _ in waves])
-    sizes = np.array([len(kernel) for _, kernel in waves])
-    taps = np.zeros((len(waves), sizes.max(), *_CONTRASTS.shape), dtype=np.complex64)
-    for i, (start, kernel) in enumerate(waves):
-        offsets = start + np.arange(len(kernel))
-        weights = kernel[::-1].copy()
-        weights[(offsets == 0) | (offsets == 1)] = 0
-        weights /= np.linalg.norm(weights)
-        taps[i, : len(kernel)] = weights[:, None, None] * _CONTRASTS
-    flank = max(
-        -int(_BRANCH_CENTERS[0] + _BRANCH_OFFSETS[0]),
-        -int(starts.min()),
-        int((starts + sizes).max()) - 2,
-    )
-    return (taps, starts, sizes), flank
-
-
-@njit
-def _context_batch(sequence, positions, taps, starts, sizes):
-    nuc_width = 4 * len(_BASE_OFFSETS)
-    features = np.zeros(
-        (len(positions), nuc_width + len(starts) * taps.shape[-1]), dtype=np.float32
-    )
+def _onehot_batch(sequence, positions):
+    features = np.zeros((len(positions), 4 * len(_BASE_OFFSETS)), dtype=np.float32)
     for i, p in enumerate(positions):
         for j, offset in enumerate(_BASE_OFFSETS):
             base = _base_at(sequence, p + offset)
             if base < 4:
                 features[i, j * 4 + base] = 1.0
-        col = nuc_width
-        for wave, offset in enumerate(starts):
-            start = p + offset
-            lo, hi = max(0, -start), min(sizes[wave], len(sequence) - start)
-            purine = at = amino = np.complex64(0)
-            for tap in range(lo, hi):
-                base = sequence[start + tap]
-                purine += taps[wave, tap, base, 0]
-                at += taps[wave, tap, base, 1]
-                amino += taps[wave, tap, base, 2]
-            for value in (purine, at, amino):
-                features[i, col] = np.log1p(value.real**2 + value.imag**2)
-                col += 1
     return features
 
 
+_CWT_CACHE = {}
+
+
+def _cwt_sites(sequence):
+    key = id(sequence)
+    entry = _CWT_CACHE.get(key)
+    if entry is None or entry[0] is not sequence:
+        sites = np.sort(
+            np.concatenate(
+                (motif_sites(sequence, DONOR), motif_sites(sequence, ACCEPTOR))
+            )
+        )
+        bank = CwtFeatureBank(sequence, PERIODS, W0)
+        cwt = bank.gather(sites, np.zeros(len(sites), dtype=np.int8))[:, :_CWT_CHANNELS]
+        entry = (sequence, sites, cwt)
+        _CWT_CACHE[key] = entry
+    return entry[1], entry[2]
+
+
 def _features(sequence, positions):
-    return _context_batch(sequence, positions, *_wavelets()[0])
+    positions = np.asarray(positions, dtype=np.intp)
+    sites, cwt = _cwt_sites(sequence)
+    return np.hstack(
+        (_onehot_batch(sequence, positions), cwt[np.searchsorted(sites, positions)])
+    )
 
 
 def _linear(features, model):
@@ -215,40 +130,10 @@ def _learned_evidence(prior, features, model):
 
 
 def _score_valid(sequence, positions, kind, model):
-    prior = _prior_batch(sequence, positions, kind)
+    prior = np.zeros(len(positions), dtype=np.float64)
     if model is None:
         return prior
     return _learned_evidence(prior, _features(sequence, positions), model)
-
-
-def _score(sequence, sites, kind, model):
-    positions = coordinates(sites)
-    sequence = nucleotide_codes(sequence)
-    scores = np.zeros(len(positions), dtype=np.float64)
-    for start in range(0, len(positions), _BATCH):
-        chunk = positions[start : start + _BATCH]
-        valid = np.flatnonzero((chunk >= 0) & (chunk < len(sequence) - 1))
-        p = chunk[valid].astype(np.intp, copy=False)
-        matches = _is_core(sequence[p], sequence[p + 1], kind)
-        if matches.any():
-            scores[start + valid[matches]] = _score_valid(
-                sequence, p[matches], kind, model
-            )
-    return scores
-
-
-def signal_prior(sequence: np.ndarray, sites: np.ndarray, kind: int) -> np.ndarray:
-    _check_kind(kind)
-    return _score(sequence, sites, kind, None)
-
-
-@dataclass(frozen=True, slots=True)
-class Critic:
-    _models: tuple[np.ndarray | None, np.ndarray | None]
-
-    def score(self, sequence: np.ndarray, sites: np.ndarray, kind: int) -> np.ndarray:
-        _check_kind(kind)
-        return _score(sequence, sites, kind, self._models[kind])
 
 
 def _genomic_left(length, strand, position):
@@ -378,7 +263,7 @@ def _fit_kind(sequences, groups, occupied, kind, flank, rng):
             positions = pairs.ravel()
             data = _features(sequence, positions)
             features.append(data.reshape(len(pairs), 2, -1))
-            priors.append(_prior_batch(sequence, positions, kind).reshape(pairs.shape))
+            priors.append(np.zeros(pairs.shape, dtype=np.float64))
     features, prior = np.concatenate(features), np.concatenate(priors)
     blocks = np.repeat(np.arange(len(counts)), counts)
     folds = fold_for[blocks]
@@ -445,7 +330,6 @@ def _example_groups(sequences, examples, flank, occupied=None):
 
 @dataclass(frozen=True, slots=True)
 class Reviewer:
-    critic: Critic | None
     _fits: tuple[_KindFit | None, _KindFit | None]
 
     def evaluate(
@@ -454,9 +338,9 @@ class Reviewer:
         examples: list[SiteExample],
     ) -> np.ndarray:
         weights = np.full(len(examples), 0.5)
-        if self.critic is None:
+        if all(fit is None for fit in self._fits):
             return weights
-        groups = _example_groups(sequences, examples, _wavelets()[1])
+        groups = _example_groups(sequences, examples, _CWT_FLANK)
         for kind, fit in enumerate(self._fits):
             if fit is None:
                 continue
@@ -481,8 +365,8 @@ def fit_reviewer(
     examples: list[SiteExample],
 ) -> Reviewer:
     if len(examples) < _MIN_PAIRS:
-        return Reviewer(None, (None, None))
-    _, flank = _wavelets()
+        return Reviewer((None, None))
+    flank = _CWT_FLANK
     occupied = defaultdict(set)
     groups = _example_groups(sequences, examples, flank, occupied)
     donor, acceptor = (
@@ -492,9 +376,5 @@ def fit_reviewer(
         for kind in (DONOR, ACCEPTOR)
     )
     if donor is None and acceptor is None:
-        return Reviewer(None, (None, None))
-    models = (
-        donor.full if donor is not None else None,
-        acceptor.full if acceptor is not None else None,
-    )
-    return Reviewer(Critic(models), (donor, acceptor))
+        return Reviewer((None, None))
+    return Reviewer((donor, acceptor))
