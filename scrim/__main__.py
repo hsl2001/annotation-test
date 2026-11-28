@@ -26,7 +26,7 @@ def run(args: argparse.Namespace) -> None:
     from . import mentor, student
 
     genome = student.orient(student.read_fasta(args.fasta))
-    model, predictions = mentor.fit(genome)
+    model, predictions = mentor.fit(genome, args.seed_gff3)
     if args.target is not None:
         genome = student.orient(student.read_fasta(args.target))
         predictions = student.predict(genome, model)
@@ -36,6 +36,7 @@ def run(args: argparse.Namespace) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
     parser.add_argument("--fasta", required=True)
+    parser.add_argument("--seed-gff3", required=True)
     parser.add_argument("--target")
     parser.add_argument("--output", required=True)
     args = parser.parse_args(argv)

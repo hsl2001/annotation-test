@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import gzip
+from collections import defaultdict
 from dataclasses import replace
 from math import sqrt
+from urllib.parse import unquote
 
 import numpy as np
 from numba import njit
@@ -11,11 +14,10 @@ from .student import (
     ENTRY_COST,
     N_CONTEXTS,
     ORDER,
+    Gene,
     Genome,
     Model,
     advance_context,
-    is_start,
-    is_stop,
     junctions,
     oriented_cds,
     predict,
@@ -69,48 +71,84 @@ def _probabilities(count, anchor=None):
     )
 
 
-@njit(cache=True)
-def _seeds(sequence):
-    for frame in range(3):
-        start = -1
-        for p in range(frame, len(sequence) - 2, 3):
-            a, b, c = sequence[p], sequence[p + 1], sequence[p + 2]
-            if a == 4 or b == 4 or c == 4:
-                start = -1
-            elif is_stop(a, b, c):
-                if start >= 0 and p + 3 - start >= 330:
-                    yield start, p
-                start = -1
-            elif start < 0 and is_start(a, b, c):
-                start = p
+
+def seed_predictions(genome: Genome, path: str) -> dict[str, list[Gene]]:
+    opener = gzip.open if str(path).endswith(".gz") else open
+    groups: dict[tuple[str, str, str], list[tuple[int, int]]] = defaultdict(list)
+    qualities: dict[tuple[str, str, str], list[float]] = defaultdict(list)
+    with opener(path, "rt", encoding="utf-8") as handle:
+        for line in handle:
+            if line.startswith("#"):
+                continue
+            fields = line.rstrip("\r\n").split("\t")
+            if len(fields) != 9 or fields[2].lower() != "cds":
+                continue
+            seqid, strand = fields[0], fields[6]
+            if strand not in ("+", "-"):
+                raise ValueError(f"{path}: invalid strand {strand!r}")
+            first, last = int(fields[3]), int(fields[4])
+            if not 1 <= first <= last:
+                raise ValueError(f"{path}: invalid interval {first}-{last}")
+            attributes = {}
+            for part in fields[8].split(";"):
+                name, separator, value = part.strip().partition("=")
+                if separator and name == "Parent":
+                    attributes[name] = unquote(value)
+            parents = [p for p in attributes.get("Parent", "").split(",") if p]
+            if not parents:
+                raise ValueError(f"{path}: CDS lacks Parent=")
+            for parent in parents:
+                key = (seqid, strand, parent)
+                groups[key].append((first, last))
+                if fields[5] not in (".", ""):
+                    qualities[key].append(float(fields[5]))
+    result: dict[str, list[Gene]] = {name: [] for name in genome}
+    for key, spans in groups.items():
+        seqid, strand, _ = key
+        if seqid not in result:
+            continue
+        spans.sort()
+        cds = tuple((first - 1, last) for first, last in spans)
+        values = qualities[key]
+        score = ENTRY_COST * sum(values) / len(values) if values else ENTRY_COST
+        result[seqid].append(Gene(cds, strand, score))
+    return result
 
 
-def bootstrap(genome: Genome) -> Model:
+def from_seed(genome: Genome, predictions: dict[str, list[Gene]]) -> Model:
     background = np.zeros((N_CONTEXTS, 4))
     coding = np.zeros((3, N_CONTEXTS, 4))
-    for strands in genome.values():
+    lengths: list[int] = []
+    for name, strands in genome.items():
         length = len(strands[0].bases)
-        occupied = np.zeros(length, dtype=bool)
-        candidates = []
-        runs = ([], [])
-        for strand, record in enumerate(strands):
-            background += counts(record, [(0, length, 0, 1)])
-            for start, end in _seeds(record.bases):
-                lo, hi = (
-                    (start, end + 3)
-                    if strand == 0
-                    else (length - end - 3, length - start)
-                )
-                candidates.append((end - start, lo, hi, strand, start, end))
-        for _, lo, hi, strand, start, end in sorted(candidates, reverse=True):
-            if not occupied[lo:hi].any():
-                occupied[lo:hi] = True
-                runs[strand].append((start, end, 0, 1))
-        for record, selected in zip(strands, runs):
-            coding += counts(record, selected, 3)
+        gaps = list(_gaps(predictions[name], length))
+        reverse_gaps = [
+            (a, b, phase, weight)
+            for (a, b), (_, _, phase, weight) in zip(
+                reverse_spans([(a, b) for a, b, _, _ in gaps], length), reversed(gaps)
+            )
+        ]
+        for strand, record in enumerate((strands[0], strands[1])):
+            background += counts(record, gaps if strand == 0 else reverse_gaps)
+            runs = []
+            for gene in predictions[name]:
+                if (gene.strand == "-") != bool(strand):
+                    continue
+                cds = oriented_cds(gene, length)
+                phase = 0
+                for index, (a, b) in enumerate(cds):
+                    end = b if index < len(cds) - 1 else b - 3
+                    runs.append((a, end, phase, 1.0))
+                    if index:
+                        lengths.append(a - cds[index - 1][1])
+                    phase = (phase + end - a) % 3
+            coding += counts(record, runs, 3)
     background = _probabilities(background)
     prior = np.broadcast_to(background, coding.shape)
-    return Model(background, _probabilities(coding, prior) if coding.any() else prior)
+    coding = _probabilities(coding, prior) if coding.any() else prior
+    anchor = Model(background, coding)
+    mean, phase_prob = _duration(lengths, np.ones(len(lengths)), anchor)
+    return Model(background, coding, mean, phase_prob)
 
 
 def _gaps(predictions, length):
@@ -198,9 +236,9 @@ def refit(genome, predictions, anchor):
     return Model(background, coding, mean, phase_prob)
 
 
-def _fit_models(genome: Genome):
-    anchor = model = bootstrap(genome)
-    blind = predict(genome, model)
+def _fit_models(genome: Genome, initial: dict[str, list[Gene]]):
+    anchor = model = from_seed(genome, initial)
+    blind = initial
     for round_index in range(UPDATES + 1):
         sequences, sites, _ = _training_batch(genome, blind)
         reviewer = fit_reviewer(sequences, sites)
@@ -211,8 +249,9 @@ def _fit_models(genome: Genome):
         yield model, blind
 
 
-def fit(genome: Genome):
-    rounds = _fit_models(genome)
+def fit(genome: Genome, seed_path: str):
+    initial = seed_predictions(genome, seed_path)
+    rounds = _fit_models(genome, initial)
     model, predictions = next(rounds)
     for model, predictions in rounds:
         pass
