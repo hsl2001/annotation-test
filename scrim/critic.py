@@ -3,199 +3,147 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
-from numba import njit
-from numba.extending import register_jitable
 from scipy.optimize import minimize
-from scipy.special import expit, logit
+from scipy.special import expit
 
 from .cwt_features import PERIODS, W0, CwtFeatureBank, nucleotide_codes
 
 DONOR = 0
 ACCEPTOR = 1
 
-_MIN_PAIRS = 24
-_PSEUDO_NOISE = 0.005
-
 _BASE_OFFSETS = np.r_[-6:0, 2:6]
 _CWT_CHANNELS = 12 * len(PERIODS)
 
 
 @dataclass(frozen=True, slots=True)
-class SiteExample:
+class Site:
     seqid: str
     strand: int
     kind: int
     position: int
 
 
-def _check_kind(kind):
-    if kind not in (DONOR, ACCEPTOR):
-        raise ValueError(f"unknown splice-site kind: {kind!r}")
+@dataclass(frozen=True, slots=True)
+class Reviewer:
+    weights: np.ndarray | None
+
+    def score(self, bank: CwtFeatureBank, sites: list[Site]) -> np.ndarray:
+        if self.weights is None or not sites:
+            return np.zeros(len(sites), np.float64)
+        design = _features_batch(bank, sites)
+        design = np.hstack((design, np.ones((len(design), 1), np.float64)))
+        return design @ self.weights
 
 
-@register_jitable(inline="always")
-def _is_core(first, second, kind):
-    if kind == DONOR:
-        return (first == 2) & ((second == 3) | (second == 1))
-    return (first == 0) & (second == 2)
+def _onehot(sequence, position):
+    result = np.zeros(4 * len(_BASE_OFFSETS), np.float32)
+    for index, offset in enumerate(_BASE_OFFSETS):
+        p = position + offset
+        if 0 <= p < len(sequence) and sequence[p] < 4:
+            result[index * 4 + sequence[p]] = 1.0
+    return result
 
 
-@njit
-def _find_motifs(sequence, kind):
-    count = 0
-    for p in range(len(sequence) - 1):
-        count += _is_core(sequence[p], sequence[p + 1], kind)
-    sites = np.empty(count, dtype=np.intp)
-    i = 0
-    for p in range(len(sequence) - 1):
-        if _is_core(sequence[p], sequence[p + 1], kind):
-            sites[i] = p
-            i += 1
+def _features_batch(bank: CwtFeatureBank, sites: list[Site]) -> np.ndarray:
+    rows = []
+    for strand in (0, 1):
+        selected = [s for s in sites if s.strand == strand]
+        if not selected:
+            continue
+        sequence = bank.codes if strand == 0 else bank.reverse_codes
+        positions = np.array(
+            [s.position if strand == 0 else len(sequence) - 2 - s.position
+             for s in selected],
+            np.int64,
+        )
+        onehot = np.vstack([_onehot(sequence, p) for p in positions])
+        cwt = bank.gather(positions, np.zeros(len(positions), np.int8))[:, :_CWT_CHANNELS]
+        rows.append(np.hstack((onehot, cwt)))
+    return np.vstack(rows)
+
+
+def _features(bank: CwtFeatureBank, site: Site) -> np.ndarray:
+    return _features_batch(bank, [site])[0]
+
+
+def sites_from_annotation(transcripts, seqid: str, length: int) -> list[Site]:
+    sites = []
+    for transcript in transcripts:
+        if transcript.seqid != seqid:
+            continue
+        strand = int(transcript.strand == "-")
+        spans = transcript.spans.get("CDS") or transcript.spans["exon"]
+        for (a, b), (c, d) in zip(spans, spans[1:]):
+            if strand == 0:
+                donor = b
+                acceptor = c - 2
+            else:
+                donor = length - c + 1
+                acceptor = length - b - 2
+            sites.append(Site(seqid, strand, DONOR, donor))
+            sites.append(Site(seqid, strand, ACCEPTOR, acceptor))
     return sites
 
 
-def motif_sites(sequence: np.ndarray, kind: int) -> np.ndarray:
-    _check_kind(kind)
-    return _find_motifs(nucleotide_codes(sequence), kind)
+def candidate_sites(sequence: np.ndarray, kind: int) -> np.ndarray:
+    codes = nucleotide_codes(sequence)
+    if kind == DONOR:
+        return np.arange(1, len(codes) - 2, dtype=np.int64)
+    return np.arange(1, len(codes) - 2, dtype=np.int64)
 
 
-@njit(inline="always")
-def _base_at(sequence, position):
-    return sequence[position] if 0 <= position < len(sequence) else 4
+def fit(banks: dict[str, CwtFeatureBank], positives: list[Site], negatives: list[Site]) -> Reviewer:
+    if not positives or not negatives:
+        return Reviewer(None)
+    rows = []
+    labels = []
+    for seqid, bank in banks.items():
+        for strand in (0, 1):
+            selected = [s for s in positives + negatives if s.seqid == seqid and s.strand == strand]
+            if not selected:
+                continue
+            rows.append(_features_batch(bank, selected))
+            labels.append(np.array([1.0 if s in positives else 0.0 for s in selected]))
+    if not rows:
+        return Reviewer(None)
+    x = np.vstack(rows).astype(np.float64)
+    y = np.concatenate(labels)
+    x = np.hstack((x, np.ones((len(x), 1), np.float64)))
+    penalty = np.ones(x.shape[1], np.float64)
+    penalty[-1] = 0.0
 
-
-@njit
-def _onehot_batch(sequence, positions):
-    features = np.zeros((len(positions), 4 * len(_BASE_OFFSETS)), dtype=np.float32)
-    for i, p in enumerate(positions):
-        for j, offset in enumerate(_BASE_OFFSETS):
-            base = _base_at(sequence, p + offset)
-            if base < 4:
-                features[i, j * 4 + base] = 1.0
-    return features
-
-
-_CWT_CACHE = {}
-
-
-def _cwt_sites(sequence):
-    key = id(sequence)
-    entry = _CWT_CACHE.get(key)
-    if entry is None or entry[0] is not sequence:
-        sites = np.sort(
-            np.concatenate(
-                (motif_sites(sequence, DONOR), motif_sites(sequence, ACCEPTOR))
-            )
-        )
-        bank = CwtFeatureBank(sequence, PERIODS, W0)
-        cwt = bank.gather(sites, np.zeros(len(sites), dtype=np.int8))[:, :_CWT_CHANNELS]
-        entry = (sequence, sites, cwt)
-        _CWT_CACHE[key] = entry
-    return entry[1], entry[2]
-
-
-def _features(sequence, positions):
-    positions = np.asarray(positions, dtype=np.intp)
-    sites, cwt = _cwt_sites(sequence)
-    return np.hstack(
-        (_onehot_batch(sequence, positions), cwt[np.searchsorted(sites, positions)])
-    )
-
-
-def _linear(features, model):
-    return np.einsum("ij,j->i", features, model[:-1]) + model[-1]
-
-
-def _learned_evidence(prior, features, model):
-    raw = prior + _linear(features, model)
-    probability = _PSEUDO_NOISE + (1 - 2 * _PSEUDO_NOISE) * expit(raw)
-    return np.where(np.any(features, axis=1), logit(probability), prior)
-
-
-def _score_valid(sequence, positions, kind, model):
-    prior = np.zeros(len(positions), dtype=np.float64)
-    if model is None:
-        return prior
-    return _learned_evidence(prior, _features(sequence, positions), model)
-
-
-@dataclass(frozen=True, slots=True)
-class Reviewer:
-    _models: tuple[np.ndarray | None, np.ndarray | None]
-
-    def score(self, sequence: np.ndarray, positions, kind: int) -> np.ndarray:
-        """Log-odds evidence for oriented splice-site positions."""
-        _check_kind(kind)
-        positions = np.asarray(positions, dtype=np.intp)
-        model = self._models[kind]
-        if model is None or not len(positions):
-            return np.zeros(len(positions), dtype=np.float64)
-        valid = (
-            (positions >= 0)
-            & (positions < len(sequence) - 1)
-            & _is_core(
-                sequence[np.clip(positions, 0, len(sequence) - 2)],
-                sequence[np.clip(positions + 1, 0, len(sequence) - 1)],
-                kind,
-            )
-        )
-        evidence = np.zeros(len(positions), dtype=np.float64)
-        if valid.any():
-            evidence[valid] = _score_valid(sequence, positions[valid], kind, model)
-        return evidence
-
-
-def _fit(features, labels):
-    x = np.asarray(features, dtype=np.float64)
-    y = np.asarray(labels, dtype=np.float64)
-
-    def objective(model):
-        scores = x @ model[:-1] + model[-1]
-        loss = np.logaddexp(0, scores - 2 * y * scores).mean()
-        loss += 0.5 * (model[:-1] @ model[:-1]) / len(x)
-        error = (expit(scores) - y) / len(x)
-        gradient = np.r_[x.T @ error + model[:-1] / len(x), error.sum()]
+    def objective(weights):
+        logits = x @ weights
+        loss = np.mean(np.logaddexp(0.0, logits) - y * logits)
+        loss += 0.5 * np.dot(penalty * weights, weights) / len(y)
+        gradient = x.T @ (expit(logits) - y) / len(y)
+        gradient += penalty * weights / len(y)
         return loss, gradient
 
-    result = minimize(objective, np.zeros(x.shape[1] + 1), jac=True, method="L-BFGS-B")
-    return result.x if result.success else None
+    result = minimize(objective, np.zeros(x.shape[1]), jac=True, method="L-BFGS-B")
+    return Reviewer(result.x if result.success else None)
 
 
-def fit_reviewer(
-    sequences: dict[str, tuple[np.ndarray, np.ndarray]],
-    examples: list[SiteExample],
-) -> Reviewer:
-    if len(examples) < _MIN_PAIRS:
-        return Reviewer((None, None))
-    rng = np.random.default_rng(0)
-    models = []
-    for kind in (DONOR, ACCEPTOR):
-        positives = []
-        for example in examples:
-            if example.kind != kind or example.seqid not in sequences:
+def train(banks: dict[str, CwtFeatureBank], transcripts, rng=None) -> Reviewer:
+    rng = np.random.default_rng(0) if rng is None else rng
+    positives = []
+    negatives = []
+    for seqid, bank in banks.items():
+        length = len(bank.codes)
+        sites = sites_from_annotation(transcripts, seqid, length)
+        positives.extend(sites)
+        for kind in (DONOR, ACCEPTOR):
+            candidates = candidate_sites(bank.codes, kind)
+            count = sum(1 for s in sites if s.kind == kind)
+            if not count or not len(candidates):
                 continue
-            sequence = sequences[example.seqid][example.strand]
-            p = example.position
-            if 0 <= p < len(sequence) - 1 and _is_core(
-                sequence[p], sequence[p + 1], kind
-            ):
-                positives.append((example.seqid, example.strand, p))
-        if len(positives) < _MIN_PAIRS:
-            models.append(None)
-            continue
-        negatives = []
-        for name, strands in sequences.items():
-            for strand, sequence in enumerate(strands):
-                sites = motif_sites(sequence, kind)
-                if len(sites):
-                    chosen = rng.choice(
-                        len(sites), size=min(len(sites), len(positives)), replace=False
-                    )
-                    negatives.extend((name, strand, int(sites[i])) for i in chosen)
-        positive_set = set(positives)
-        rows, labels = [], []
-        for name, strand, p in positives + negatives:
-            rows.append(_features(sequences[name][strand], np.array([p]))[0])
-            labels.append(1.0 if (name, strand, p) in positive_set else 0.0)
-        models.append(_fit(rows, labels))
-    return Reviewer(tuple(models))
+            chosen = rng.choice(len(candidates), size=min(len(candidates), count), replace=False)
+            negatives.extend(Site(seqid, 0, kind, int(candidates[i])) for i in chosen)
+    return fit(banks, positives, negatives)
+
+
+def select(reviewer: Reviewer, bank: CwtFeatureBank, sites: list[Site]) -> list[Site]:
+    if not sites or reviewer.weights is None:
+        return sites
+    scores = reviewer.score(bank, sites)
+    return [site for site, score in zip(sites, scores) if score > 0]

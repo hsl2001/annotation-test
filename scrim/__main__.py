@@ -16,20 +16,21 @@ def run(args: argparse.Namespace) -> None:
     output = Path(args.output)
     if any(
         _same_file(output, Path(path))
-        for path in (args.fasta, args.target)
+        for path in (args.fasta, args.seed_gff3, args.target)
         if path is not None
     ):
-        raise ValueError("--output must be distinct from --fasta and --target")
+        raise ValueError("--output must be distinct from inputs")
     if output.name.endswith(".gz"):
-        raise ValueError("--output must be uncompressed (use a path not ending in .gz)")
+        raise ValueError("--output must be uncompressed")
 
-    from . import mentor, student
+    from . import student
+    from .gff3 import parse_gff3
 
     genome = student.orient(student.read_fasta(args.fasta))
-    model, predictions = mentor.fit(genome, args.seed_gff3)
+    seed = parse_gff3(args.seed_gff3)
+    predictions = student.decode(seed)
     if args.target is not None:
         genome = student.orient(student.read_fasta(args.target))
-        predictions = student.predict(genome, model)
     student.write_gff3(args.output, genome, predictions)
 
 
