@@ -49,9 +49,13 @@ for _kind, _motifs in MOTIFS.items():
     TABLES[_kind] = (_table, _lengths)
 
 DATASETS = (
-    ("arabidopsis", "data/truth.col.chr5.fasta.gz", "data/truth.col.chr5.gff3.gz"),
-    ("rice", "data/truth.nip.chr5.fasta.gz", "data/truth.nip.chr5.gff3.gz"),
-    ("tomato", "data/truth.slm.chr5.fasta.gz", "data/truth.slm.chr5.gff3.gz"),
+    (
+        "arabidopsis",
+        "data/truth.arabidopsis.chr5.fasta.gz",
+        "data/truth.arabidopsis.chr5.gff3.gz",
+    ),
+    ("rice", "data/truth.rice.chr5.fasta.gz", "data/truth.rice.chr5.gff3.gz"),
+    ("tomato", "data/truth.tomato.chr5.fasta.gz", "data/truth.tomato.chr5.gff3.gz"),
     ("human", "data/truth.human.chr21.fasta.gz", "data/truth.human.chr21.gff3.gz"),
     ("mouse", "data/truth.mouse.chr19.fasta.gz", "data/truth.mouse.chr19.gff3.gz"),
     ("zebrafish", "data/truth.zebrafish.chr25.fasta.gz", "data/truth.zebrafish.chr25.gff3.gz"),

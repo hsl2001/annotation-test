@@ -38,9 +38,12 @@ MATCH_THRESHOLD = 0.3
 TEMPLATE_PATH = "splice_templates_train_100genes.npz"
 PLOT_PATH = "splice_sn_pr_human_vp.png"
 DATASETS = {
-    "arabidopsis": ("data/truth.col.chr5.fasta.gz", "data/truth.col.chr5.gff3.gz"),
-    "rice": ("data/truth.nip.chr5.fasta.gz", "data/truth.nip.chr5.gff3.gz"),
-    "tomato": ("data/truth.slm.chr5.fasta.gz", "data/truth.slm.chr5.gff3.gz"),
+    "arabidopsis": (
+        "data/truth.arabidopsis.chr5.fasta.gz",
+        "data/truth.arabidopsis.chr5.gff3.gz",
+    ),
+    "rice": ("data/truth.rice.chr5.fasta.gz", "data/truth.rice.chr5.gff3.gz"),
+    "tomato": ("data/truth.tomato.chr5.fasta.gz", "data/truth.tomato.chr5.gff3.gz"),
     "human": ("data/truth.human.chr21.fasta.gz", "data/truth.human.chr21.gff3.gz"),
     "mouse": ("data/truth.mouse.chr19.fasta.gz", "data/truth.mouse.chr19.gff3.gz"),
     "zebrafish": (
