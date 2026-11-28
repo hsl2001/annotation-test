@@ -2,37 +2,9 @@ import argparse
 import zlib
 from pathlib import Path
 
-
-def _same_file(a: Path, b: Path) -> bool:
-    if a.resolve() == b.resolve():
-        return True
-    try:
-        return a.samefile(b)
-    except FileNotFoundError:
-        return False
-
-
 def run(args: argparse.Namespace) -> None:
-    output = Path(args.output)
-    if any(
-        _same_file(output, Path(path))
-        for path in (args.fasta, args.seed_gff3, args.target)
-        if path is not None
-    ):
-        raise ValueError("--output must be distinct from inputs")
-    if output.name.endswith(".gz"):
-        raise ValueError("--output must be uncompressed")
-
-    from . import student
-    from .gff3 import parse_gff3
-
-    genome = student.orient(student.read_fasta(args.fasta))
-    seed = parse_gff3(args.seed_gff3)
-    predictions = student.decode(seed)
-    if args.target is not None:
-        genome = student.orient(student.read_fasta(args.target))
-    student.write_gff3(args.output, genome, predictions)
-
+    # TODO
+    return None
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False)

@@ -115,3 +115,33 @@ def parse_gff3(path: str) -> list[Transcript]:
         cds = merge(t.spans.get("CDS", []))
         t.spans = {"exon": cds or merge(t.spans.get("exon", [])), "CDS": cds}
     return list(models.values())
+
+
+def write_gff3(path: str, transcripts: list[Transcript]) -> None:
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write("##gff-version 3\n")
+        for index, transcript in enumerate(transcripts, 1):
+            gid = f"gene{index}"
+            tid = f"{gid}.t1"
+            seqid = transcript.seqid
+            strand = transcript.strand
+            spans = transcript.spans.get("CDS") or transcript.spans["exon"]
+            start, end = spans[0][0], spans[-1][1]
+            handle.write(
+                f"{seqid}\tgff3\tgene\t{start}\t{end}\t.\t{strand}\t.\tID={gid}\n"
+            )
+            handle.write(
+                f"{seqid}\tgff3\tmRNA\t{start}\t{end}\t.\t{strand}\t.\t"
+                f"ID={tid};Parent={gid}\n"
+            )
+            phase = 0
+            ordered = spans if strand == "+" else tuple(reversed(spans))
+            for a, b in ordered:
+                handle.write(
+                    f"{seqid}\tgff3\texon\t{a}\t{b}\t.\t{strand}\t.\tParent={tid}\n"
+                )
+                handle.write(
+                    f"{seqid}\tgff3\tCDS\t{a}\t{b}\t.\t{strand}\t{phase}\t"
+                    f"Parent={tid}\n"
+                )
+                phase = (phase - (b - a + 1)) % 3
